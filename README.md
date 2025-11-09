@@ -103,10 +103,11 @@ Minimal commands and packages referenced by this README.
 
 ```bash
 # Node, npm/yarn, Git and Docker: install from official sites (no npm command)
-# Expo & EAS CLIs (optional, used for mobile builds)
-npm install -g expo-cli eas-cli
+# Expo CLI is now deprecated - use npx expo instead
+# EAS CLI (for mobile builds)
+npm install -g eas-cli
 # or with yarn
-yarn global add expo-cli eas-cli
+yarn global add eas-cli
 ```
 
 2. Backend (from c:\...\MedGuide\backend)
@@ -118,13 +119,13 @@ cd backend
 npm install express cors dotenv @supabase/supabase-js axios
 
 # AI / OCR (choose one or both)
-# OpenAI
-npm install openai
+# Google Generative AI (Gemini)
+npm install @google/generative-ai
 # Google Cloud Vision (if using Google Cloud)
 npm install @google-cloud/vision
 
 # dev / TypeScript tooling
-npm install -D typescript ts-node-dev @types/node @types/express
+npm install -D typescript ts-node-dev @types/node @types/express @types/cors
 ```
 
 3. Mobile (from c:\...\MedGuide\mobile) — Expo managed workflow
@@ -133,15 +134,18 @@ npm install -D typescript ts-node-dev @types/node @types/express
 cd mobile
 
 # main deps (Expo provides react-native)
-npm install axios i18n-js
+npm install axios
 
 # navigation (minimal)
 npm install @react-navigation/native @react-navigation/native-stack
 # install native dependencies via expo
-expo install react-native-screens react-native-safe-area-context react-native-gesture-handler react-native-reanimated
+npx expo install react-native-screens react-native-safe-area-context react-native-gesture-handler react-native-reanimated
 
 # camera & storage
-expo install expo-camera @react-native-async-storage/async-storage
+npx expo install expo-camera @react-native-async-storage/async-storage
+
+# i18n (internationalization)
+npm install i18next react-i18next
 
 # TypeScript (if using TS)
 npm install -D typescript @types/react @types/react-native
@@ -150,9 +154,10 @@ npm install -D typescript @types/react @types/react-native
 4. Notes / optional packages
 
 - For database interaction: @supabase/supabase-js (backend).
-- For AI: openai (OpenAI) or Google client libs for Gemini; pick according to your provider and API keys.
+- For AI: openai (OpenAI) or @google/generative-ai (Gemini); pick according to your provider and API keys.
 - For containerized backend: Docker and docker-compose (no npm package).
 - Use yarn instead of npm if preferred; replace npm install with yarn add and npm install -D with yarn add -D.
+- **Important**: Always use `npx expo` instead of `expo-cli` (deprecated as of SDK 46+).
 
 ---
 
