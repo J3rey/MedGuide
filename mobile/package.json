@@ -10,7 +10,11 @@
     "web": "expo start --web",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["medguide", "medication", "mobile"],
+  "keywords": [
+    "medguide",
+    "medication",
+    "mobile"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
