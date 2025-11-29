@@ -2,13 +2,17 @@ import React, { useState } from "react";
 import { StyleSheet, View, StatusBar } from "react-native";
 import LoginScreen from "./src/screens/LoginScreen";
 import MainApp from "./src/components/MainApp";
+import theme from "./src/styles/theme";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F9FAFB" />
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor={theme.colors.background}
+      />
       {!isLoggedIn ? (
         <LoginScreen onLogin={() => setIsLoggedIn(true)} />
       ) : (
@@ -21,6 +25,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: theme.colors.background,
   },
 });

@@ -4,7 +4,34 @@
  * across the MedGuide mobile application.
  */
 
-export const colors = {
+type ColorPalette = {
+  background: string;
+  foreground: string;
+  card: string;
+  cardForeground: string;
+  primary: string;
+  primaryForeground: string;
+  secondary: string;
+  secondaryForeground: string;
+  muted: string;
+  mutedForeground: string;
+  accent: string;
+  accentForeground: string;
+  destructive: string;
+  destructiveForeground: string;
+  border: string;
+  input: string;
+  inputBackground: string;
+  switchBackground: string;
+  ring: string;
+  chart1: string;
+  chart2: string;
+  chart3: string;
+  chart4: string;
+  chart5: string;
+};
+
+export const colors: ColorPalette = {
   // Base colors
   background: '#ffffff',
   foreground: '#030213',
@@ -54,7 +81,7 @@ export const colors = {
   chart5: '#f08a5d',
 };
 
-export const darkColors = {
+export const darkColors: Omit<ColorPalette, 'chart1' | 'chart2' | 'chart3' | 'chart4' | 'chart5'> = {
   background: '#030213',
   foreground: '#fafafa',
   card: '#030213',
@@ -75,8 +102,31 @@ export const darkColors = {
   ring: '#666666',
 };
 
-export const typography = {
-  // Font sizes
+type Typography = {
+  fontSize: {
+    xs: number;
+    sm: number;
+    base: number;
+    lg: number;
+    xl: number;
+    '2xl': number;
+    '3xl': number;
+    '4xl': number;
+  };
+  fontWeight: {
+    normal: '400';
+    medium: '500';
+    semibold: '600';
+    bold: '700';
+  };
+  lineHeight: {
+    tight: number;
+    normal: number;
+    relaxed: number;
+  };
+};
+
+export const typography: Typography = {
   fontSize: {
     xs: 12,
     sm: 14,
@@ -87,16 +137,12 @@ export const typography = {
     '3xl': 30,
     '4xl': 36,
   },
-  
-  // Font weights
   fontWeight: {
-    normal: '400' as const,
-    medium: '500' as const,
-    semibold: '600' as const,
-    bold: '700' as const,
+    normal: '400',
+    medium: '500',
+    semibold: '600',
+    bold: '700',
   },
-  
-  // Line heights
   lineHeight: {
     tight: 1.25,
     normal: 1.5,
@@ -104,7 +150,20 @@ export const typography = {
   },
 };
 
-export const spacing = {
+type Spacing = {
+  xs: number;
+  sm: number;
+  md: number;
+  base: number;
+  lg: number;
+  xl: number;
+  '2xl': number;
+  '3xl': number;
+  '4xl': number;
+  '5xl': number;
+};
+
+export const spacing: Spacing = {
   xs: 4,
   sm: 8,
   md: 12,
@@ -117,15 +176,38 @@ export const spacing = {
   '5xl': 64,
 };
 
-export const radius = {
-  sm: 6, // calc(10px - 4px)
-  md: 8, // calc(10px - 2px)
-  lg: 10, // base radius
-  xl: 14, // calc(10px + 4px)
+type Radius = {
+  sm: number;
+  md: number;
+  lg: number;
+  xl: number;
+  full: number;
+};
+
+export const radius: Radius = {
+  sm: 6,
+  md: 8,
+  lg: 10,
+  xl: 14,
   full: 9999,
 };
 
-export const shadows = {
+type Shadow = {
+  shadowColor: string;
+  shadowOffset: { width: number; height: number };
+  shadowOpacity: number;
+  shadowRadius: number;
+  elevation: number;
+};
+
+type Shadows = {
+  sm: Shadow;
+  base: Shadow;
+  md: Shadow;
+  lg: Shadow;
+};
+
+export const shadows: Shadows = {
   sm: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -156,8 +238,16 @@ export const shadows = {
   },
 };
 
-// Export default theme
-export const theme = {
+type Theme = {
+  colors: ColorPalette;
+  darkColors: Omit<ColorPalette, 'chart1' | 'chart2' | 'chart3' | 'chart4' | 'chart5'>;
+  typography: Typography;
+  spacing: Spacing;
+  radius: Radius;
+  shadows: Shadows;
+};
+
+export const theme: Theme = {
   colors,
   darkColors,
   typography,

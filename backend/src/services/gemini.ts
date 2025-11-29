@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
-export const chat = async (message: string, language: string = 'en') => {
+export const chat = async (message: string, language: string = 'en'): Promise<string> => {
   const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
   
   const prompt = `You are a helpful medical assistant. Answer the following question about medications in ${language}:\n\n${message}`;

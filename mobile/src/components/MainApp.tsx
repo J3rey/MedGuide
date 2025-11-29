@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import BottomNavigation from "../components/BottomNavigation";
+import BottomNavigation from "./BottomNavigation";
 import HomeScreen from "../screens/HomeScreen";
 import ScanScreen from "../screens/ScanScreen";
 import HistoryScreen from "../screens/HistoryScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import theme from "../styles/theme";
 
 interface MainAppProps {
   onLogout: () => void;
@@ -39,7 +40,7 @@ export default function MainApp({ onLogout }: MainAppProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: theme.colors.background,
   },
   content: {
     flex: 1,

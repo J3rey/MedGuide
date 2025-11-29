@@ -31,7 +31,7 @@ export default function BottomNavigation({
         return (
           <TouchableOpacity
             key={tab.id}
-            style={[styles.tab, isActive && styles.activeTab]}
+            style={styles.tab}
             onPress={() => onTabChange(tab.id)}
             activeOpacity={0.7}
           >
@@ -67,9 +67,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     paddingVertical: theme.spacing.xs,
-  },
-  activeTab: {
-    // Additional styling for active tab if needed
   },
   iconContainer: {
     width: 48,
