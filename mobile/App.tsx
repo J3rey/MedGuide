@@ -1,11 +1,19 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, StatusBar } from "react-native";
+import LoginScreen from "./src/screens/LoginScreen";
+import MainApp from "./src/components/MainApp";
 
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>MedGuide</Text>
-      <Text style={styles.subtitle}>Medication Management App</Text>
+      <StatusBar barStyle="dark-content" backgroundColor="#F9FAFB" />
+      {!isLoggedIn ? (
+        <LoginScreen onLogin={() => setIsLoggedIn(true)} />
+      ) : (
+        <MainApp onLogout={() => setIsLoggedIn(false)} />
+      )}
     </View>
   );
 }
@@ -13,17 +21,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
+    backgroundColor: "#F9FAFB",
   },
 });
