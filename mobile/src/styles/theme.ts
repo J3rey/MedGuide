@@ -1,7 +1,6 @@
 /**
  * Design System Theme - Based on Figma Design Tokens
- * This theme provides consistent colors, typography, spacing, and other design tokens
- * across the MedGuide mobile application.
+ * Converted from globals.css to React Native compatible theme
  */
 
 type ColorPalette = {
@@ -9,6 +8,8 @@ type ColorPalette = {
   foreground: string;
   card: string;
   cardForeground: string;
+  popover: string;
+  popoverForeground: string;
   primary: string;
   primaryForeground: string;
   secondary: string;
@@ -29,63 +30,60 @@ type ColorPalette = {
   chart3: string;
   chart4: string;
   chart5: string;
+  sidebar: string;
+  sidebarForeground: string;
+  sidebarPrimary: string;
+  sidebarPrimaryForeground: string;
+  sidebarAccent: string;
+  sidebarAccentForeground: string;
+  sidebarBorder: string;
+  sidebarRing: string;
 };
 
 export const colors: ColorPalette = {
-  // Base colors
   background: '#ffffff',
   foreground: '#030213',
-  
-  // Card colors
   card: '#ffffff',
   cardForeground: '#030213',
-  
-  // Primary brand colors
+  popover: '#ffffff',
+  popoverForeground: '#030213',
   primary: '#030213',
   primaryForeground: '#ffffff',
-  
-  // Secondary colors
   secondary: '#f3f3f5',
   secondaryForeground: '#030213',
-  
-  // Muted colors (for subtle text/backgrounds)
   muted: '#ececf0',
   mutedForeground: '#717182',
-  
-  // Accent colors (for highlights)
   accent: '#e9ebef',
   accentForeground: '#030213',
-  
-  // Destructive/Error colors
   destructive: '#d4183d',
   destructiveForeground: '#ffffff',
-  
-  // Border colors
   border: 'rgba(0, 0, 0, 0.1)',
-  
-  // Input colors
   input: 'transparent',
   inputBackground: '#f3f3f5',
-  
-  // Switch/Toggle colors
   switchBackground: '#cbced4',
-  
-  // Ring/Focus colors
   ring: 'rgba(0, 0, 0, 0.3)',
-  
-  // Chart colors
   chart1: '#ff8c42',
   chart2: '#5eb3d6',
   chart3: '#2d4a6d',
   chart4: '#f4e04d',
   chart5: '#f08a5d',
+  sidebar: '#fafafa',
+  sidebarForeground: '#030213',
+  sidebarPrimary: '#030213',
+  sidebarPrimaryForeground: '#fafafa',
+  sidebarAccent: '#f7f7f7',
+  sidebarAccentForeground: '#1a1a1a',
+  sidebarBorder: '#e5e5e5',
+  sidebarRing: 'rgba(0, 0, 0, 0.3)',
 };
 
-export const darkColors: Omit<ColorPalette, 'chart1' | 'chart2' | 'chart3' | 'chart4' | 'chart5'> = {
+export const darkColors: ColorPalette = {
   background: '#030213',
   foreground: '#fafafa',
   card: '#030213',
   cardForeground: '#fafafa',
+  popover: '#030213',
+  popoverForeground: '#fafafa',
   primary: '#fafafa',
   primaryForeground: '#1a1a1a',
   secondary: '#2a2a2a',
@@ -99,7 +97,21 @@ export const darkColors: Omit<ColorPalette, 'chart1' | 'chart2' | 'chart3' | 'ch
   border: '#2a2a2a',
   input: '#2a2a2a',
   inputBackground: '#2a2a2a',
+  switchBackground: '#4b5563',
   ring: '#666666',
+  chart1: '#60a5fa',
+  chart2: '#86efac',
+  chart3: '#f08a5d',
+  chart4: '#c084fc',
+  chart5: '#fb923c',
+  sidebar: '#1a1a1a',
+  sidebarForeground: '#fafafa',
+  sidebarPrimary: '#60a5fa',
+  sidebarPrimaryForeground: '#fafafa',
+  sidebarAccent: '#2a2a2a',
+  sidebarAccentForeground: '#fafafa',
+  sidebarBorder: '#2a2a2a',
+  sidebarRing: '#666666',
 };
 
 type Typography = {
@@ -240,7 +252,7 @@ export const shadows: Shadows = {
 
 type Theme = {
   colors: ColorPalette;
-  darkColors: Omit<ColorPalette, 'chart1' | 'chart2' | 'chart3' | 'chart4' | 'chart5'>;
+  darkColors: ColorPalette;
   typography: Typography;
   spacing: Spacing;
   radius: Radius;
