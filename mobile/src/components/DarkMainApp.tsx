@@ -9,10 +9,10 @@ import theme from "../styles/theme";
 type Tab = "schedule" | "camera" | "chat";
 
 interface DarkMainAppProps {
-  onLogout: () => void;
+  onBack: () => void;
 }
 
-export default function DarkMainApp({ onLogout }: DarkMainAppProps) {
+export default function DarkMainApp({ onBack }: DarkMainAppProps) {
   const [activeTab, setActiveTab] = useState<Tab>("camera");
 
   const renderContent = (): React.JSX.Element => {
@@ -33,7 +33,7 @@ export default function DarkMainApp({ onLogout }: DarkMainAppProps) {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.settingsButton}
-          onPress={onLogout}
+          onPress={onBack}
           activeOpacity={0.7}
         >
           <Text style={styles.settingsIcon}>⚙️</Text>

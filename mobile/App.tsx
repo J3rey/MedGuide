@@ -4,7 +4,7 @@ import LanguageSelectionScreen from "./src/screens/LanguageSelectionScreen";
 import DarkMainApp from "./src/components/DarkMainApp";
 import theme from "./src/styles/theme";
 
-type AppState = "language" | "login" | "main" | "dark";
+type AppState = "language" | "main";
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>("language");
@@ -12,14 +12,10 @@ export default function App() {
 
   const handleLanguageSelect = (code: string): void => {
     setSelectedLanguage(code);
-    setAppState("login");
+    setAppState("main");
   };
 
-  const handleLogin = (): void => {
-    setAppState("dark");
-  };
-
-  const handleLogout = (): void => {
+  const handleBack = (): void => {
     setAppState("language");
     setSelectedLanguage(null);
   };
@@ -27,9 +23,9 @@ export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar
-        barStyle={appState === "dark" ? "light-content" : "dark-content"}
+        barStyle={appState === "main" ? "light-content" : "dark-content"}
         backgroundColor={
-          appState === "dark"
+          appState === "main"
             ? theme.darkColors.background
             : theme.colors.background
         }
@@ -37,6 +33,7 @@ export default function App() {
       {appState === "language" && (
         <LanguageSelectionScreen onLanguageSelect={handleLanguageSelect} />
       )}
+      {appState === "main" && <DarkMainApp onBack={handleBack} />}
     </View>
   );
 }
