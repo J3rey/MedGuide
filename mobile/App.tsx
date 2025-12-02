@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, View, StatusBar } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import LanguageSelectionScreen from "./src/screens/LanguageSelectionScreen";
 import DarkMainApp from "./src/components/DarkMainApp";
 import theme from "./src/styles/theme";
@@ -21,20 +22,22 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar
-        barStyle={appState === "main" ? "light-content" : "dark-content"}
-        backgroundColor={
-          appState === "main"
-            ? theme.darkColors.background
-            : theme.colors.background
-        }
-      />
-      {appState === "language" && (
-        <LanguageSelectionScreen onLanguageSelect={handleLanguageSelect} />
-      )}
-      {appState === "main" && <DarkMainApp onBack={handleBack} />}
-    </View>
+    <SafeAreaProvider>
+      <View style={styles.container}>
+        <StatusBar
+          barStyle={appState === "main" ? "light-content" : "dark-content"}
+          backgroundColor={
+            appState === "main"
+              ? theme.darkColors.background
+              : theme.colors.background
+          }
+        />
+        {appState === "language" && (
+          <LanguageSelectionScreen onLanguageSelect={handleLanguageSelect} />
+        )}
+        {appState === "main" && <DarkMainApp onBack={handleBack} />}
+      </View>
+    </SafeAreaProvider>
   );
 }
 

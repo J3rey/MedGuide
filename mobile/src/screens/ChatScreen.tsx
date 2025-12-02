@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  useWindowDimensions,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import theme from "../styles/theme";
 
 interface ChatMessage {
@@ -29,6 +31,8 @@ export default function ChatScreen(): React.JSX.Element {
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const scrollViewRef = useRef<ScrollView>(null);
+  const { width: screenWidth } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -57,13 +61,24 @@ export default function ChatScreen(): React.JSX.Element {
     }
   };
 
+  const containerPadding = screenWidth > 768 ? 48 : 24;
+  const maxContentWidth = screenWidth > 768 ? 800 : screenWidth;
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
-      <View style={styles.header}>
+      <View
+        style={[
+          styles.header,
+          {
+            paddingHorizontal: containerPadding,
+            paddingTop: Math.max(insets.top, 16) + 80,
+          },
+        ]}
+      >
         <View style={styles.headerContent}>
           <Text style={styles.headerIcon}>💬</Text>
           <View>
@@ -78,7 +93,15 @@ export default function ChatScreen(): React.JSX.Element {
       <ScrollView
         ref={scrollViewRef}
         style={styles.messagesContainer}
-        contentContainerStyle={styles.messagesContent}
+        contentContainerStyle={[
+          styles.messagesContent,
+          {
+            paddingHorizontal: containerPadding,
+            maxWidth: maxContentWidth,
+            alignSelf: "center",
+            width: "100%",
+          },
+        ]}
         onContentSizeChange={() =>
           scrollViewRef.current?.scrollToEnd({ animated: true })
         }
@@ -116,7 +139,17 @@ export default function ChatScreen(): React.JSX.Element {
         ))}
       </ScrollView>
 
-      <View style={styles.inputContainer}>
+      <View
+        style={[
+          styles.inputContainer,
+          {
+            paddingHorizontal: containerPadding,
+            maxWidth: maxContentWidth,
+            alignSelf: "center",
+            width: "100%",
+          },
+        ]}
+      >
         <TextInput
           style={styles.input}
           value={inputMessage}

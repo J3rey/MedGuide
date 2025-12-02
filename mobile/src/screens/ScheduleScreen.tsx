@@ -7,7 +7,10 @@ import {
   TouchableOpacity,
   TextInput,
   Switch,
+  useWindowDimensions,
+  Platform,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import theme from "../styles/theme";
 
 interface Alarm {
@@ -19,6 +22,8 @@ interface Alarm {
 }
 
 export default function ScheduleScreen(): React.JSX.Element {
+  const { width: screenWidth } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const [alarms, setAlarms] = useState<Alarm[]>([
     {
       id: 1,
@@ -74,10 +79,17 @@ export default function ScheduleScreen(): React.JSX.Element {
     setAlarms(alarms.filter((alarm) => alarm.id !== id));
   };
 
+  const containerPadding = screenWidth > 768 ? 48 : 24;
+  const maxContentWidth =
+    screenWidth > 768 ? 800 : screenWidth - containerPadding * 2;
+
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={{ paddingTop: Math.max(insets.top, 16) + 80 }}
+      >
+        <View style={[styles.header, { paddingHorizontal: containerPadding }]}>
           <View style={styles.headerLeft}>
             <Text style={styles.bellIcon}>🔔</Text>
             <Text style={styles.title}>Medication Alarms</Text>
@@ -91,7 +103,17 @@ export default function ScheduleScreen(): React.JSX.Element {
         </View>
 
         {showAddAlarm && (
-          <View style={styles.addAlarmCard}>
+          <View
+            style={[
+              styles.addAlarmCard,
+              {
+                marginHorizontal: containerPadding,
+                maxWidth: maxContentWidth,
+                alignSelf: "center",
+                width: "100%",
+              },
+            ]}
+          >
             <Text style={styles.addAlarmTitle}>Add New Alarm</Text>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Time</Text>
@@ -130,7 +152,17 @@ export default function ScheduleScreen(): React.JSX.Element {
           </View>
         )}
 
-        <View style={styles.alarmsList}>
+        <View
+          style={[
+            styles.alarmsList,
+            {
+              paddingHorizontal: containerPadding,
+              maxWidth: maxContentWidth,
+              alignSelf: "center",
+              width: "100%",
+            },
+          ]}
+        >
           {alarms.map((alarm) => (
             <View key={alarm.id} style={styles.alarmCard}>
               <View style={styles.alarmContent}>

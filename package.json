@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/J3rey/MedGuide/issues"
   },
-  "homepage": "https://github.com/J3rey/MedGuide#readme"
+  "homepage": "https://github.com/J3rey/MedGuide#readme",
+  "dependencies": {
+    "react-native-safe-area-context": "^5.6.2"
+  }
 }
