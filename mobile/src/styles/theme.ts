@@ -97,7 +97,7 @@ export const darkColors: ColorPalette = {
   border: '#2a2a2a',
   input: '#2a2a2a',
   inputBackground: '#2a2a2a',
-  switchBackground: '#4b5563',
+  switchBackground: '#cbced4',
   ring: '#666666',
   chart1: '#60a5fa',
   chart2: '#86efac',
