@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import theme from "../styles/theme";
 
 interface Language {
@@ -16,10 +17,10 @@ interface Language {
 
 const languages: Language[] = [
   { code: "en", name: "English", flag: "🇬🇧" },
-  { code: "zh", name: "Chinese", flag: "🇨🇳" },
-  { code: "ko", name: "Korean", flag: "🇰🇷" },
-  { code: "es", name: "Spanish", flag: "🇪🇸" },
-  { code: "it", name: "Italian", flag: "🇮🇹" },
+  { code: "zh", name: "中文", flag: "🇨🇳" },
+  { code: "ko", name: "한국어", flag: "🇰🇷" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
+  { code: "it", name: "Italiano", flag: "🇮🇹" },
 ];
 
 interface LanguageSelectionScreenProps {
@@ -28,12 +29,14 @@ interface LanguageSelectionScreenProps {
 
 export default function LanguageSelectionScreen({
   onLanguageSelect,
-}: LanguageSelectionScreenProps) {
+}: LanguageSelectionScreenProps): React.JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>MedGuide</Text>
-        <Text style={styles.subtitle}>Select your preferred language</Text>
+        <Text style={styles.title}>{t("languageSelection.title")}</Text>
+        <Text style={styles.subtitle}>{t("languageSelection.subtitle")}</Text>
       </View>
 
       <ScrollView

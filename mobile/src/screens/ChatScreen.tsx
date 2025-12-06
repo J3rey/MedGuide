@@ -11,7 +11,9 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 import theme from "../styles/theme";
+import { medicationApi } from "../services/api";
 
 interface ChatMessage {
   id: number;
@@ -21,10 +23,11 @@ interface ChatMessage {
 }
 
 export default function ChatScreen(): React.JSX.Element {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 1,
-      text: "Hello! I'm your Medguide assistant. How can I help you today?",
+      text: t("chat.greeting"),
       sender: "bot",
       timestamp: new Date(),
     },
@@ -38,7 +41,7 @@ export default function ChatScreen(): React.JSX.Element {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
-  const sendMessage = (): void => {
+  const sendMessage = async (): Promise<void> => {
     if (inputMessage.trim()) {
       const userMessage: ChatMessage = {
         id: Date.now(),
@@ -47,17 +50,27 @@ export default function ChatScreen(): React.JSX.Element {
         timestamp: new Date(),
       };
       setMessages([...messages, userMessage]);
+      const messageText = inputMessage;
       setInputMessage("");
 
-      setTimeout(() => {
+      try {
+        const response = await medicationApi.sendChatMessage(messageText);
         const botMessage: ChatMessage = {
           id: Date.now() + 1,
-          text: "I understand you have a question about your medication. Please consult with your healthcare provider for specific medical advice.",
+          text: response.message,
           sender: "bot",
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, botMessage]);
-      }, 1000);
+      } catch (error) {
+        const botMessage: ChatMessage = {
+          id: Date.now() + 1,
+          text: t("chat.defaultResponse"),
+          sender: "bot",
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, botMessage]);
+      }
     }
   };
 
@@ -82,10 +95,8 @@ export default function ChatScreen(): React.JSX.Element {
         <View style={styles.headerContent}>
           <Text style={styles.headerIcon}>💬</Text>
           <View>
-            <Text style={styles.headerTitle}>Medical Assistant</Text>
-            <Text style={styles.headerSubtitle}>
-              Ask about your medications
-            </Text>
+            <Text style={styles.headerTitle}>{t("chat.title")}</Text>
+            <Text style={styles.headerSubtitle}>{t("chat.subtitle")}</Text>
           </View>
         </View>
       </View>
@@ -154,7 +165,7 @@ export default function ChatScreen(): React.JSX.Element {
           style={styles.input}
           value={inputMessage}
           onChangeText={setInputMessage}
-          placeholder="Type your question..."
+          placeholder={t("chat.placeholder")}
           placeholderTextColor={theme.darkColors.mutedForeground}
           multiline
           maxLength={500}

@@ -1,10 +1,50 @@
 {
-  "welcome": "欢迎使用医疗指南",
-  "scan_prescription": "扫描处方",
-  "chat": "聊天",
-  "reminders": "提醒",
-  "settings": "设置",
-  "language": "语言",
-  "english": "English",
-  "chinese": "中文"
+  "common": {
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "add": "添加",
+    "edit": "编辑",
+    "done": "完成",
+    "back": "返回"
+  },
+  "languageSelection": {
+    "title": "医疗指南",
+    "subtitle": "选择您的首选语言"
+  },
+  "navigation": {
+    "schedule": "日程",
+    "camera": "相机",
+    "chat": "聊天"
+  },
+  "schedule": {
+    "title": "用药时间表",
+    "subtitle": "管理您的用药提醒",
+    "addAlarm": "添加新闹钟",
+    "time": "时间",
+    "medication": "药物",
+    "days": "天数",
+    "daily": "每天",
+    "noAlarms": "未设置闹钟",
+    "mon": "周一",
+    "tue": "周二",
+    "wed": "周三",
+    "thu": "周四",
+    "fri": "周五",
+    "sat": "周六",
+    "sun": "周日"
+  },
+  "camera": {
+    "title": "扫描处方",
+    "subtitle": "拍摄您的处方照片",
+    "takePicture": "拍照",
+    "scanPrescription": "扫描处方"
+  },
+  "chat": {
+    "title": "医疗助手",
+    "subtitle": "询问有关您的药物",
+    "placeholder": "输入您的问题...",
+    "greeting": "您好！我是您的医疗指南助手。今天我能帮您什么？",
+    "defaultResponse": "我了解您对药物有疑问。请咨询您的医疗保健提供者以获取具体的医疗建议。"
+  }
 }

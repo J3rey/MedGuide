@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Platform,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import theme from "../styles/theme";
 
 type Tab = "schedule" | "camera" | "chat";
@@ -18,11 +19,13 @@ interface DarkBottomNavigationProps {
 export default function DarkBottomNavigation({
   activeTab,
   onTabChange,
-}: DarkBottomNavigationProps) {
+}: DarkBottomNavigationProps): React.JSX.Element {
+  const { t } = useTranslation();
+
   const tabs = [
-    { id: "schedule" as Tab, label: "Schedule", icon: "⏰" },
-    { id: "camera" as Tab, label: "Camera", icon: "📷" },
-    { id: "chat" as Tab, label: "Chat", icon: "💬" },
+    { id: "schedule" as Tab, label: t("navigation.schedule"), icon: "⏰" },
+    { id: "camera" as Tab, label: t("navigation.camera"), icon: "📷" },
+    { id: "chat" as Tab, label: t("navigation.chat"), icon: "💬" },
   ];
 
   return (

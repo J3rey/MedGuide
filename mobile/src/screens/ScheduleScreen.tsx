@@ -11,38 +11,41 @@ import {
   Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 import theme from "../styles/theme";
+import { getLocalizedMedicationName } from "../services/medicationService";
 
 interface Alarm {
   id: number;
   time: string;
-  medication: string;
+  medicationId: string;
   enabled: boolean;
   days: string[];
 }
 
 export default function ScheduleScreen(): React.JSX.Element {
+  const { t } = useTranslation();
   const { width: screenWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [alarms, setAlarms] = useState<Alarm[]>([
     {
       id: 1,
       time: "08:00",
-      medication: "Aspirin",
+      medicationId: "aspirin",
       enabled: true,
       days: ["Mon", "Wed", "Fri"],
     },
     {
       id: 2,
       time: "14:00",
-      medication: "Vitamin D",
+      medicationId: "vitamin-d",
       enabled: true,
       days: ["Daily"],
     },
     {
       id: 3,
       time: "20:00",
-      medication: "Blood Pressure Med",
+      medicationId: "blood-pressure-med",
       enabled: false,
       days: ["Daily"],
     },
@@ -64,7 +67,7 @@ export default function ScheduleScreen(): React.JSX.Element {
       const newAlarm: Alarm = {
         id: Date.now(),
         time: newAlarmTime,
-        medication: newAlarmMed,
+        medicationId: newAlarmMed.toLowerCase().replace(/\s+/g, "-"),
         enabled: true,
         days: ["Daily"],
       };
@@ -92,7 +95,7 @@ export default function ScheduleScreen(): React.JSX.Element {
         <View style={[styles.header, { paddingHorizontal: containerPadding }]}>
           <View style={styles.headerLeft}>
             <Text style={styles.bellIcon}>🔔</Text>
-            <Text style={styles.title}>Medication Alarms</Text>
+            <Text style={styles.title}>{t("schedule.title")}</Text>
           </View>
           <TouchableOpacity
             onPress={() => setShowAddAlarm(!showAddAlarm)}
@@ -181,7 +184,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                       !alarm.enabled && styles.disabledMedication,
                     ]}
                   >
-                    {alarm.medication}
+                    {getLocalizedMedicationName(alarm.medicationId)}
                   </Text>
                   <View style={styles.daysContainer}>
                     {alarm.days.map((day, idx) => (

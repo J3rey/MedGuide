@@ -1,0 +1,50 @@
+{
+  "common": {
+    "save": "Salva",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "add": "Aggiungi",
+    "edit": "Modifica",
+    "done": "Fatto",
+    "back": "Indietro"
+  },
+  "languageSelection": {
+    "title": "MedGuide",
+    "subtitle": "Seleziona la tua lingua preferita"
+  },
+  "navigation": {
+    "schedule": "Programma",
+    "camera": "Fotocamera",
+    "chat": "Chat"
+  },
+  "schedule": {
+    "title": "Programma Farmaci",
+    "subtitle": "Gestisci i tuoi promemoria farmaci",
+    "addAlarm": "Aggiungi Nuova Sveglia",
+    "time": "Ora",
+    "medication": "Farmaco",
+    "days": "Giorni",
+    "daily": "Giornaliero",
+    "noAlarms": "Nessuna sveglia impostata",
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mer",
+    "thu": "Gio",
+    "fri": "Ven",
+    "sat": "Sab",
+    "sun": "Dom"
+  },
+  "camera": {
+    "title": "Scansiona Prescrizione",
+    "subtitle": "Scatta una foto della tua prescrizione",
+    "takePicture": "Scatta Foto",
+    "scanPrescription": "Scansiona Prescrizione"
+  },
+  "chat": {
+    "title": "Assistente Medico",
+    "subtitle": "Chiedi informazioni sui tuoi farmaci",
+    "placeholder": "Digita la tua domanda...",
+    "greeting": "Ciao! Sono il tuo assistente Medguide. Come posso aiutarti oggi?",
+    "defaultResponse": "Capisco che hai una domanda sui tuoi farmaci. Si prega di consultare il proprio medico per consigli medici specifici."
+  }
+}

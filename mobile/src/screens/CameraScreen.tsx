@@ -1,15 +1,18 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 import theme from "../styles/theme";
 
-export default function CameraScreen() {
+export default function CameraScreen(): React.JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
       <View style={styles.cameraView}>
         <View style={styles.cameraPlaceholder}>
           <Text style={styles.icon}>📷</Text>
-          <Text style={styles.title}>Camera View</Text>
-          <Text style={styles.description}>Scan medication</Text>
+          <Text style={styles.title}>{t("camera.title")}</Text>
+          <Text style={styles.description}>{t("camera.subtitle")}</Text>
         </View>
       </View>
     </View>

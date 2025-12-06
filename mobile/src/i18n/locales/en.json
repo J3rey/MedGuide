@@ -1,10 +1,50 @@
 {
-  "welcome": "Welcome to MedGuide",
-  "scan_prescription": "Scan Prescription",
-  "chat": "Chat",
-  "reminders": "Reminders",
-  "settings": "Settings",
-  "language": "Language",
-  "english": "English",
-  "chinese": "中文"
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "add": "Add",
+    "edit": "Edit",
+    "done": "Done",
+    "back": "Back"
+  },
+  "languageSelection": {
+    "title": "MedGuide",
+    "subtitle": "Select your preferred language"
+  },
+  "navigation": {
+    "schedule": "Schedule",
+    "camera": "Camera",
+    "chat": "Chat"
+  },
+  "schedule": {
+    "title": "Medication Schedule",
+    "subtitle": "Manage your medication reminders",
+    "addAlarm": "Add New Alarm",
+    "time": "Time",
+    "medication": "Medication",
+    "days": "Days",
+    "daily": "Daily",
+    "noAlarms": "No alarms set",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  },
+  "camera": {
+    "title": "Scan Prescription",
+    "subtitle": "Take a photo of your prescription",
+    "takePicture": "Take Picture",
+    "scanPrescription": "Scan Prescription"
+  },
+  "chat": {
+    "title": "Medical Assistant",
+    "subtitle": "Ask about your medications",
+    "placeholder": "Type your question...",
+    "greeting": "Hello! I'm your Medguide assistant. How can I help you today?",
+    "defaultResponse": "I understand you have a question about your medication. Please consult with your healthcare provider for specific medical advice."
+  }
 }

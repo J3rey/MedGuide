@@ -1,0 +1,50 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "add": "Agregar",
+    "edit": "Editar",
+    "done": "Hecho",
+    "back": "Atrás"
+  },
+  "languageSelection": {
+    "title": "MedGuide",
+    "subtitle": "Seleccione su idioma preferido"
+  },
+  "navigation": {
+    "schedule": "Horario",
+    "camera": "Cámara",
+    "chat": "Chat"
+  },
+  "schedule": {
+    "title": "Horario de Medicamentos",
+    "subtitle": "Administre sus recordatorios de medicamentos",
+    "addAlarm": "Agregar Nueva Alarma",
+    "time": "Hora",
+    "medication": "Medicamento",
+    "days": "Días",
+    "daily": "Diario",
+    "noAlarms": "No hay alarmas configuradas",
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mié",
+    "thu": "Jue",
+    "fri": "Vie",
+    "sat": "Sáb",
+    "sun": "Dom"
+  },
+  "camera": {
+    "title": "Escanear Receta",
+    "subtitle": "Tome una foto de su receta",
+    "takePicture": "Tomar Foto",
+    "scanPrescription": "Escanear Receta"
+  },
+  "chat": {
+    "title": "Asistente Médico",
+    "subtitle": "Pregunte sobre sus medicamentos",
+    "placeholder": "Escriba su pregunta...",
+    "greeting": "¡Hola! Soy su asistente de Medguide. ¿Cómo puedo ayudarle hoy?",
+    "defaultResponse": "Entiendo que tiene una pregunta sobre su medicamento. Por favor consulte con su proveedor de atención médica para obtener asesoramiento médico específico."
+  }
+}
