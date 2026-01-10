@@ -2,21 +2,14 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 
-<<<<<<< HEAD
 // Configure alarm behavior - critical alerts with persistent notification
-=======
-// Configure notification behavior
->>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
-<<<<<<< HEAD
     shouldShowBanner: true,
     shouldShowList: true,
-=======
->>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
   }),
 });
 
@@ -27,7 +20,6 @@ export interface ScheduledAlarm {
   time: string;
   days: string[];
   enabled: boolean;
-<<<<<<< HEAD
   snoozeDuration?: number;
   snoozeCount?: number;
 }
@@ -36,8 +28,6 @@ export interface AlarmAction {
   identifier: string;
   buttonTitle: string;
   textInput?: boolean;
-=======
->>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
 }
 
 /**
@@ -47,7 +37,6 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
   let token;
 
   if (Platform.OS === 'android') {
-<<<<<<< HEAD
     await Notifications.setNotificationChannelAsync('medication-alarms', {
       name: 'Medication Alarms',
       importance: Notifications.AndroidImportance.MAX,
@@ -58,14 +47,6 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
       enableVibrate: true,
       lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
       bypassDnd: true,
-=======
-    await Notifications.setNotificationChannelAsync('medication-reminders', {
-      name: 'Medication Reminders',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#3B82F6',
-      sound: 'default',
->>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
     });
   }
 
@@ -74,7 +55,6 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
     let finalStatus = existingStatus;
     
     if (existingStatus !== 'granted') {
-<<<<<<< HEAD
       const { status } = await Notifications.requestPermissionsAsync({
         ios: {
           allowAlert: true,
@@ -84,18 +64,11 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
         },
         android: {},
       });
-=======
-      const { status } = await Notifications.requestPermissionsAsync();
->>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
       finalStatus = status;
     }
     
     if (finalStatus !== 'granted') {
-<<<<<<< HEAD
       throw new Error('Permission not granted for alarm notifications');
-=======
-      throw new Error('Permission not granted for notifications');
->>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
     }
   }
 
@@ -111,7 +84,6 @@ export async function scheduleAlarmNotification(
   minute: number,
   days: string[]
 ): Promise<string> {
-<<<<<<< HEAD
   // If daily or all days selected, use daily trigger
   if (days.includes('Daily') || days.length === 7) {
     const notificationId = await Notifications.scheduleNotificationAsync({
@@ -273,24 +245,31 @@ export async function snoozeAlarm(
     },
 =======
   const trigger =
+=======
+  const trigger: any =
+>>>>>>> 15c3a42 (feat: Enhance alarm system with medication selection and time picker functionality)
     days.includes('Daily') || days.length === 7
       ? {
+          type: Notifications.SchedulableTriggerInputTypes.DAILY,
           hour,
           minute,
           repeats: true,
+          channelId: 'medication-reminders',
         }
       : {
+          type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
           weekday: getDayNumbers(days),
           hour,
           minute,
           repeats: true,
+          channelId: 'medication-reminders',
         };
 
   const notificationId = await Notifications.scheduleNotificationAsync({
     content: {
       title: '💊 Medication Reminder',
       body: `Time to take ${medicationName}`,
-      sound: 'default',
+      sound: true,
       priority: Notifications.AndroidNotificationPriority.HIGH,
       data: { medicationName },
     },
@@ -302,31 +281,110 @@ export async function snoozeAlarm(
 }
 
 /**
-<<<<<<< HEAD
- * Dismiss an alarm notification
- */
-export async function dismissAlarm(notificationId: string): Promise<void> {
-  await Notifications.dismissNotificationAsync(notificationId);
-=======
  * Cancel a scheduled notification
  */
 export async function cancelAlarmNotification(notificationId: string): Promise<void> {
-  await Notifications.cancelScheduledNotificationAsync(notificationId);
+  try {
+    // Check if it's a JSON array of IDs
+    const ids = JSON.parse(notificationId);
+    if (Array.isArray(ids)) {
+      for (const id of ids) {
+        await Notifications.cancelScheduledNotificationAsync(id);
+      }
+    } else {
+      await Notifications.cancelScheduledNotificationAsync(notificationId);
+    }
+  } catch {
+    // Single notification ID
+    await Notifications.cancelScheduledNotificationAsync(notificationId);
+  }
 }
 
 /**
- * Cancel all scheduled notifications
+ * Cancel all scheduled alarms
  */
 export async function cancelAllNotifications(): Promise<void> {
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
 
 /**
- * Get all scheduled notifications
+ * Get all scheduled alarms
  */
 export async function getAllScheduledNotifications() {
   return await Notifications.getAllScheduledNotificationsAsync();
->>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
+}
+
+/**
+ * Setup alarm action categories (dismiss/snooze)
+ */
+export async function setupAlarmCategories(): Promise<void> {
+  await Notifications.setNotificationCategoryAsync('MEDICATION_ALARM', [
+    {
+      identifier: 'DISMISS',
+      buttonTitle: 'Take Medication',
+      options: {
+        opensAppToForeground: true,
+      },
+    },
+    {
+      identifier: 'SNOOZE_5',
+      buttonTitle: 'Snooze 5 min',
+      options: {
+        opensAppToForeground: false,
+      },
+    },
+    {
+      identifier: 'SNOOZE_10',
+      buttonTitle: 'Snooze 10 min',
+      options: {
+        opensAppToForeground: false,
+      },
+    },
+  ]);
+}
+
+/**
+ * Snooze an alarm for specified minutes
+ */
+export async function snoozeAlarm(
+  medicationName: string,
+  snoozeMinutes: number
+): Promise<string> {
+  const triggerDate = new Date();
+  triggerDate.setMinutes(triggerDate.getMinutes() + snoozeMinutes);
+
+  const notificationId = await Notifications.scheduleNotificationAsync({
+    content: {
+      title: '💊 MEDICATION ALARM (Snoozed)',
+      body: `Time to take ${medicationName}`,
+      sound: true,
+      priority: Notifications.AndroidNotificationPriority.MAX,
+      vibrate: [0, 250, 250, 250],
+      sticky: true,
+      autoDismiss: false,
+      data: {
+        medicationName,
+        isAlarm: true,
+        isSnoozed: true,
+        timestamp: Date.now(),
+      },
+      categoryIdentifier: 'MEDICATION_ALARM',
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: triggerDate,
+      channelId: 'medication-alarms',
+    },
+  });
+
+  return notificationId;
+}
+
+/**
+ * Dismiss an alarm notification
+ */
+export async function dismissAlarm(notificationId: string): Promise<void> {
+  await Notifications.dismissNotificationAsync(notificationId);
 }
 
 /**
