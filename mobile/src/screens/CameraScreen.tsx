@@ -1,27 +1,19 @@
-import { useRef, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
+import React, { useRef, useState } from "react";
+import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import theme from "../styles/theme";
 
-export default function CameraScreen() {
-  const cameraRef = useRef<CameraView>(null);
+export default function CameraScreen({ navigation }: any) {
+  const cameraRef = useRef<CameraView | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
+
   const [photoUri, setPhotoUri] = useState<string | null>(null);
 
-  if (!permission) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.text}>Checking camera permissions...</Text>
-      </View>
-    );
-  }
-
+  if (!permission) return <View />;
   if (!permission.granted) {
     return (
       <View style={styles.center}>
-        <Text style={[styles.text, { textAlign: "center", marginBottom: 12 }]}>
-          We need camera permission to use this feature.
-        </Text>
-
+        <Text style={styles.text}>We need camera permission</Text>
         <TouchableOpacity style={styles.button} onPress={requestPermission}>
           <Text style={styles.buttonText}>Grant permission</Text>
         </TouchableOpacity>
@@ -30,97 +22,89 @@ export default function CameraScreen() {
   }
 
   const takePhoto = async () => {
-    try {
-      if (!cameraRef.current) return;
-
-      const photo = await cameraRef.current.takePictureAsync({
-        quality: 0.8,
-      });
-
-      setPhotoUri(photo.uri);
-    } catch {
-      Alert.alert("Error", "Failed to take photo");
-    }
+    const photo = await cameraRef.current?.takePictureAsync({ quality: 0.8 });
+    if (photo?.uri) setPhotoUri(photo.uri);
   };
 
+  const retake = () => setPhotoUri(null);
+
+  const scan = () => {
+    if (!photoUri) return;
+    navigation.navigate("ScanResults", { uri: photoUri });
+  };
+
+  // PREVIEW MODE
+  if (photoUri) {
+    return (
+      <View style={styles.container}>
+        <Image source={{ uri: photoUri }} style={styles.preview} />
+        <View style={styles.previewActions}>
+          <TouchableOpacity style={styles.button} onPress={retake}>
+            <Text style={styles.buttonText}>Retake</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonPrimary} onPress={scan}>
+            <Text style={styles.buttonTextPrimary}>Scan</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  // CAMERA MODE
   return (
     <View style={styles.container}>
-      <View style={styles.cameraWrapper}>
-        <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+      <CameraView ref={cameraRef} style={styles.camera} />
+      <View style={styles.captureBar}>
+        <TouchableOpacity style={styles.shutter} onPress={takePhoto} />
       </View>
-
-      <View style={styles.controls}>
-        <TouchableOpacity style={styles.capture} onPress={takePhoto}>
-          <Text style={styles.captureText}>Take Photo</Text>
-        </TouchableOpacity>
-      </View>
-
-      {photoUri && (
-        <View style={styles.preview}>
-          <Text style={styles.text}>Preview</Text>
-          <Image source={{ uri: photoUri }} style={styles.previewImg} />
-        </View>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0b0b0f",
+  container: { flex: 1, backgroundColor: theme.darkColors.background },
+  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
+  text: { color: theme.darkColors.foreground, marginBottom: 12 },
+
+  camera: { flex: 1 },
+
+  captureBar: {
+    padding: 16,
+    alignItems: "center",
+    backgroundColor: theme.darkColors.background,
+  },
+  shutter: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    borderWidth: 6,
+    borderColor: theme.darkColors.foreground,
+  },
+
+  preview: { flex: 1, resizeMode: "contain", backgroundColor: "#000" },
+  previewActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12, // if gap causes issues, replace with marginLeft on 2nd button
     padding: 16,
   },
-  center: {
-    flex: 1,
-    backgroundColor: "#0b0b0f",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-  },
-  text: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  cameraWrapper: {
-    width: "100%",
-    aspectRatio: 1,
-    borderRadius: 16,
-    overflow: "hidden",
-  },
-  camera: {
-    flex: 1,
-  },
-  controls: {
-    marginTop: 16,
-  },
-  capture: {
-    backgroundColor: "rgba(255,255,255,0.15)",
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  captureText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 16,
-  },
+
   button: {
-    backgroundColor: "rgba(255,255,255,0.15)",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1,
+    borderColor: theme.darkColors.border,
+    alignItems: "center",
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "700",
+  buttonText: { color: theme.darkColors.foreground, fontWeight: "600" },
+
+  buttonPrimary: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.darkColors.primary,
+    alignItems: "center",
   },
-  preview: {
-    marginTop: 16,
-  },
-  previewImg: {
-    width: "100%",
-    height: 220,
-    borderRadius: 12,
-  },
+  buttonTextPrimary: { color: theme.darkColors.primaryForeground, fontWeight: "700" },
 });
