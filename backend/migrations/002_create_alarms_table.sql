@@ -7,11 +7,8 @@ CREATE TABLE IF NOT EXISTS alarms (
   days TEXT[] NOT NULL DEFAULT '{}',
   enabled BOOLEAN NOT NULL DEFAULT true,
   notification_id TEXT,
-<<<<<<< HEAD
   snooze_count INTEGER DEFAULT 0,
   last_snoozed TIMESTAMP WITH TIME ZONE,
-=======
->>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );

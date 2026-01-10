@@ -88,17 +88,25 @@ export async function scheduleAlarmNotification(
   if (days.includes('Daily') || days.length === 7) {
     const notificationId = await Notifications.scheduleNotificationAsync({
       content: {
-        title: '💊 Medication Reminder',
+        title: '💊 MEDICATION ALARM',
         body: `Time to take ${medicationName}`,
         sound: true,
-        priority: Notifications.AndroidNotificationPriority.HIGH,
-        data: { medicationName },
+        priority: Notifications.AndroidNotificationPriority.MAX,
+        vibrate: [0, 250, 250, 250],
+        sticky: true,
+        autoDismiss: false,
+        data: { 
+          medicationName,
+          isAlarm: true,
+          timestamp: Date.now(),
+        },
+        categoryIdentifier: 'MEDICATION_ALARM',
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
         hour,
         minute,
-        channelId: 'medication-reminders',
+        channelId: 'medication-alarms',
       } as Notifications.DailyTriggerInput,
     });
     return notificationId;
@@ -111,18 +119,26 @@ export async function scheduleAlarmNotification(
   for (const weekday of dayNumbers) {
     const notificationId = await Notifications.scheduleNotificationAsync({
       content: {
-        title: '💊 Medication Reminder',
+        title: '💊 MEDICATION ALARM',
         body: `Time to take ${medicationName}`,
         sound: true,
-        priority: Notifications.AndroidNotificationPriority.HIGH,
-        data: { medicationName },
+        priority: Notifications.AndroidNotificationPriority.MAX,
+        vibrate: [0, 250, 250, 250],
+        sticky: true,
+        autoDismiss: false,
+        data: { 
+          medicationName,
+          isAlarm: true,
+          timestamp: Date.now(),
+        },
+        categoryIdentifier: 'MEDICATION_ALARM',
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
         weekday,
         hour,
         minute,
-        channelId: 'medication-reminders',
+        channelId: 'medication-alarms',
       } as Notifications.WeeklyTriggerInput,
     });
     notificationIds.push(notificationId);
