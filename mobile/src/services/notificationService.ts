@@ -8,6 +8,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -76,9 +78,8 @@ export async function scheduleAlarmNotification(
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
         hour,
         minute,
-        repeats: true,
         channelId: 'medication-reminders',
-      },
+      } as Notifications.DailyTriggerInput,
     });
     return notificationId;
   }
@@ -101,9 +102,8 @@ export async function scheduleAlarmNotification(
         weekday,
         hour,
         minute,
-        repeats: true,
         channelId: 'medication-reminders',
-      },
+      } as Notifications.WeeklyTriggerInput,
     });
     notificationIds.push(notificationId);
   }

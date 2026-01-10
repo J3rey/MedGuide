@@ -15,7 +15,7 @@ router.post('/chat', async (req: Request, res: Response): Promise<void> => {
     const response = await chat(message, language);
     res.json({ response });
   } catch (error) {
-    console.error('Chat error:', error);
+    console.error('Chat error:', error instanceof Error ? error.message : error);
     res.status(500).json({ error: 'Failed to process chat message' });
   }
 });

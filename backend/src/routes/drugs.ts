@@ -15,7 +15,7 @@ router.get('/drugs', async (req: Request, res: Response): Promise<void> => {
 
     res.json(data);
   } catch (error) {
-    console.error('Error fetching drugs:', error);
+    console.error('Error fetching drugs:', error instanceof Error ? error.message : error);
     res.status(500).json({ error: 'Failed to fetch drugs' });
   }
 });
@@ -35,7 +35,7 @@ router.get('/drugs/:id', async (req: Request, res: Response): Promise<void> => {
 
     res.json(data);
   } catch (error) {
-    console.error('Error fetching drug:', error);
+    console.error('Error fetching drug:', error instanceof Error ? error.message : error);
     res.status(500).json({ error: 'Failed to fetch drug' });
   }
 });

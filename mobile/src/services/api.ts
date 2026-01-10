@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import i18n from '../i18n/config';
 
 const API_URL = process.env.API_URL || 'http://192.168.1.11:3000';
