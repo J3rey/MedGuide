@@ -44,24 +44,11 @@ export default function ScheduleScreen(): React.JSX.Element {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [newAlarmMed, setNewAlarmMed] = useState("");
   const [selectedDays, setSelectedDays] = useState<string[]>(["Daily"]);
-  const [medications, setMedications] = useState<string[]>([]);
-  const [showMedPicker, setShowMedPicker] = useState(false);
 
   useEffect(() => {
     initializeNotifications();
     fetchAlarms();
-    fetchMedications();
   }, []);
-
-  const fetchMedications = async (): Promise<void> => {
-    try {
-      const response = await api.get("/drugs");
-      const medNames = response.data.map((drug: any) => drug.drug_name);
-      setMedications(medNames);
-    } catch (error) {
-      console.error("Error fetching medications:", error);
-    }
-  };
 
   const toggleDay = (day: string): void => {
     if (day === "Daily") {
@@ -250,20 +237,13 @@ export default function ScheduleScreen(): React.JSX.Element {
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Medication</Text>
-              <TouchableOpacity
-                style={styles.pickerButton}
-                onPress={() => setShowMedPicker(true)}
-              >
-                <Text
-                  style={[
-                    styles.pickerButtonText,
-                    !newAlarmMed && styles.placeholderText,
-                  ]}
-                >
-                  {newAlarmMed || "Select medication"}
-                </Text>
-                <Text style={styles.pickerArrow}>▼</Text>
-              </TouchableOpacity>
+              <TextInput
+                style={styles.input}
+                value={newAlarmMed}
+                onChangeText={setNewAlarmMed}
+                placeholder="Enter medication name"
+                placeholderTextColor={theme.darkColors.mutedForeground}
+              />
             </View>
 
             <View style={styles.inputGroup}>
@@ -464,43 +444,6 @@ export default function ScheduleScreen(): React.JSX.Element {
             onChange={onTimeChange}
           />
         ))}
-
-      {/* Medication Picker Modal */}
-      <Modal
-        visible={showMedPicker}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowMedPicker(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowMedPicker(false)}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Medication</Text>
-              <TouchableOpacity onPress={() => setShowMedPicker(false)}>
-                <Text style={styles.modalClose}>✕</Text>
-              </TouchableOpacity>
-            </View>
-            <ScrollView style={styles.medicationList}>
-              {medications.map((med, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.medicationItem}
-                  onPress={() => {
-                    setNewAlarmMed(med);
-                    setShowMedPicker(false);
-                  }}
-                >
-                  <Text style={styles.medicationItemText}>{med}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        </TouchableOpacity>
-      </Modal>
     </View>
   );
 }
@@ -560,10 +503,10 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.lg,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.darkColors.foreground,
-    marginBottom: theme.spacing.base,
+    marginBottom: theme.spacing.md,
   },
   inputGroup: {
-    marginBottom: theme.spacing.base,
+    marginBottom: theme.spacing.md,
   },
   label: {
     fontSize: theme.typography.fontSize.sm,
