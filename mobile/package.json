@@ -29,6 +29,7 @@
     "expo-camera": "~17.0.10",
     "expo-constants": "~18.0.13",
     "expo-device": "~8.0.10",
+    "expo-file-system": "~19.0.21",
     "expo-notifications": "~0.32.16",
     "i18next": "^23.16.8",
     "react": "19.1.0",

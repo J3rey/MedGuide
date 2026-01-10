@@ -1,15 +1,17 @@
 import React, { useRef, useState } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import { useNavigation } from "@react-navigation/native";
 import theme from "../styles/theme";
 
-export default function CameraScreen({ navigation }: any) {
+export default function CameraScreen() {
+  const navigation = useNavigation<any>();
   const cameraRef = useRef<CameraView | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
-
   const [photoUri, setPhotoUri] = useState<string | null>(null);
 
   if (!permission) return <View />;
+
   if (!permission.granted) {
     return (
       <View style={styles.center}>
