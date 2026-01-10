@@ -16,7 +16,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import theme from "../styles/theme";
-import api from "../services/api";
+import { supabase } from "../services/supabase";
 import {
   registerForPushNotificationsAsync,
   scheduleAlarmNotification,
@@ -71,9 +71,28 @@ export default function ScheduleScreen(): React.JSX.Element {
   };
 
   const formatTime = (date: Date): string => {
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    return `${hours}:${minutes} ${ampm}`;
+  };
+
+  const formatTime24 = (date: Date): string => {
     const hours = date.getHours().toString().padStart(2, "0");
     const minutes = date.getMinutes().toString().padStart(2, "0");
     return `${hours}:${minutes}`;
+  };
+
+  const displayTime = (time24: string): string => {
+    const [hoursStr, minutesStr] = time24.split(":");
+    let hours = parseInt(hoursStr, 10);
+    const minutes = minutesStr;
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return `${hours}:${minutes} ${ampm}`;
   };
 
   const initializeNotifications = async (): Promise<void> => {
@@ -90,8 +109,13 @@ export default function ScheduleScreen(): React.JSX.Element {
 
   const fetchAlarms = async (): Promise<void> => {
     try {
-      const response = await api.get("/alarms");
-      setAlarms(response.data);
+      const { data, error } = await supabase
+        .from("alarms")
+        .select("*")
+        .order("time", { ascending: true });
+
+      if (error) throw error;
+      setAlarms(data || []);
     } catch (error) {
       console.error("Error fetching alarms:", error);
       Alert.alert("Error", "Failed to load alarms");
@@ -133,10 +157,12 @@ export default function ScheduleScreen(): React.JSX.Element {
       }
 
       // Update backend
-      await api.put(`/alarms/${alarm.id}`, {
-        enabled: newEnabled,
-        notification_id: notificationId,
-      });
+      const { error } = await supabase
+        .from("alarms")
+        .update({ enabled: newEnabled, notification_id: notificationId })
+        .eq("id", alarm.id);
+
+      if (error) throw error;
     } catch (error) {
       console.error("Error toggling alarm:", error);
       // Revert on error
@@ -152,8 +178,8 @@ export default function ScheduleScreen(): React.JSX.Element {
     }
 
     try {
-      const timeString = formatTime(newAlarmTime);
-      const { hour, minute } = parseTime(timeString);
+      const timeString24 = formatTime24(newAlarmTime);
+      const { hour, minute } = parseTime(timeString24);
       const notificationId = await scheduleAlarmNotification(
         newAlarmMed,
         hour,
@@ -161,15 +187,21 @@ export default function ScheduleScreen(): React.JSX.Element {
         selectedDays
       );
 
-      const response = await api.post("/alarms", {
-        medication_name: newAlarmMed,
-        time: timeString,
-        days: selectedDays,
-        enabled: true,
-        notification_id: notificationId,
-      });
+      const { data, error } = await supabase
+        .from("alarms")
+        .insert({
+          medication_name: newAlarmMed,
+          time: timeString24,
+          days: selectedDays,
+          enabled: true,
+          notification_id: notificationId,
+        })
+        .select()
+        .single();
 
-      setAlarms([...alarms, response.data]);
+      if (error) throw error;
+
+      setAlarms([...alarms, data]);
       setNewAlarmMed("");
       setNewAlarmTime(new Date());
       setSelectedDays(["Daily"]);
@@ -188,7 +220,12 @@ export default function ScheduleScreen(): React.JSX.Element {
       }
 
       // Delete from backend
-      await api.delete(`/alarms/${alarm.id}`);
+      const { error } = await supabase
+        .from("alarms")
+        .delete()
+        .eq("id", alarm.id);
+
+      if (error) throw error;
 
       // Update local state
       setAlarms(alarms.filter((a) => a.id !== alarm.id));
@@ -330,7 +367,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                         !alarm.enabled && styles.disabledText,
                       ]}
                     >
-                      {alarm.time}
+                      {displayTime(alarm.time)}
                     </Text>
                     <Text
                       style={[
