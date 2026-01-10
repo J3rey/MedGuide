@@ -15,7 +15,7 @@ router.get('/alarms', async (req: Request, res: Response): Promise<void> => {
 
     res.json(data);
   } catch (error) {
-    console.error('Error fetching alarms:', error);
+    console.error('Error fetching alarms:', error instanceof Error ? error.message : error);
     res.status(500).json({ error: 'Failed to fetch alarms' });
   }
 });
@@ -46,7 +46,7 @@ router.post('/alarms', async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json(data);
   } catch (error) {
-    console.error('Error creating alarm:', error);
+    console.error('Error creating alarm:', error instanceof Error ? error.message : error);
     res.status(500).json({ error: 'Failed to create alarm' });
   }
 });
@@ -57,7 +57,13 @@ router.put('/alarms/:id', async (req: Request, res: Response): Promise<void> => 
     const { id } = req.params;
     const { medication_name, time, days, enabled, notification_id } = req.body;
 
-    const updateData: any = {};
+    const updateData: Partial<{
+      medication_name: string;
+      time: string;
+      days: string[];
+      enabled: boolean;
+      notification_id: string;
+    }> = {};
     if (medication_name !== undefined) updateData.medication_name = medication_name;
     if (time !== undefined) updateData.time = time;
     if (days !== undefined) updateData.days = days;
@@ -75,7 +81,7 @@ router.put('/alarms/:id', async (req: Request, res: Response): Promise<void> => 
 
     res.json(data);
   } catch (error) {
-    console.error('Error updating alarm:', error);
+    console.error('Error updating alarm:', error instanceof Error ? error.message : error);
     res.status(500).json({ error: 'Failed to update alarm' });
   }
 });
@@ -94,7 +100,7 @@ router.delete('/alarms/:id', async (req: Request, res: Response): Promise<void> 
 
     res.json({ message: 'Alarm deleted successfully' });
   } catch (error) {
-    console.error('Error deleting alarm:', error);
+    console.error('Error deleting alarm:', error instanceof Error ? error.message : error);
     res.status(500).json({ error: 'Failed to delete alarm' });
   }
 });
