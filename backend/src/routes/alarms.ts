@@ -15,7 +15,7 @@ router.get('/alarms', async (req: Request, res: Response): Promise<void> => {
 
     res.json(data);
   } catch (error) {
-    console.error('Error fetching alarms:', error instanceof Error ? error.message : error);
+    console.error('Error fetching alarms:', error);
     res.status(500).json({ error: 'Failed to fetch alarms' });
   }
 });
