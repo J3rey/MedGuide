@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,77 +9,161 @@ import {
   Switch,
   useWindowDimensions,
   Platform,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import theme from "../styles/theme";
-import { getLocalizedMedicationName } from "../services/medicationService";
+import api from "../services/api";
+import {
+  registerForPushNotificationsAsync,
+  scheduleAlarmNotification,
+  cancelAlarmNotification,
+  parseTime,
+} from "../services/notificationService";
 
 interface Alarm {
   id: number;
   time: string;
-  medicationId: string;
+  medication_name: string;
   enabled: boolean;
   days: string[];
+  notification_id?: string;
 }
 
 export default function ScheduleScreen(): React.JSX.Element {
   const { t } = useTranslation();
   const { width: screenWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const [alarms, setAlarms] = useState<Alarm[]>([
-    {
-      id: 1,
-      time: "08:00",
-      medicationId: "aspirin",
-      enabled: true,
-      days: ["Mon", "Wed", "Fri"],
-    },
-    {
-      id: 2,
-      time: "14:00",
-      medicationId: "vitamin-d",
-      enabled: true,
-      days: ["Daily"],
-    },
-    {
-      id: 3,
-      time: "20:00",
-      medicationId: "blood-pressure-med",
-      enabled: false,
-      days: ["Daily"],
-    },
-  ]);
+  const [alarms, setAlarms] = useState<Alarm[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showAddAlarm, setShowAddAlarm] = useState(false);
   const [newAlarmTime, setNewAlarmTime] = useState("09:00");
   const [newAlarmMed, setNewAlarmMed] = useState("");
 
-  const toggleAlarm = (id: number): void => {
-    setAlarms(
-      alarms.map((alarm) =>
-        alarm.id === id ? { ...alarm, enabled: !alarm.enabled } : alarm
-      )
-    );
-  };
+  useEffect(() => {
+    initializeNotifications();
+    fetchAlarms();
+  }, []);
 
-  const addAlarm = (): void => {
-    if (newAlarmMed.trim()) {
-      const newAlarm: Alarm = {
-        id: Date.now(),
-        time: newAlarmTime,
-        medicationId: newAlarmMed.toLowerCase().replace(/\s+/g, "-"),
-        enabled: true,
-        days: ["Daily"],
-      };
-      setAlarms([...alarms, newAlarm]);
-      setNewAlarmMed("");
-      setNewAlarmTime("09:00");
-      setShowAddAlarm(false);
+  const initializeNotifications = async (): Promise<void> => {
+    try {
+      await registerForPushNotificationsAsync();
+    } catch (error) {
+      console.error("Failed to register for notifications:", error);
+      Alert.alert(
+        "Notifications Disabled",
+        "Please enable notifications in your device settings to receive medication reminders."
+      );
     }
   };
 
-  const removeAlarm = (id: number): void => {
-    setAlarms(alarms.filter((alarm) => alarm.id !== id));
+  const fetchAlarms = async (): Promise<void> => {
+    try {
+      const response = await api.get("/alarms");
+      setAlarms(response.data);
+    } catch (error) {
+      console.error("Error fetching alarms:", error);
+      Alert.alert("Error", "Failed to load alarms");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleAlarm = async (alarm: Alarm): Promise<void> => {
+    const newEnabled = !alarm.enabled;
+
+    try {
+      // Update local state immediately for better UX
+      setAlarms(
+        alarms.map((a) =>
+          a.id === alarm.id ? { ...a, enabled: newEnabled } : a
+        )
+      );
+
+      // Handle notification scheduling
+      if (newEnabled && alarm.notification_id) {
+        // Cancel old notification and create new one
+        await cancelAlarmNotification(alarm.notification_id);
+      }
+
+      let notificationId = alarm.notification_id;
+
+      if (newEnabled) {
+        const { hour, minute } = parseTime(alarm.time);
+        notificationId = await scheduleAlarmNotification(
+          alarm.medication_name,
+          hour,
+          minute,
+          alarm.days
+        );
+      } else if (notificationId) {
+        await cancelAlarmNotification(notificationId);
+        notificationId = undefined;
+      }
+
+      // Update backend
+      await api.put(`/alarms/${alarm.id}`, {
+        enabled: newEnabled,
+        notification_id: notificationId,
+      });
+    } catch (error) {
+      console.error("Error toggling alarm:", error);
+      // Revert on error
+      setAlarms(alarms.map((a) => (a.id === alarm.id ? alarm : a)));
+      Alert.alert("Error", "Failed to update alarm");
+    }
+  };
+
+  const addAlarm = async (): Promise<void> => {
+    if (!newAlarmMed.trim()) {
+      Alert.alert("Error", "Please enter a medication name");
+      return;
+    }
+
+    try {
+      const { hour, minute } = parseTime(newAlarmTime);
+      const notificationId = await scheduleAlarmNotification(
+        newAlarmMed,
+        hour,
+        minute,
+        ["Daily"]
+      );
+
+      const response = await api.post("/alarms", {
+        medication_name: newAlarmMed,
+        time: newAlarmTime,
+        days: ["Daily"],
+        enabled: true,
+        notification_id: notificationId,
+      });
+
+      setAlarms([...alarms, response.data]);
+      setNewAlarmMed("");
+      setNewAlarmTime("09:00");
+      setShowAddAlarm(false);
+    } catch (error) {
+      console.error("Error adding alarm:", error);
+      Alert.alert("Error", "Failed to create alarm");
+    }
+  };
+
+  const removeAlarm = async (alarm: Alarm): Promise<void> => {
+    try {
+      // Cancel notification if exists
+      if (alarm.notification_id) {
+        await cancelAlarmNotification(alarm.notification_id);
+      }
+
+      // Delete from backend
+      await api.delete(`/alarms/${alarm.id}`);
+
+      // Update local state
+      setAlarms(alarms.filter((a) => a.id !== alarm.id));
+    } catch (error) {
+      console.error("Error removing alarm:", error);
+      Alert.alert("Error", "Failed to delete alarm");
+    }
   };
 
   const containerPadding = screenWidth > 768 ? 48 : 24;
@@ -166,74 +250,81 @@ export default function ScheduleScreen(): React.JSX.Element {
             },
           ]}
         >
-          {alarms.map((alarm) => (
-            <View key={alarm.id} style={styles.alarmCard}>
-              <View style={styles.alarmContent}>
-                <View style={styles.alarmInfo}>
-                  <Text
-                    style={[
-                      styles.alarmTime,
-                      !alarm.enabled && styles.disabledText,
-                    ]}
-                  >
-                    {alarm.time}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.alarmMedication,
-                      !alarm.enabled && styles.disabledMedication,
-                    ]}
-                  >
-                    {getLocalizedMedicationName(alarm.medicationId)}
-                  </Text>
-                  <View style={styles.daysContainer}>
-                    {alarm.days.map((day, idx) => (
-                      <View
-                        key={idx}
-                        style={[
-                          styles.dayBadge,
-                          alarm.enabled
-                            ? styles.dayBadgeActive
-                            : styles.dayBadgeInactive,
-                        ]}
-                      >
-                        <Text
+          {loading ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>⏳</Text>
+              <Text style={styles.emptyText}>Loading alarms...</Text>
+            </View>
+          ) : (
+            alarms.map((alarm) => (
+              <View key={alarm.id} style={styles.alarmCard}>
+                <View style={styles.alarmContent}>
+                  <View style={styles.alarmInfo}>
+                    <Text
+                      style={[
+                        styles.alarmTime,
+                        !alarm.enabled && styles.disabledText,
+                      ]}
+                    >
+                      {alarm.time}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.alarmMedication,
+                        !alarm.enabled && styles.disabledMedication,
+                      ]}
+                    >
+                      {alarm.medication_name}
+                    </Text>
+                    <View style={styles.daysContainer}>
+                      {alarm.days.map((day, idx) => (
+                        <View
+                          key={idx}
                           style={[
-                            styles.dayText,
+                            styles.dayBadge,
                             alarm.enabled
-                              ? styles.dayTextActive
-                              : styles.dayTextInactive,
+                              ? styles.dayBadgeActive
+                              : styles.dayBadgeInactive,
                           ]}
                         >
-                          {day}
-                        </Text>
-                      </View>
-                    ))}
+                          <Text
+                            style={[
+                              styles.dayText,
+                              alarm.enabled
+                                ? styles.dayTextActive
+                                : styles.dayTextInactive,
+                            ]}
+                          >
+                            {day}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                  <View style={styles.alarmActions}>
+                    <TouchableOpacity
+                      onPress={() => removeAlarm(alarm)}
+                      style={styles.deleteButton}
+                    >
+                      <Text style={styles.deleteIcon}>🗑️</Text>
+                    </TouchableOpacity>
+                    <Switch
+                      value={alarm.enabled}
+                      onValueChange={() => toggleAlarm(alarm)}
+                      trackColor={{
+                        false: theme.darkColors.border,
+                        true: "#3b82f6",
+                      }}
+                      thumbColor="#ffffff"
+                    />
                   </View>
                 </View>
-                <View style={styles.alarmActions}>
-                  <TouchableOpacity
-                    onPress={() => removeAlarm(alarm.id)}
-                    style={styles.deleteButton}
-                  >
-                    <Text style={styles.deleteIcon}>🗑️</Text>
-                  </TouchableOpacity>
-                  <Switch
-                    value={alarm.enabled}
-                    onValueChange={() => toggleAlarm(alarm.id)}
-                    trackColor={{
-                      false: theme.darkColors.border,
-                      true: "#3b82f6",
-                    }}
-                    thumbColor="#ffffff"
-                  />
-                </View>
               </View>
-            </View>
-          ))}
+            ))
+          )}
         </View>
 
-        {alarms.length === 0 && (
+        {!loading && alarms.length === 0 && (
           <View style={styles.emptyState}>
             <Text style={styles.emptyIcon}>⏰</Text>
             <Text style={styles.emptyText}>No alarms set</Text>
