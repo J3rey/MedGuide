@@ -22,6 +22,8 @@ import {
   scheduleAlarmNotification,
   cancelAlarmNotification,
   parseTime,
+  setupAlarmCategories,
+  snoozeAlarm,
 } from "../services/notificationService";
 
 interface Alarm {
@@ -31,6 +33,8 @@ interface Alarm {
   enabled: boolean;
   days: string[];
   notification_id?: string;
+  snooze_count?: number;
+  last_snoozed?: string;
 }
 
 export default function ScheduleScreen(): React.JSX.Element {
@@ -99,11 +103,12 @@ export default function ScheduleScreen(): React.JSX.Element {
   const initializeNotifications = async (): Promise<void> => {
     try {
       await registerForPushNotificationsAsync();
+      await setupAlarmCategories();
     } catch (error) {
       console.error("Failed to register for notifications:", error);
       Alert.alert(
-        "Notifications Disabled",
-        "Please enable notifications in your device settings to receive medication reminders."
+        "Alarms Disabled",
+        "Please enable notifications in your device settings to receive medication alarms."
       );
     }
   };
