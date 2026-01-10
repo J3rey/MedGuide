@@ -21,10 +21,15 @@
     "@google-cloud/vision": "^4.3.3",
     "@google/generative-ai": "^0.2.1",
     "@supabase/supabase-js": "^2.90.1",
+    "@types/multer": "^1.4.12",
     "axios": "^1.13.2",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
-    "express": "^4.22.1"
+    "expo-constants": "~18.0.13",
+    "expo-device": "~8.0.10",
+    "expo-notifications": "~0.32.16",
+    "express": "^4.22.1",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

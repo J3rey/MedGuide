@@ -21,6 +21,14 @@
         {
           "cameraPermission": "Allow MedGuide to access your camera to scan prescriptions."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#3B82F6",
+          "sounds": ["./assets/notification.wav"]
+        }
       ]
     ]
   }
