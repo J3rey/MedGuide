@@ -10,7 +10,9 @@ import {
   useWindowDimensions,
   Platform,
   Alert,
+  Modal,
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import theme from "../styles/theme";
@@ -38,13 +40,54 @@ export default function ScheduleScreen(): React.JSX.Element {
   const [alarms, setAlarms] = useState<Alarm[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddAlarm, setShowAddAlarm] = useState(false);
-  const [newAlarmTime, setNewAlarmTime] = useState("09:00");
+  const [newAlarmTime, setNewAlarmTime] = useState(new Date());
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [newAlarmMed, setNewAlarmMed] = useState("");
+  const [selectedDays, setSelectedDays] = useState<string[]>(["Daily"]);
+  const [medications, setMedications] = useState<string[]>([]);
+  const [showMedPicker, setShowMedPicker] = useState(false);
 
   useEffect(() => {
     initializeNotifications();
     fetchAlarms();
+    fetchMedications();
   }, []);
+
+  const fetchMedications = async (): Promise<void> => {
+    try {
+      const response = await api.get("/drugs");
+      const medNames = response.data.map((drug: any) => drug.drug_name);
+      setMedications(medNames);
+    } catch (error) {
+      console.error("Error fetching medications:", error);
+    }
+  };
+
+  const toggleDay = (day: string): void => {
+    if (day === "Daily") {
+      setSelectedDays(["Daily"]);
+    } else {
+      const withoutDaily = selectedDays.filter((d) => d !== "Daily");
+      if (withoutDaily.includes(day)) {
+        const newDays = withoutDaily.filter((d) => d !== day);
+        setSelectedDays(newDays.length === 0 ? ["Daily"] : newDays);
+      } else {
+        setSelectedDays([...withoutDaily, day]);
+      }
+    }
+  };
+
+  const onTimeChange = (event: any, selectedDate?: Date): void => {
+    const currentDate = selectedDate || newAlarmTime;
+    setShowTimePicker(Platform.OS === "ios");
+    setNewAlarmTime(currentDate);
+  };
+
+  const formatTime = (date: Date): string => {
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
 
   const initializeNotifications = async (): Promise<void> => {
     try {
@@ -117,30 +160,32 @@ export default function ScheduleScreen(): React.JSX.Element {
 
   const addAlarm = async (): Promise<void> => {
     if (!newAlarmMed.trim()) {
-      Alert.alert("Error", "Please enter a medication name");
+      Alert.alert("Error", "Please select a medication");
       return;
     }
 
     try {
-      const { hour, minute } = parseTime(newAlarmTime);
+      const timeString = formatTime(newAlarmTime);
+      const { hour, minute } = parseTime(timeString);
       const notificationId = await scheduleAlarmNotification(
         newAlarmMed,
         hour,
         minute,
-        ["Daily"]
+        selectedDays
       );
 
       const response = await api.post("/alarms", {
         medication_name: newAlarmMed,
-        time: newAlarmTime,
-        days: ["Daily"],
+        time: timeString,
+        days: selectedDays,
         enabled: true,
         notification_id: notificationId,
       });
 
       setAlarms([...alarms, response.data]);
       setNewAlarmMed("");
-      setNewAlarmTime("09:00");
+      setNewAlarmTime(new Date());
+      setSelectedDays(["Daily"]);
       setShowAddAlarm(false);
     } catch (error) {
       console.error("Error adding alarm:", error);
@@ -202,25 +247,64 @@ export default function ScheduleScreen(): React.JSX.Element {
             ]}
           >
             <Text style={styles.addAlarmTitle}>Add New Alarm</Text>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Medication</Text>
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setShowMedPicker(true)}
+              >
+                <Text
+                  style={[
+                    styles.pickerButtonText,
+                    !newAlarmMed && styles.placeholderText,
+                  ]}
+                >
+                  {newAlarmMed || "Select medication"}
+                </Text>
+                <Text style={styles.pickerArrow}>▼</Text>
+              </TouchableOpacity>
+            </View>
+
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Time</Text>
-              <TextInput
-                style={styles.input}
-                value={newAlarmTime}
-                onChangeText={setNewAlarmTime}
-                placeholder="09:00"
-                placeholderTextColor={theme.darkColors.mutedForeground}
-              />
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setShowTimePicker(true)}
+              >
+                <Text style={styles.pickerButtonText}>
+                  {formatTime(newAlarmTime)}
+                </Text>
+                <Text style={styles.pickerArrow}>🕐</Text>
+              </TouchableOpacity>
             </View>
+
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Medication Name</Text>
-              <TextInput
-                style={styles.input}
-                value={newAlarmMed}
-                onChangeText={setNewAlarmMed}
-                placeholder="Enter medication name"
-                placeholderTextColor={theme.darkColors.mutedForeground}
-              />
+              <Text style={styles.label}>Repeat</Text>
+              <View style={styles.daysSelector}>
+                {["Daily", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                  (day) => (
+                    <TouchableOpacity
+                      key={day}
+                      style={[
+                        styles.dayButton,
+                        selectedDays.includes(day) && styles.dayButtonActive,
+                      ]}
+                      onPress={() => toggleDay(day)}
+                    >
+                      <Text
+                        style={[
+                          styles.dayButtonText,
+                          selectedDays.includes(day) &&
+                            styles.dayButtonTextActive,
+                        ]}
+                      >
+                        {day}
+                      </Text>
+                    </TouchableOpacity>
+                  )
+                )}
+              </View>
             </View>
             <View style={styles.buttonRow}>
               <TouchableOpacity
@@ -332,6 +416,91 @@ export default function ScheduleScreen(): React.JSX.Element {
           </View>
         )}
       </ScrollView>
+
+      {/* Time Picker Modal */}
+      {showTimePicker &&
+        (Platform.OS === "ios" ? (
+          <Modal
+            visible={showTimePicker}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setShowTimePicker(false)}
+          >
+            <TouchableOpacity
+              style={styles.modalOverlay}
+              activeOpacity={1}
+              onPress={() => setShowTimePicker(false)}
+            >
+              <View style={styles.timePickerContainer}>
+                <View style={styles.timePickerHeader}>
+                  <TouchableOpacity onPress={() => setShowTimePicker(false)}>
+                    <Text style={styles.timePickerButton}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setShowTimePicker(false)}>
+                    <Text
+                      style={[styles.timePickerButton, styles.timePickerDone]}
+                    >
+                      Done
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <DateTimePicker
+                  value={newAlarmTime}
+                  mode="time"
+                  is24Hour={true}
+                  display="spinner"
+                  onChange={onTimeChange}
+                  textColor={theme.darkColors.foreground}
+                />
+              </View>
+            </TouchableOpacity>
+          </Modal>
+        ) : (
+          <DateTimePicker
+            value={newAlarmTime}
+            mode="time"
+            is24Hour={true}
+            display="default"
+            onChange={onTimeChange}
+          />
+        ))}
+
+      {/* Medication Picker Modal */}
+      <Modal
+        visible={showMedPicker}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowMedPicker(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowMedPicker(false)}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Medication</Text>
+              <TouchableOpacity onPress={() => setShowMedPicker(false)}>
+                <Text style={styles.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.medicationList}>
+              {medications.map((med, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.medicationItem}
+                  onPress={() => {
+                    setNewAlarmMed(med);
+                    setShowMedPicker(false);
+                  }}
+                >
+                  <Text style={styles.medicationItemText}>{med}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -523,5 +692,114 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.sm,
     color: theme.darkColors.mutedForeground,
     marginTop: theme.spacing.xs,
+  },
+  pickerButton: {
+    backgroundColor: theme.darkColors.background,
+    borderWidth: 1,
+    borderColor: theme.darkColors.border,
+    borderRadius: theme.radius.lg,
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: theme.spacing.sm,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  pickerButtonText: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.darkColors.foreground,
+  },
+  placeholderText: {
+    color: theme.darkColors.mutedForeground,
+  },
+  pickerArrow: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.darkColors.mutedForeground,
+  },
+  daysSelector: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing.xs,
+  },
+  dayButton: {
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.darkColors.accent,
+    borderWidth: 1,
+    borderColor: theme.darkColors.border,
+  },
+  dayButtonActive: {
+    backgroundColor: "#3b82f6",
+    borderColor: "#3b82f6",
+  },
+  dayButtonText: {
+    fontSize: theme.typography.fontSize.xs,
+    color: theme.darkColors.mutedForeground,
+  },
+  dayButtonTextActive: {
+    color: "#ffffff",
+    fontWeight: theme.typography.fontWeight.semibold,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: theme.darkColors.card,
+    borderTopLeftRadius: theme.radius.xl,
+    borderTopRightRadius: theme.radius.xl,
+    maxHeight: "70%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: theme.spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.darkColors.border,
+  },
+  modalTitle: {
+    fontSize: theme.typography.fontSize.lg,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.darkColors.foreground,
+  },
+  modalClose: {
+    fontSize: 24,
+    color: theme.darkColors.mutedForeground,
+  },
+  medicationList: {
+    padding: theme.spacing.base,
+  },
+  medicationItem: {
+    paddingVertical: theme.spacing.base,
+    paddingHorizontal: theme.spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.darkColors.border,
+  },
+  medicationItemText: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.darkColors.foreground,
+  },
+  timePickerContainer: {
+    backgroundColor: theme.darkColors.card,
+    borderTopLeftRadius: theme.radius.xl,
+    borderTopRightRadius: theme.radius.xl,
+    paddingBottom: theme.spacing.xl,
+  },
+  timePickerHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: theme.spacing.base,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.darkColors.border,
+  },
+  timePickerButton: {
+    fontSize: theme.typography.fontSize.base,
+    color: "#3b82f6",
+    padding: theme.spacing.sm,
+  },
+  timePickerDone: {
+    fontWeight: theme.typography.fontWeight.bold,
   },
 });

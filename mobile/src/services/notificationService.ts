@@ -62,25 +62,29 @@ export async function scheduleAlarmNotification(
   minute: number,
   days: string[]
 ): Promise<string> {
-  const trigger =
+  const trigger: any =
     days.includes('Daily') || days.length === 7
       ? {
+          type: Notifications.SchedulableTriggerInputTypes.DAILY,
           hour,
           minute,
           repeats: true,
+          channelId: 'medication-reminders',
         }
       : {
+          type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
           weekday: getDayNumbers(days),
           hour,
           minute,
           repeats: true,
+          channelId: 'medication-reminders',
         };
 
   const notificationId = await Notifications.scheduleNotificationAsync({
     content: {
       title: '💊 Medication Reminder',
       body: `Time to take ${medicationName}`,
-      sound: 'default',
+      sound: true,
       priority: Notifications.AndroidNotificationPriority.HIGH,
       data: { medicationName },
     },
