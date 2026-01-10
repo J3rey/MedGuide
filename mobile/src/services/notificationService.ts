@@ -2,14 +2,21 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 
+<<<<<<< HEAD
 // Configure alarm behavior - critical alerts with persistent notification
+=======
+// Configure notification behavior
+>>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+<<<<<<< HEAD
     shouldShowBanner: true,
     shouldShowList: true,
+=======
+>>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
   }),
 });
 
@@ -20,6 +27,7 @@ export interface ScheduledAlarm {
   time: string;
   days: string[];
   enabled: boolean;
+<<<<<<< HEAD
   snoozeDuration?: number;
   snoozeCount?: number;
 }
@@ -28,6 +36,8 @@ export interface AlarmAction {
   identifier: string;
   buttonTitle: string;
   textInput?: boolean;
+=======
+>>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
 }
 
 /**
@@ -39,6 +49,7 @@ export async function registerForPushNotificationsAsync(): Promise<
   let token;
 
   if (Platform.OS === 'android') {
+<<<<<<< HEAD
     await Notifications.setNotificationChannelAsync('medication-alarms', {
       name: 'Medication Alarms',
       importance: Notifications.AndroidImportance.MAX,
@@ -49,6 +60,14 @@ export async function registerForPushNotificationsAsync(): Promise<
       enableVibrate: true,
       lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
       bypassDnd: true,
+=======
+    await Notifications.setNotificationChannelAsync('medication-reminders', {
+      name: 'Medication Reminders',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#3B82F6',
+      sound: 'default',
+>>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
     });
   }
 
@@ -58,6 +77,7 @@ export async function registerForPushNotificationsAsync(): Promise<
     let finalStatus = existingStatus;
 
     if (existingStatus !== 'granted') {
+<<<<<<< HEAD
       const { status } = await Notifications.requestPermissionsAsync({
         ios: {
           allowAlert: true,
@@ -67,11 +87,18 @@ export async function registerForPushNotificationsAsync(): Promise<
         },
         android: {},
       });
+=======
+      const { status } = await Notifications.requestPermissionsAsync();
+>>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
       finalStatus = status;
     }
 
     if (finalStatus !== 'granted') {
+<<<<<<< HEAD
       throw new Error('Permission not granted for alarm notifications');
+=======
+      throw new Error('Permission not granted for notifications');
+>>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
     }
   }
 
@@ -87,6 +114,7 @@ export async function scheduleAlarmNotification(
   minute: number,
   days: string[]
 ): Promise<string> {
+<<<<<<< HEAD
   // If daily or all days selected, use daily trigger
   if (days.includes('Daily') || days.length === 7) {
     const notificationId = await Notifications.scheduleNotificationAsync({
@@ -248,16 +276,62 @@ export async function snoozeAlarm(
       date: triggerDate,
       channelId: 'medication-alarms',
     },
+=======
+  const trigger =
+    days.includes('Daily') || days.length === 7
+      ? {
+          hour,
+          minute,
+          repeats: true,
+        }
+      : {
+          weekday: getDayNumbers(days),
+          hour,
+          minute,
+          repeats: true,
+        };
+
+  const notificationId = await Notifications.scheduleNotificationAsync({
+    content: {
+      title: '💊 Medication Reminder',
+      body: `Time to take ${medicationName}`,
+      sound: 'default',
+      priority: Notifications.AndroidNotificationPriority.HIGH,
+      data: { medicationName },
+    },
+    trigger,
+>>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
   });
 
   return notificationId;
 }
 
 /**
+<<<<<<< HEAD
  * Dismiss an alarm notification
  */
 export async function dismissAlarm(notificationId: string): Promise<void> {
   await Notifications.dismissNotificationAsync(notificationId);
+=======
+ * Cancel a scheduled notification
+ */
+export async function cancelAlarmNotification(notificationId: string): Promise<void> {
+  await Notifications.cancelScheduledNotificationAsync(notificationId);
+}
+
+/**
+ * Cancel all scheduled notifications
+ */
+export async function cancelAllNotifications(): Promise<void> {
+  await Notifications.cancelAllScheduledNotificationsAsync();
+}
+
+/**
+ * Get all scheduled notifications
+ */
+export async function getAllScheduledNotifications() {
+  return await Notifications.getAllScheduledNotificationsAsync();
+>>>>>>> d843cbc (feat: Implement alarm system with CRUD operations and notifications)
 }
 
 /**
