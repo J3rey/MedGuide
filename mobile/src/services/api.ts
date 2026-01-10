@@ -1,7 +1,7 @@
 import axios from 'axios';
 import i18n from '../i18n/config';
 
-const API_URL = process.env.API_URL || 'http://localhost:3000';
+const API_URL = process.env.API_URL || 'http://192.168.1.11:3000';
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,

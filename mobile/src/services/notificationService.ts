@@ -62,43 +62,74 @@ export async function scheduleAlarmNotification(
   minute: number,
   days: string[]
 ): Promise<string> {
-  const trigger: any =
-    days.includes('Daily') || days.length === 7
-      ? {
-          type: Notifications.SchedulableTriggerInputTypes.DAILY,
-          hour,
-          minute,
-          repeats: true,
-          channelId: 'medication-reminders',
-        }
-      : {
-          type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-          weekday: getDayNumbers(days),
-          hour,
-          minute,
-          repeats: true,
-          channelId: 'medication-reminders',
-        };
+  // If daily or all days selected, use daily trigger
+  if (days.includes('Daily') || days.length === 7) {
+    const notificationId = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: '💊 Medication Reminder',
+        body: `Time to take ${medicationName}`,
+        sound: true,
+        priority: Notifications.AndroidNotificationPriority.HIGH,
+        data: { medicationName },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
+        hour,
+        minute,
+        repeats: true,
+        channelId: 'medication-reminders',
+      },
+    });
+    return notificationId;
+  }
 
-  const notificationId = await Notifications.scheduleNotificationAsync({
-    content: {
-      title: '💊 Medication Reminder',
-      body: `Time to take ${medicationName}`,
-      sound: true,
-      priority: Notifications.AndroidNotificationPriority.HIGH,
-      data: { medicationName },
-    },
-    trigger,
-  });
+  // For specific days, schedule multiple notifications (one per day)
+  const dayNumbers = getDayNumbers(days);
+  const notificationIds: string[] = [];
+  
+  for (const weekday of dayNumbers) {
+    const notificationId = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: '💊 Medication Reminder',
+        body: `Time to take ${medicationName}`,
+        sound: true,
+        priority: Notifications.AndroidNotificationPriority.HIGH,
+        data: { medicationName },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+        weekday,
+        hour,
+        minute,
+        repeats: true,
+        channelId: 'medication-reminders',
+      },
+    });
+    notificationIds.push(notificationId);
+  }
 
-  return notificationId;
+  // Return first notification ID (we'll store all IDs as JSON array)
+  return JSON.stringify(notificationIds);
 }
 
 /**
  * Cancel a scheduled notification
  */
 export async function cancelAlarmNotification(notificationId: string): Promise<void> {
-  await Notifications.cancelScheduledNotificationAsync(notificationId);
+  try {
+    // Check if it's a JSON array of IDs
+    const ids = JSON.parse(notificationId);
+    if (Array.isArray(ids)) {
+      for (const id of ids) {
+        await Notifications.cancelScheduledNotificationAsync(id);
+      }
+    } else {
+      await Notifications.cancelScheduledNotificationAsync(notificationId);
+    }
+  } catch {
+    // Single notification ID
+    await Notifications.cancelScheduledNotificationAsync(notificationId);
+  }
 }
 
 /**
