@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -9,10 +9,13 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as Notifications from "expo-notifications";
 import DarkBottomNavigation from "./DarkBottomNavigation";
 import ScheduleScreen from "../screens/ScheduleScreen";
 import CameraScreen from "../screens/CameraScreen";
 import ChatScreen from "../screens/ChatScreen";
+import AlarmScreen from "../screens/AlarmScreen";
+import { snoozeAlarm, dismissAlarm } from "../services/notificationService";
 import theme from "../styles/theme";
 
 type Tab = "schedule" | "camera" | "chat";
@@ -21,10 +24,89 @@ interface DarkMainAppProps {
   onBack: () => void;
 }
 
+interface AlarmData {
+  medicationName: string;
+  notificationId: string;
+}
+
 export default function DarkMainApp({ onBack }: DarkMainAppProps) {
   const [activeTab, setActiveTab] = useState<Tab>("camera");
+  const [showAlarm, setShowAlarm] = useState(false);
+  const [currentAlarm, setCurrentAlarm] = useState<AlarmData | null>(null);
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
+  const notificationListener = useRef<Notifications.Subscription | undefined>(
+    undefined
+  );
+  const responseListener = useRef<Notifications.Subscription | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    // Listen for notifications when app is in foreground
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        const data = notification.request.content.data;
+        if (data.isAlarm) {
+          setCurrentAlarm({
+            medicationName: data.medicationName as string,
+            notificationId: notification.request.identifier,
+          });
+          setShowAlarm(true);
+        }
+      });
+
+    // Listen for user interactions with notifications
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener(
+        async (response) => {
+          const data = response.notification.request.content.data;
+          const actionId = response.actionIdentifier;
+
+          if (data.isAlarm) {
+            if (actionId === "SNOOZE_5") {
+              await handleSnooze(data.medicationName as string, 5);
+            } else if (actionId === "SNOOZE_10") {
+              await handleSnooze(data.medicationName as string, 10);
+            } else if (
+              actionId === "DISMISS" ||
+              actionId === Notifications.DEFAULT_ACTION_IDENTIFIER
+            ) {
+              await dismissAlarm(response.notification.request.identifier);
+            }
+          }
+        }
+      );
+
+    return () => {
+      if (notificationListener.current) {
+        notificationListener.current.remove();
+      }
+      if (responseListener.current) {
+        responseListener.current.remove();
+      }
+    };
+  }, []);
+
+  const handleDismiss = async (): Promise<void> => {
+    if (currentAlarm) {
+      await dismissAlarm(currentAlarm.notificationId);
+    }
+    setShowAlarm(false);
+    setCurrentAlarm(null);
+  };
+
+  const handleSnooze = async (
+    medicationName: string,
+    minutes: number
+  ): Promise<void> => {
+    if (currentAlarm) {
+      await dismissAlarm(currentAlarm.notificationId);
+      await snoozeAlarm(medicationName, minutes);
+    }
+    setShowAlarm(false);
+    setCurrentAlarm(null);
+  };
 
   const renderContent = (): React.JSX.Element => {
     switch (activeTab) {
@@ -64,6 +146,17 @@ export default function DarkMainApp({ onBack }: DarkMainAppProps) {
       <View style={styles.content}>{renderContent()}</View>
 
       <DarkBottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+
+      {currentAlarm && (
+        <AlarmScreen
+          visible={showAlarm}
+          medicationName={currentAlarm.medicationName}
+          onDismiss={handleDismiss}
+          onSnooze={(minutes) =>
+            handleSnooze(currentAlarm.medicationName, minutes)
+          }
+        />
+      )}
     </View>
   );
 }
