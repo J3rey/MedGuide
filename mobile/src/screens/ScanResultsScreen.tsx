@@ -1,4 +1,3 @@
-// src/screens/ScanResultsScreen.tsx
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -7,6 +6,7 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 import { findDrugMatchesFromImage } from "../services/matchDrugsFromImage";
 import type { Drug } from "../types/drug";
@@ -24,6 +24,10 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
   const [matches, setMatches] = useState<Drug[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  // debug info (so you can see what Gemini read)
+  const [ocrText, setOcrText] = useState("");
+  const [candidates, setCandidates] = useState<string[]>([]);
+
   useEffect(() => {
     let mounted = true;
 
@@ -31,14 +35,30 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
       try {
         setLoading(true);
         setError(null);
+        setOcrText("");
+        setCandidates([]);
 
         const res = await findDrugMatchesFromImage(uri);
 
         if (!mounted) return;
-        setMatches(res.matches);
+        setMatches(res.matches ?? []);
+        setOcrText(res.ocrText ?? "");
+        setCandidates(res.candidates ?? []);
       } catch (e: any) {
         if (!mounted) return;
-        setError(e?.message ?? "Scan failed. Please try again.");
+
+        const msg = String(e?.message ?? "Scan failed. Please try again.");
+
+        // Ignore Expo "deprecated expo-file-system" warning
+        if (
+          msg.toLowerCase().includes("deprecated") &&
+          msg.toLowerCase().includes("expo-file-system")
+        ) {
+          setError(null);
+        } else {
+          setError(msg);
+        }
+
         setMatches([]);
       } finally {
         if (!mounted) return;
@@ -63,24 +83,39 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
   const hasMatches = matches.length > 0;
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: theme.spacing["2xl"] }}
+    >
       <Text style={styles.title}>
         {hasMatches ? "Possible matches" : "No matches found"}
       </Text>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
+      {/* DEBUG (remove later) */}
+      <View style={styles.debugBox}>
+        <Text style={styles.debugTitle}>OCR text (debug)</Text>
+        <Text style={styles.debugText}>{ocrText || "(empty)"}</Text>
+
+        <Text style={[styles.debugTitle, { marginTop: theme.spacing.sm }]}>
+          Candidates (debug)
+        </Text>
+        <Text style={styles.debugText}>
+          {candidates.length ? candidates.join(", ") : "(none)"}
+        </Text>
+      </View>
+
       {hasMatches ? (
         <FlatList
           data={matches}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
+          scrollEnabled={false}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.row}
-              onPress={() =>
-                navigation.navigate("DrugDetails", { drugId: item.id })
-              }
+              onPress={() => navigation.navigate("DrugDetails", { drugId: item.id })}
             >
               <Text style={styles.rowTitle}>{item.brandName}</Text>
               <Text style={styles.rowSubtitle}>{item.genericName}</Text>
@@ -95,10 +130,7 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
       )}
 
       <View style={styles.actions}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
           <Text style={styles.buttonText}>Retry scan</Text>
         </TouchableOpacity>
 
@@ -109,7 +141,7 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
           <Text style={styles.buttonText}>Manual search</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -147,6 +179,23 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.sm,
     marginBottom: theme.spacing.md,
     color: theme.darkColors.destructive,
+  },
+
+  debugBox: {
+    borderWidth: 1,
+    borderColor: theme.darkColors.border,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+  },
+  debugTitle: {
+    color: theme.darkColors.foreground,
+    fontWeight: theme.typography.fontWeight.semibold,
+    marginBottom: 6,
+  },
+  debugText: {
+    color: theme.darkColors.mutedForeground,
+    fontSize: theme.typography.fontSize.sm,
   },
 
   list: { paddingTop: theme.spacing.sm },

@@ -1,55 +1,32 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, View, StatusBar } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { LanguageProvider } from "./src/contexts/LanguageContext";
+// App.tsx
+import React from "react";
+import "./src/i18n/index"; // MUST be here
+
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
 import LanguageSelectionScreen from "./src/screens/LanguageSelectionScreen";
-import DarkMainApp from "./src/components/DarkMainApp";
-import theme from "./src/styles/theme";
-import "./src/i18n/config";
-import i18n from "./src/i18n/config";
+import CameraScreen from "./src/screens/CameraScreen";
+import ScanResultsScreen from "./src/screens/ScanResultsScreen";
 
-type AppState = "language" | "main";
+export type RootStackParamList = {
+  Language: undefined;
+  Camera: undefined;
+  ScanResults: { uri: string };
+  ManualSearch: undefined;
+  DrugDetails: { drugId: string };
+};
 
-export default function App(): React.JSX.Element {
-  const [appState, setAppState] = useState<AppState>("language");
-  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
-  const handleLanguageSelect = (code: string): void => {
-    setSelectedLanguage(code);
-    i18n.changeLanguage(code);
-    setAppState("main");
-  };
-
-  const handleBack = (): void => {
-    setAppState("language");
-    setSelectedLanguage(null);
-  };
-
+export default function App() {
   return (
-    <SafeAreaProvider>
-      <LanguageProvider>
-        <View style={styles.container}>
-          <StatusBar
-            barStyle={appState === "main" ? "light-content" : "dark-content"}
-            backgroundColor={
-              appState === "main"
-                ? theme.darkColors.background
-                : theme.colors.background
-            }
-          />
-          {appState === "language" && (
-            <LanguageSelectionScreen onLanguageSelect={handleLanguageSelect} />
-          )}
-          {appState === "main" && <DarkMainApp onBack={handleBack} />}
-        </View>
-      </LanguageProvider>
-    </SafeAreaProvider>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Language" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Language" component={LanguageSelectionScreen} />
+        <Stack.Screen name="Camera" component={CameraScreen} />
+        <Stack.Screen name="ScanResults" component={ScanResultsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-});

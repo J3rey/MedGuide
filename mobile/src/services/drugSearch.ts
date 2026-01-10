@@ -1,13 +1,25 @@
-import { Drug } from "../types/drug";
+import type { Drug } from "../types/drug";
 
-const API_BASE = "https://YOUR_API_HERE"; // change this
+const MOCK: Drug[] = [
+  {
+    id: "panadol-rapid",
+    brandName: "Panadol Rapid",
+    genericName: "Paracetamol",
+  },
+  {
+    id: "paracetamol",
+    brandName: "Paracetamol",
+    genericName: "Paracetamol",
+  },
+];
 
 export async function searchDrugs(query: string): Promise<Drug[]> {
-  const url = `${API_BASE}/drugs/search?q=${encodeURIComponent(query)}`;
-  const res = await fetch(url);
+  const q = (query ?? "").toLowerCase().trim();
+  if (!q) return [];
 
-  if (!res.ok) {
-    throw new Error(`Drug search failed: ${res.status}`);
-  }
-  return (await res.json()) as Drug[];
+  return MOCK.filter(
+    (d) =>
+      d.brandName.toLowerCase().includes(q) ||
+      d.genericName.toLowerCase().includes(q)
+  );
 }

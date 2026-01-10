@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useNavigation } from "@react-navigation/native";
 import theme from "../styles/theme";
 
 interface Language {
@@ -23,14 +24,14 @@ const languages: Language[] = [
   { code: "it", name: "Italiano", flag: "🇮🇹" },
 ];
 
-interface LanguageSelectionScreenProps {
-  onLanguageSelect: (code: string) => void;
-}
+export default function LanguageSelectionScreen(): React.JSX.Element {
+  const { t, i18n } = useTranslation();
+  const navigation = useNavigation<any>();
 
-export default function LanguageSelectionScreen({
-  onLanguageSelect,
-}: LanguageSelectionScreenProps): React.JSX.Element {
-  const { t } = useTranslation();
+  const handleSelect = async (code: string) => {
+    await i18n.changeLanguage(code);
+    navigation.replace("Camera"); // go to camera screen
+  };
 
   return (
     <View style={styles.container}>
@@ -47,7 +48,7 @@ export default function LanguageSelectionScreen({
         {languages.map((language) => (
           <TouchableOpacity
             key={language.code}
-            onPress={() => onLanguageSelect(language.code)}
+            onPress={() => handleSelect(language.code)}
             style={styles.languageButton}
             activeOpacity={0.7}
           >
@@ -61,10 +62,7 @@ export default function LanguageSelectionScreen({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#EBF4FF",
-  },
+  container: { flex: 1, backgroundColor: "#EBF4FF" },
   header: {
     alignItems: "center",
     paddingTop: theme.spacing["5xl"],
@@ -81,12 +79,11 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.mutedForeground,
   },
-  languageList: {
-    flex: 1,
-  },
+  languageList: { flex: 1 },
   languageListContent: {
     paddingHorizontal: theme.spacing.xl,
     paddingBottom: theme.spacing.xl,
+    // NOTE: gap can cause issues on some RN setups; remove if needed
     gap: theme.spacing.base,
   },
   languageButton: {
@@ -96,12 +93,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.xl,
     flexDirection: "row",
     alignItems: "center",
+    // NOTE: remove gap if it causes red squiggles / runtime issues
     gap: theme.spacing.base,
     ...theme.shadows.base,
   },
-  flag: {
-    fontSize: 32,
-  },
+  flag: { fontSize: 32 },
   languageName: {
     fontSize: theme.typography.fontSize.lg,
     color: theme.colors.foreground,
