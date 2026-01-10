@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -22,8 +22,9 @@ interface ChatMessage {
   timestamp: Date;
 }
 
-export default function ChatScreen(): React.JSX.Element {
+export default function ChatScreen() {
   const { t } = useTranslation();
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 1,
@@ -32,7 +33,9 @@ export default function ChatScreen(): React.JSX.Element {
       timestamp: new Date(),
     },
   ]);
+
   const [inputMessage, setInputMessage] = useState("");
+
   const scrollViewRef = useRef<ScrollView>(null);
   const { width: screenWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -41,36 +44,40 @@ export default function ChatScreen(): React.JSX.Element {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
-  const sendMessage = async (): Promise<void> => {
-    if (inputMessage.trim()) {
-      const userMessage: ChatMessage = {
-        id: Date.now(),
-        text: inputMessage,
-        sender: "user",
+  const sendMessage = async () => {
+    if (!inputMessage.trim()) return;
+
+    const userMessage: ChatMessage = {
+      id: Date.now(),
+      text: inputMessage,
+      sender: "user",
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    const messageText = inputMessage;
+    setInputMessage("");
+
+    try {
+      const response = await medicationApi.sendChatMessage(messageText);
+
+      const botMessage: ChatMessage = {
+        id: Date.now() + 1,
+        text: response.message,
+        sender: "bot",
         timestamp: new Date(),
       };
-      setMessages([...messages, userMessage]);
-      const messageText = inputMessage;
-      setInputMessage("");
 
-      try {
-        const response = await medicationApi.sendChatMessage(messageText);
-        const botMessage: ChatMessage = {
-          id: Date.now() + 1,
-          text: response.message,
-          sender: "bot",
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, botMessage]);
-      } catch (error) {
-        const botMessage: ChatMessage = {
-          id: Date.now() + 1,
-          text: t("chat.defaultResponse"),
-          sender: "bot",
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, botMessage]);
-      }
+      setMessages((prev) => [...prev, botMessage]);
+    } catch {
+      const botMessage: ChatMessage = {
+        id: Date.now() + 1,
+        text: t("chat.defaultResponse"),
+        sender: "bot",
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, botMessage]);
     }
   };
 
@@ -93,7 +100,6 @@ export default function ChatScreen(): React.JSX.Element {
         ]}
       >
         <View style={styles.headerContent}>
-          <Text style={styles.headerIcon}>💬</Text>
           <View>
             <Text style={styles.headerTitle}>{t("chat.title")}</Text>
             <Text style={styles.headerSubtitle}>{t("chat.subtitle")}</Text>
@@ -169,14 +175,14 @@ export default function ChatScreen(): React.JSX.Element {
           placeholderTextColor={theme.darkColors.mutedForeground}
           multiline
           maxLength={500}
-          onSubmitEditing={sendMessage}
         />
+
         <TouchableOpacity
           onPress={sendMessage}
           style={styles.sendButton}
           disabled={!inputMessage.trim()}
         >
-          <Text style={styles.sendIcon}>➤</Text>
+          <Text style={styles.sendText}>Send</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -197,10 +203,6 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.spacing.sm,
-  },
-  headerIcon: {
-    fontSize: 32,
   },
   headerTitle: {
     fontSize: theme.typography.fontSize.lg,
@@ -274,14 +276,15 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     backgroundColor: "#3b82f6",
-    width: 48,
+    paddingHorizontal: 16,
     height: 48,
     borderRadius: theme.radius.lg,
     alignItems: "center",
     justifyContent: "center",
   },
-  sendIcon: {
-    fontSize: 20,
+  sendText: {
     color: "#ffffff",
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: "600",
   },
 });
