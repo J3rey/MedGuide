@@ -44,6 +44,7 @@ export default function ScheduleScreen(): React.JSX.Element {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [newAlarmMed, setNewAlarmMed] = useState("");
   const [selectedDays, setSelectedDays] = useState<string[]>(["Daily"]);
+  const [editingAlarm, setEditingAlarm] = useState<Alarm | null>(null);
 
   useEffect(() => {
     initializeNotifications();
@@ -206,10 +207,84 @@ export default function ScheduleScreen(): React.JSX.Element {
       setNewAlarmTime(new Date());
       setSelectedDays(["Daily"]);
       setShowAddAlarm(false);
+      setEditingAlarm(null);
     } catch (error) {
       console.error("Error adding alarm:", error);
       Alert.alert("Error", "Failed to create alarm");
     }
+  };
+
+  const startEditAlarm = (alarm: Alarm): void => {
+    setEditingAlarm(alarm);
+    setNewAlarmMed(alarm.medication_name);
+    
+    // Parse the 24-hour time string to create a Date object
+    const [hours, minutes] = alarm.time.split(":").map(Number);
+    const date = new Date();
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    setNewAlarmTime(date);
+    
+    setSelectedDays(alarm.days);
+    setShowAddAlarm(true);
+  };
+
+  const updateAlarm = async (): Promise<void> => {
+    if (!newAlarmMed.trim() || !editingAlarm) {
+      Alert.alert("Error", "Please enter a medication");
+      return;
+    }
+
+    try {
+      // Cancel old notification
+      if (editingAlarm.notification_id) {
+        await cancelAlarmNotification(editingAlarm.notification_id);
+      }
+
+      // Schedule new notification
+      const timeString24 = formatTime24(newAlarmTime);
+      const { hour, minute } = parseTime(timeString24);
+      const notificationId = await scheduleAlarmNotification(
+        newAlarmMed,
+        hour,
+        minute,
+        selectedDays
+      );
+
+      // Update in database
+      const { data, error } = await supabase
+        .from("alarms")
+        .update({
+          medication_name: newAlarmMed,
+          time: timeString24,
+          days: selectedDays,
+          notification_id: notificationId,
+        })
+        .eq("id", editingAlarm.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Update local state
+      setAlarms(alarms.map((a) => (a.id === editingAlarm.id ? data : a)));
+      setNewAlarmMed("");
+      setNewAlarmTime(new Date());
+      setSelectedDays(["Daily"]);
+      setShowAddAlarm(false);
+      setEditingAlarm(null);
+    } catch (error) {
+      console.error("Error updating alarm:", error);
+      Alert.alert("Error", "Failed to update alarm");
+    }
+  };
+
+  const cancelEdit = (): void => {
+    setNewAlarmMed("");
+    setNewAlarmTime(new Date());
+    setSelectedDays(["Daily"]);
+    setShowAddAlarm(false);
+    setEditingAlarm(null);
   };
 
   const removeAlarm = async (alarm: Alarm): Promise<void> => {
@@ -270,7 +345,9 @@ export default function ScheduleScreen(): React.JSX.Element {
               },
             ]}
           >
-            <Text style={styles.addAlarmTitle}>Add New Alarm</Text>
+            <Text style={styles.addAlarmTitle}>
+              {editingAlarm ? "Edit Alarm" : "Add New Alarm"}
+            </Text>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Medication</Text>
@@ -325,13 +402,15 @@ export default function ScheduleScreen(): React.JSX.Element {
             </View>
             <View style={styles.buttonRow}>
               <TouchableOpacity
-                onPress={addAlarm}
+                onPress={editingAlarm ? updateAlarm : addAlarm}
                 style={[styles.button, styles.addButtonStyle]}
               >
-                <Text style={styles.buttonText}>Add Alarm</Text>
+                <Text style={styles.buttonText}>
+                  {editingAlarm ? "Update Alarm" : "Add Alarm"}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => setShowAddAlarm(false)}
+                onPress={cancelEdit}
                 style={[styles.button, styles.cancelButton]}
               >
                 <Text style={styles.buttonText}>Cancel</Text>
@@ -403,6 +482,12 @@ export default function ScheduleScreen(): React.JSX.Element {
                     </View>
                   </View>
                   <View style={styles.alarmActions}>
+                    <TouchableOpacity
+                      onPress={() => startEditAlarm(alarm)}
+                      style={styles.editButton}
+                    >
+                      <Text style={styles.editIcon}>✏️</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => removeAlarm(alarm)}
                       style={styles.deleteButton}
@@ -648,6 +733,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.sm,
+  },
+  editButton: {
+    padding: theme.spacing.xs,
+  },
+  editIcon: {
+    fontSize: 20,
   },
   deleteButton: {
     padding: theme.spacing.xs,
