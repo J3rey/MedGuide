@@ -222,14 +222,14 @@ export default function ScheduleScreen(): React.JSX.Element {
   const startEditAlarm = (alarm: Alarm): void => {
     setEditingAlarm(alarm);
     setNewAlarmMed(alarm.medication_name);
-    
+
     // Parse the 24-hour time string to create a Date object
     const [hours, minutes] = alarm.time.split(":").map(Number);
     const date = new Date();
     date.setHours(hours);
     date.setMinutes(minutes);
     setNewAlarmTime(date);
-    
+
     setSelectedDays(alarm.days);
     setShowAddAlarm(true);
   };
@@ -315,7 +315,7 @@ export default function ScheduleScreen(): React.JSX.Element {
     }
   };
 
-  const containerPadding = screenWidth > 768 ? 48 : 24;
+  const containerPadding = screenWidth > 768 ? 48 : 12;
   const maxContentWidth =
     screenWidth > 768 ? 800 : screenWidth - containerPadding * 2;
 
@@ -447,19 +447,19 @@ export default function ScheduleScreen(): React.JSX.Element {
                   <View style={styles.alarmInfo}>
                     <Text
                       style={[
-                        styles.alarmTime,
-                        !alarm.enabled && styles.disabledText,
-                      ]}
-                    >
-                      {displayTime(alarm.time)}
-                    </Text>
-                    <Text
-                      style={[
                         styles.alarmMedication,
                         !alarm.enabled && styles.disabledMedication,
                       ]}
                     >
                       {alarm.medication_name}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.alarmTime,
+                        !alarm.enabled && styles.disabledText,
+                      ]}
+                    >
+                      {displayTime(alarm.time)}
                     </Text>
                     <View style={styles.daysContainer}>
                       {alarm.days.map((day, idx) => (
@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.medium,
   },
   alarmsList: {
-    paddingHorizontal: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.base,
     gap: theme.spacing.sm,
   },
   alarmCard: {
@@ -693,15 +693,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   alarmTime: {
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: theme.typography.fontWeight.medium,
+    color: theme.darkColors.mutedForeground,
+    marginBottom: theme.spacing.xs,
+  },
+  alarmMedication: {
     fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.darkColors.foreground,
     marginBottom: theme.spacing.xs,
-  },
-  alarmMedication: {
-    fontSize: theme.typography.fontSize.sm,
-    color: "#60a5fa",
-    marginBottom: theme.spacing.sm,
   },
   disabledText: {
     color: theme.darkColors.mutedForeground,
