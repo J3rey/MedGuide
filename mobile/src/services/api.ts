@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import i18n from '../i18n/config';
 
 // Use your local IP or localhost - update this based on your setup
