@@ -70,7 +70,7 @@ export default function AlarmScreen({
               { transform: [{ scale: pulseAnim }] },
             ]}
           >
-            <Text style={styles.icon}>💊</Text>
+            <Text style={styles.icon}>PILL</Text>
           </Animated.View>
 
           <Text style={styles.title}>MEDICATION ALARM</Text>
@@ -83,7 +83,7 @@ export default function AlarmScreen({
               onPress={onDismiss}
               activeOpacity={0.8}
             >
-              <Text style={styles.dismissButtonText}>✓ I Took It</Text>
+              <Text style={styles.dismissButtonText}>I Took It</Text>
             </TouchableOpacity>
 
             <View style={styles.snoozeContainer}>

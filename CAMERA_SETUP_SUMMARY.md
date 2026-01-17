@@ -1,6 +1,6 @@
 # Camera Scanning Feature - Summary
 
-## ✅ Fixed Issues
+## Fixed Issues
 
 ### 1. Import Error in matchDrugsFromImage.ts
 - **Problem**: `import { buildCandidates } from "./buildCandidates"` - file doesn't exist
@@ -35,7 +35,7 @@
 
 ## 📋 Implementation Status
 
-### ✅ Working Components
+### Working Components
 
 1. **CameraScreen** - Takes and previews photos
 2. **OCR Service** - Extracts text using Gemini Vision API
@@ -47,16 +47,16 @@
 
 ### 🎨 Features Implemented
 
-- ✅ Camera permission handling
-- ✅ Photo capture and preview
-- ✅ Retake functionality
-- ✅ OCR text extraction (Gemini Vision API)
-- ✅ Smart candidate generation (n-grams, tokens)
-- ✅ Database search with fuzzy matching
-- ✅ Results display with debug information
-- ✅ Drug details view
-- ✅ Error handling and loading states
-- ✅ Navigation between screens
+- Camera permission handling
+- Photo capture and preview
+- Retake functionality
+- OCR text extraction (Gemini Vision API)
+- Smart candidate generation (n-grams, tokens)
+- Database search with fuzzy matching
+- Results display with debug information
+- Drug details view
+- Error handling and loading states
+- Navigation between screens
 
 ## 🧪 How to Test
 
