@@ -139,7 +139,7 @@ export default function DarkMainApp({ onBack }: DarkMainAppProps) {
           activeOpacity={0.7}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Text style={styles.settingsIcon}>⚙️</Text>
+          <Text style={styles.settingsIcon}>SETTINGS</Text>
         </TouchableOpacity>
       </View>
 
