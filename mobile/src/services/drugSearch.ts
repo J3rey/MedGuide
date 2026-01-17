@@ -21,9 +21,7 @@ export async function searchDrugs(query: string): Promise<Drug[]> {
     }
 
     console.log("[DrugSearch] Found", data?.length ?? 0, "results");
-    console.log("[DrugSearch] Raw data:", JSON.stringify(data, null, 2));
 
-    // Data already matches Drug type structure
     return data || [];
   } catch (error) {
     console.error("[DrugSearch] Search failed:", error);
