@@ -1,7 +1,7 @@
 import { extractTextFromImage } from "./ocr";
 import { searchDrugs } from "./drugSearch";
 import type { Drug } from "../types/drug";
-import { buildCandidates } from "./buildCandidates"; // wherever yours lives
+import { buildCandidates } from "./match";
 
 function normalize(s: string): string {
   return s
@@ -57,7 +57,7 @@ export async function findDrugMatchesFromImage(
 
   // 1) Build candidates from your existing logic, then normalize/dedupe
   const rawCandidates = buildCandidates(ocrText);
-  const cleanedCandidates = rawCandidates.map(normalize).filter((c) => c.length >= 3);
+  const cleanedCandidates = rawCandidates.map(normalize).filter((c: string) => c.length >= 3);
 
   // 2) Add fallback tokens extracted from OCR text itself
   const fallbackTokens = extractTokenFallbacks(ocrText);
