@@ -3,7 +3,7 @@
 ## 📸 Overview
 The camera scanning feature allows users to take photos of medicine labels/packages and extracts medication names using OCR (Gemini Vision API).
 
-## ✅ Fixed Issues
+## Fixed Issues
 1. **Import Error**: Fixed `buildCandidates` import path (was `./buildCandidates`, now correctly `./match`)
 2. **Type Error**: Added explicit type annotation for filter callback parameter
 3. **Missing Screens**: Added `ManualSearchScreen` and `DrugDetailsScreen` placeholders
@@ -62,18 +62,18 @@ Create test images with these medication names written on paper:
 ### Test 4: Scan Results Screen
 
 **When matches found:**
-- ✅ Loading indicator appears briefly
-- ✅ Title shows "Possible matches"
-- ✅ Debug box shows OCR text and candidates
-- ✅ List of matched drugs appears
-- ✅ Each drug shows Brand Name and Generic Name
-- ✅ "Retry scan" button returns to camera
-- ✅ "Manual search" button navigates to placeholder screen
+- Loading indicator appears briefly
+- Title shows "Possible matches"
+- Debug box shows OCR text and candidates
+- List of matched drugs appears
+- Each drug shows Brand Name and Generic Name
+- "Retry scan" button returns to camera
+- "Manual search" button navigates to placeholder screen
 
 **When no matches:**
-- ✅ Title shows "No matches found"
-- ✅ Helpful message suggests retrying or manual search
-- ✅ Both action buttons work correctly
+- Title shows "No matches found"
+- Helpful message suggests retrying or manual search
+- Both action buttons work correctly
 
 ### Test 5: Drug Details
 1. From scan results, tap any medication
@@ -146,13 +146,13 @@ Currently using **8 mock medications**:
 
 ### OCR Accuracy Tips
 For best results:
-- ✅ Good lighting (natural light or bright room)
-- ✅ Clear, focused image
-- ✅ Text fills most of frame
-- ✅ Minimal glare or shadows
-- ❌ Avoid blurry images
-- ❌ Avoid extreme angles
-- ❌ Avoid dark/low-light conditions
+- Good lighting (natural light or bright room)
+- Clear, focused image
+- Text fills most of frame
+- Minimal glare or shadows
+- Avoid blurry images
+- Avoid extreme angles
+- Avoid dark/low-light conditions
 
 ## 🔧 Troubleshooting
 
@@ -202,13 +202,13 @@ For best results:
 ## 📊 Success Criteria
 
 Camera scanning feature is working correctly if:
-1. ✅ Photos can be taken and previewed
-2. ✅ OCR extracts visible text from images
-3. ✅ Known medications are matched correctly
-4. ✅ Results screen displays matches clearly
-5. ✅ Navigation between screens works smoothly
-6. ✅ Error states are handled gracefully
-7. ✅ Debug information helps troubleshoot issues
+1. Photos can be taken and previewed
+2. OCR extracts visible text from images
+3. Known medications are matched correctly
+4. Results screen displays matches clearly
+5. Navigation between screens works smoothly
+6. Error states are handled gracefully
+7. Debug information helps troubleshoot issues
 
 ---
 

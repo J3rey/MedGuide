@@ -2,11 +2,11 @@
 
 A Mobile Applicaiton that detects medicine consumption compatability
 
-# 💊 Medguide - Medication Management App
+#  Medguide - Medication Management App
 
 A mobile app that helps users understand their medications through prescription scanning, AI-powered Q&A, and multi-language support.
 
-## 📋 Table of Contents
+##  Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -21,33 +21,33 @@ A mobile app that helps users understand their medications through prescription 
 
 ---
 
-## ✨ Features
+##  Features
 
 ### MVP (Phase 1)
 
-- ✅ Multi-language support (English + Chinese)
-- ✅ Prescription scanning via camera
-- ✅ OCR to extract medication names
-- ✅ AI-powered chatbot for medication questions
-- ✅ Basic medication information
-- ✅ Scan history storage
+-  Multi-language support (English + Chinese)
+-  Prescription scanning via camera
+-  OCR to extract medication names
+-  AI-powered chatbot for medication questions
+-  Basic medication information
+-  Scan history storage
 
 ### Phase 2 (Planned)
 
-- ⏳ Medication package scanning
-- ⏳ Drug interaction checking
-- ⏳ Reminder system with notifications
-- ⏳ Additional languages (Arabic)
+-  Medication package scanning
+-  Drug interaction checking
+-  Reminder system with notifications
+-  Additional languages (Arabic)
 
 ### Phase 3 (Future)
 
-- ❌ Advanced NLP for complex queries
-- ❌ User profiles & personalization
-- ❌ Community feedback integration
+-  Advanced NLP for complex queries
+-  User profiles & personalization
+-  Community feedback integration
 
 ---
 
-## 🚀 Tech Stack
+##  Tech Stack
 
 ### Frontend (Mobile App)
 
@@ -77,7 +77,7 @@ A mobile app that helps users understand their medications through prescription 
 
 ---
 
-## 📦 Prerequisites
+##  Prerequisites
 
 Before you begin, ensure you have the following installed:
 
@@ -95,7 +95,7 @@ Before you begin, ensure you have the following installed:
 
 ---
 
-## 📦 Packages to install
+##  Packages to install
 
 Minimal commands and packages referenced by this README.
 
@@ -128,7 +128,7 @@ npm install @google-cloud/vision
 npm install -D typescript ts-node-dev @types/node @types/express @types/cors
 ```
 
-3. Mobile (from c:\...\MedGuide\mobile) — Expo managed workflow
+3. Mobile (from c:\...\MedGuide\mobile) - Expo managed workflow
 
 ```bash
 cd mobile
@@ -161,41 +161,41 @@ npm install -D typescript @types/react @types/react-native
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 medguide/
-├── mobile/                    # React Native mobile app
-│   ├── src/
-│   │   ├── screens/          # App screens (Home, Scanner, Chat, Reminders)
-│   │   ├── components/       # Reusable components
-│   │   ├── services/         # API calls, OCR logic
-│   │   ├── utils/            # Helper functions
-│   │   └── i18n/             # Translations (EN, ZH)
-│   ├── App.tsx               # Main app entry
-│   ├── package.json
-│   └── app.json
-│
-├── backend/                   # Node.js Express API
-│   ├── src/
-│   │   ├── routes/           # API routes
-│   │   ├── controllers/      # Business logic
-│   │   ├── services/         # Supabase, AI, OCR services
-│   │   ├── middleware/       # Auth, validation, error handling
-│   │   └── index.ts          # Server entry point
-│   ├── Dockerfile
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── .env.example
-│
-├── docker-compose.yml         # Docker orchestration
-├── .gitignore
-└── README.md
+ mobile/                    # React Native mobile app
+    src/
+       screens/          # App screens (Home, Scanner, Chat, Reminders)
+       components/       # Reusable components
+       services/         # API calls, OCR logic
+       utils/            # Helper functions
+       i18n/             # Translations (EN, ZH)
+    App.tsx               # Main app entry
+    package.json
+    app.json
+
+ backend/                   # Node.js Express API
+    src/
+       routes/           # API routes
+       controllers/      # Business logic
+       services/         # Supabase, AI, OCR services
+       middleware/       # Auth, validation, error handling
+       index.ts          # Server entry point
+    Dockerfile
+    package.json
+    tsconfig.json
+    .env.example
+
+ docker-compose.yml         # Docker orchestration
+ .gitignore
+ README.md
 ```
 
 ---
 
-## 🛠️ Setup Instructions
+##  Setup Instructions
 
 ### 1. Clone the Repository
 
@@ -207,7 +207,7 @@ cd MedGuide
 ### 2. Setup Supabase Database
 
 1. Go to [Supabase](https://supabase.com/) and create a new project
-2. Once created, go to **Settings** → **API**
+2. Once created, go to **Settings**  **API**
 3. Copy your:
    - Project URL
    - `anon` public key
@@ -303,7 +303,7 @@ API_URL=http://localhost:3000
 
 ---
 
-## 💻 Development
+##  Development
 
 ### Option 1: Run Backend with Docker (Recommended for team)
 
@@ -353,13 +353,13 @@ curl -X POST http://localhost:3000/api/chat \
 
 ---
 
-## 🚀 Deployment
+##  Deployment
 
 ### Deploy Backend to Render
 
 1. Push code to GitHub
 2. Go to [Render Dashboard](https://dashboard.render.com/)
-3. Click **New** → **Web Service**
+3. Click **New**  **Web Service**
 4. Connect your GitHub repository
 5. Configure:
    - **Name:** medguide-backend
@@ -392,7 +392,7 @@ eas build --platform ios --profile preview
 
 ---
 
-## 🔐 Environment Variables
+##  Environment Variables
 
 ### Backend `.env`
 
@@ -416,7 +416,7 @@ eas build --platform ios --profile preview
 
 ---
 
-## 👥 Contributing
+##  Contributing
 
 ### Team Members
 
@@ -456,7 +456,7 @@ git push origin feature/your-feature-name
 
 ---
 
-## 📅 Timeline
+##  Timeline
 
 ### Phase 1: MVP (Late Nov - End Dec) - 4 weeks
 
@@ -484,7 +484,7 @@ git push origin feature/your-feature-name
 
 ---
 
-## 📝 Useful Commands
+##  Useful Commands
 
 ```bash
 # Backend
@@ -505,7 +505,7 @@ eas submit           # Submit to app stores
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Backend won't start
 
@@ -543,7 +543,7 @@ API_URL=http://192.168.1.XXX:3000
 
 ---
 
-## 📚 Resources
+##  Resources
 
 - [React Native Docs](https://reactnative.dev/docs/getting-started)
 - [Expo Docs](https://docs.expo.dev/)
@@ -554,13 +554,13 @@ API_URL=http://192.168.1.XXX:3000
 
 ---
 
-## 📄 License
+##  License
 
 This project is for educational purposes as part of [University/Course Name].
 
 ---
 
-## 🤝 Support
+##  Support
 
 For questions or issues:
 

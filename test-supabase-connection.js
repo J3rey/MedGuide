@@ -16,9 +16,9 @@ async function testConnection() {
   try {
     console.log('✓ Connecting to:', SUPABASE_URL);
     
-    // Test 1: Simple query
+    // Test 1: Simple query - check drugs table
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/medications?select=*&limit=5`,
+      `${SUPABASE_URL}/rest/v1/drugs?select=*&limit=5`,
       {
         headers: {
           'apikey': SUPABASE_ANON_KEY,
@@ -39,13 +39,13 @@ async function testConnection() {
     console.log('✓ Found', data.length, 'medications');
     console.log('\nMedications in database:');
     data.forEach((med) => {
-      console.log(`  - ${med.brand_name} (${med.generic_name})`);
+      console.log(`  - ${med.drug_name} (ID: ${med.id})`);
     });
 
-    // Test 2: Search for Panadol
-    console.log('\n🔍 Searching for "Panadol"...');
+    // Test 2: Search for Paracetamol
+    console.log('\n🔍 Searching for "Paracetamol"...');
     const searchResponse = await fetch(
-      `${SUPABASE_URL}/rest/v1/medications?or=(brand_name.ilike.*panadol*,generic_name.ilike.*panadol*)`,
+      `${SUPABASE_URL}/rest/v1/drugs?drug_name=ilike.*paracetamol*`,
       {
         headers: {
           'apikey': SUPABASE_ANON_KEY,
@@ -55,15 +55,15 @@ async function testConnection() {
     );
 
     const searchData = await searchResponse.json();
-    console.log('✓ Found', searchData.length, 'matches for "Panadol"');
+    console.log('✓ Found', searchData.length, 'matches for "Paracetamol"');
     
     if (searchData.length > 0) {
       console.log('\n✅ SUCCESS! Your Supabase database is set up correctly.\n');
-      console.log('Panadol data:');
+      console.log('Paracetamol data:');
       console.log(JSON.stringify(searchData[0], null, 2));
     } else {
-      console.log('\n⚠️  No Panadol found in database.');
-      console.log('Add Panadol using the SQL in supabase-setup.sql\n');
+      console.log('\n⚠️  No Paracetamol found in database.');
+      console.log('Check your Drugs table has Paracetamol entry\n');
     }
 
   } catch (error) {
