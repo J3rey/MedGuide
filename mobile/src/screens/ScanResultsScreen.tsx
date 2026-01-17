@@ -102,11 +102,18 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      {/* Recognized Text Card */}
-      {ocrText && (
+      {/* Only show recognized text when there are matches */}
+      {hasMatches && ocrText && (
         <View style={styles.ocrCard}>
-          <Text style={styles.ocrLabel}>Recognized Text</Text>
+          <Text style={styles.ocrLabel}>OCR text (debug)</Text>
           <Text style={styles.ocrText}>{ocrText}</Text>
+        </View>
+      )}
+
+      {hasMatches && candidates.length > 0 && (
+        <View style={styles.ocrCard}>
+          <Text style={styles.ocrLabel}>Candidates (debug)</Text>
+          <Text style={styles.ocrText}>{candidates.join(", ")}</Text>
         </View>
       )}
 
