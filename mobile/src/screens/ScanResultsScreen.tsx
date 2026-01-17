@@ -38,9 +38,15 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
         setOcrText("");
         setCandidates([]);
 
+        console.log("[ScanResults] Starting scan with URI:", uri);
         const res = await findDrugMatchesFromImage(uri);
 
         if (!mounted) return;
+        
+        console.log("[ScanResults] Scan complete. OCR text:", res.ocrText);
+        console.log("[ScanResults] Candidates:", res.candidates);
+        console.log("[ScanResults] Matches:", res.matches.length);
+        
         setMatches(res.matches ?? []);
         setOcrText(res.ocrText ?? "");
         setCandidates(res.candidates ?? []);
@@ -48,6 +54,9 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
         if (!mounted) return;
 
         const msg = String(e?.message ?? "Scan failed. Please try again.");
+        
+        console.error("[ScanResults] Error:", msg);
+        console.error("[ScanResults] Full error:", e);
 
         // Ignore Expo "deprecated expo-file-system" warning
         if (
@@ -85,7 +94,7 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingBottom: theme.spacing["2xl"] }}
+      contentContainerStyle={{ paddingBottom: theme.spacing["2xl"], alignItems: "center" }}
     >
       <Text style={styles.title}>
         {hasMatches ? "Possible matches" : "No matches found"}
@@ -93,23 +102,18 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      {/* DEBUG (remove later) */}
-      <View style={styles.debugBox}>
-        <Text style={styles.debugTitle}>OCR text (debug)</Text>
-        <Text style={styles.debugText}>{ocrText || "(empty)"}</Text>
-
-        <Text style={[styles.debugTitle, { marginTop: theme.spacing.sm }]}>
-          Candidates (debug)
-        </Text>
-        <Text style={styles.debugText}>
-          {candidates.length ? candidates.join(", ") : "(none)"}
-        </Text>
-      </View>
+      {/* Recognized Text Card */}
+      {ocrText && (
+        <View style={styles.ocrCard}>
+          <Text style={styles.ocrLabel}>Recognized Text</Text>
+          <Text style={styles.ocrText}>{ocrText}</Text>
+        </View>
+      )}
 
       {hasMatches ? (
         <FlatList
           data={matches}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => String(item.id)}
           contentContainerStyle={styles.list}
           scrollEnabled={false}
           renderItem={({ item }) => (
@@ -117,8 +121,8 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
               style={styles.row}
               onPress={() => navigation.navigate("DrugDetails", { drugId: item.id })}
             >
-              <Text style={styles.rowTitle}>{item.brandName}</Text>
-              <Text style={styles.rowSubtitle}>{item.genericName}</Text>
+              <Text style={styles.rowTitle}>{item.drug_name}</Text>
+              <Text style={styles.rowSubtitle}>{item.indications || "No indication info"}</Text>
             </TouchableOpacity>
           )}
         />
@@ -160,15 +164,19 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: theme.typography.fontSize.xl,
+    fontSize: theme.typography.fontSize["2xl"],
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.darkColors.foreground,
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+    marginTop: theme.spacing.xl,
+    textAlign: "center",
   },
   bodyText: {
     fontSize: theme.typography.fontSize.sm,
     color: theme.darkColors.mutedForeground,
     marginTop: theme.spacing.sm,
+    textAlign: "center",
+    paddingHorizontal: theme.spacing.lg,
   },
   subtleText: {
     marginTop: theme.spacing.md,
@@ -179,31 +187,52 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.sm,
     marginBottom: theme.spacing.md,
     color: theme.darkColors.destructive,
+    textAlign: "center",
   },
 
-  debugBox: {
+  ocrCard: {
+    width: "90%",
+    backgroundColor: theme.darkColors.card,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.xl,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: theme.darkColors.border,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  ocrLabel: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.darkColors.mutedForeground,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: theme.spacing.sm,
+  },
+  ocrText: {
+    fontSize: theme.typography.fontSize["2xl"],
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.darkColors.primary,
+    textAlign: "center",
+  },
+
+  list: { 
+    paddingTop: theme.spacing.sm,
+    width: "100%",
+    paddingHorizontal: theme.spacing.base,
+  },
+
+  row: {
+    paddingVertical: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
     borderWidth: 1,
     borderColor: theme.darkColors.border,
     borderRadius: theme.radius.lg,
-    padding: theme.spacing.md,
     marginBottom: theme.spacing.md,
-  },
-  debugTitle: {
-    color: theme.darkColors.foreground,
-    fontWeight: theme.typography.fontWeight.semibold,
-    marginBottom: 6,
-  },
-  debugText: {
-    color: theme.darkColors.mutedForeground,
-    fontSize: theme.typography.fontSize.sm,
-  },
-
-  list: { paddingTop: theme.spacing.sm },
-
-  row: {
-    paddingVertical: theme.spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.darkColors.border,
+    backgroundColor: theme.darkColors.card,
   },
   rowTitle: {
     fontSize: theme.typography.fontSize.base,
@@ -216,14 +245,19 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
 
-  actions: { marginTop: theme.spacing.lg },
+  actions: { 
+    marginTop: theme.spacing.lg,
+    width: "90%",
+    alignSelf: "center",
+  },
   button: {
     marginTop: theme.spacing.sm,
-    paddingVertical: theme.spacing.md,
+    paddingVertical: theme.spacing.lg,
     borderWidth: 1,
-    borderRadius: theme.radius.lg,
+    borderRadius: theme.radius.xl,
     borderColor: theme.darkColors.border,
     alignItems: "center",
+    backgroundColor: theme.darkColors.card,
   },
   buttonText: {
     fontSize: theme.typography.fontSize.sm,

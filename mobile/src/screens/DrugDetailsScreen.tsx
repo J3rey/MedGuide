@@ -24,11 +24,35 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
   useEffect(() => {
     (async () => {
       try {
-        // Simple lookup by ID - in real app, you'd have a getDrugById API
-        const results = await searchDrugs(drugId.replace(/-/g, " "));
-        setDrug(results[0] || null);
+        console.log("[DrugDetails] Fetching drug with ID:", drugId);
+        // Import supabase client to fetch by ID
+        const { createClient } = await import('@supabase/supabase-js');
+        const Constants = await import('expo-constants');
+        
+        const supabaseUrl = Constants.default.expoConfig?.extra?.supabaseUrl || 
+                           process.env.EXPO_PUBLIC_SUPABASE_URL || 
+                           'https://kzqqeodwdpqlsgvydqyb.supabase.co';
+        const supabaseKey = Constants.default.expoConfig?.extra?.supabaseAnonKey || 
+                           process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 
+                           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6cXFlb2R3ZHBxbHNndnlkcXliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc3Mzk0NjEsImV4cCI6MjA1MzMxNTQ2MX0.3rRRlp-0cOTPJX_xAKzA0YWgS1qAy8x1EiOMb8gI1AI';
+        
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        const { data, error } = await supabase
+          .from('drugs')
+          .select('*')
+          .eq('id', Number(drugId))
+          .single();
+        
+        if (error) {
+          console.error("[DrugDetails] Error:", error);
+          setDrug(null);
+        } else {
+          console.log("[DrugDetails] Loaded drug:", data);
+          setDrug(data);
+        }
       } catch (error) {
-        console.error("Failed to load drug details:", error);
+        console.error("[DrugDetails] Failed to load drug details:", error);
+        setDrug(null);
       } finally {
         setLoading(false);
       }
@@ -62,32 +86,48 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
     <ScrollView style={styles.container}>
       <TouchableOpacity
         style={styles.backButton}
-        onPress={() => navigation.goBack()}
+        onPress={() => {
+          console.log("[DrugDetails] Back button pressed");
+          navigation.goBack();
+        }}
       >
-        <Text style={styles.backText}>Back</Text>
+        <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
-      <Text style={styles.brandName}>{drug.brandName}</Text>
-      <Text style={styles.genericName}>{drug.genericName}</Text>
+      <Text style={styles.brandName}>{drug.drug_name}</Text>
 
-      {drug.precautions && (
+      {drug.indications && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Precautions</Text>
-          <Text style={styles.sectionText}>{drug.precautions}</Text>
+          <Text style={styles.sectionTitle}>Indications</Text>
+          <Text style={styles.sectionText}>{drug.indications}</Text>
         </View>
       )}
 
-      {drug.adverseEffects && (
+      {drug.counseling && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Counseling Points</Text>
+          <Text style={styles.sectionText}>{drug.counseling}</Text>
+        </View>
+      )}
+
+      {drug.adverse_effects && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Adverse Effects</Text>
-          <Text style={styles.sectionText}>{drug.adverseEffects}</Text>
+          <Text style={styles.sectionText}>{drug.adverse_effects}</Text>
         </View>
       )}
 
-      {drug.counselling && (
+      {drug.precautions_pregnancy && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Counselling Points</Text>
-          <Text style={styles.sectionText}>{drug.counselling}</Text>
+          <Text style={styles.sectionTitle}>Precautions (Pregnancy)</Text>
+          <Text style={styles.sectionText}>{drug.precautions_pregnancy}</Text>
+        </View>
+      )}
+
+      {drug.precautions_children && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Precautions (Children)</Text>
+          <Text style={styles.sectionText}>{drug.precautions_children}</Text>
         </View>
       )}
     </ScrollView>
@@ -116,12 +156,19 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   backButton: {
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    backgroundColor: theme.darkColors.card,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.darkColors.border,
+    alignSelf: "flex-start",
   },
   backText: {
     color: theme.darkColors.primary,
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: theme.typography.fontWeight.semibold,
+    fontSize: theme.typography.fontSize.lg,
+    fontWeight: theme.typography.fontWeight.bold,
   },
   brandName: {
     fontSize: theme.typography.fontSize["2xl"],

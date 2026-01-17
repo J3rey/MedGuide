@@ -8,12 +8,12 @@ export async function searchDrugs(query: string): Promise<Drug[]> {
   console.log("[DrugSearch] Searching for:", q);
 
   try {
-    // Search in Supabase database
-    // Searches both brand_name and generic_name columns using ILIKE (case-insensitive)
+    // Search in Supabase database - table name is "drugs" (lowercase)
+    // Search in drug_name column using ILIKE (case-insensitive)
     const { data, error } = await supabase
-      .from("medications")
+      .from("drugs")
       .select("*")
-      .or(`brand_name.ilike.%${q}%,generic_name.ilike.%${q}%`);
+      .ilike("drug_name", `%${q}%`);
 
     if (error) {
       console.error("[DrugSearch] Supabase error:", error);
@@ -21,18 +21,10 @@ export async function searchDrugs(query: string): Promise<Drug[]> {
     }
 
     console.log("[DrugSearch] Found", data?.length ?? 0, "results");
+    console.log("[DrugSearch] Raw data:", JSON.stringify(data, null, 2));
 
-    // Map Supabase columns to Drug type
-    const drugs: Drug[] = (data || []).map((row) => ({
-      id: row.id,
-      brandName: row.brand_name,
-      genericName: row.generic_name,
-      precautions: row.precautions,
-      adverseEffects: row.adverse_effects,
-      counselling: row.counselling,
-    }));
-
-    return drugs;
+    // Data already matches Drug type structure
+    return data || [];
   } catch (error) {
     console.error("[DrugSearch] Search failed:", error);
     // Return empty array on error rather than throwing

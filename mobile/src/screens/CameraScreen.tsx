@@ -24,14 +24,31 @@ export default function CameraScreen() {
   }
 
   const takePhoto = async () => {
-    const photo = await cameraRef.current?.takePictureAsync({ quality: 0.8 });
-    if (photo?.uri) setPhotoUri(photo.uri);
+    try {
+      console.log("[Camera] Taking photo...");
+      const photo = await cameraRef.current?.takePictureAsync({ 
+        quality: 0.8,
+        base64: false 
+      });
+      console.log("[Camera] Photo captured:", photo?.uri);
+      if (photo?.uri) {
+        setPhotoUri(photo.uri);
+      } else {
+        console.error("[Camera] No photo URI returned");
+      }
+    } catch (error) {
+      console.error("[Camera] Error taking photo:", error);
+    }
   };
 
   const retake = () => setPhotoUri(null);
 
   const scan = () => {
-    if (!photoUri) return;
+    if (!photoUri) {
+      console.warn("[Camera] No photo URI available for scanning");
+      return;
+    }
+    console.log("[Camera] Navigating to ScanResults with URI:", photoUri);
     navigation.navigate("ScanResults", { uri: photoUri });
   };
 

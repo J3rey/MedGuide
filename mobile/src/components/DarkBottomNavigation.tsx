@@ -23,9 +23,9 @@ export default function DarkBottomNavigation({
   const { t } = useTranslation();
 
   const tabs = [
-    { id: "schedule" as Tab, label: t("navigation.schedule"), icon: "⏰" },
-    { id: "camera" as Tab, label: t("navigation.camera"), icon: "📷" },
-    { id: "chat" as Tab, label: t("navigation.chat"), icon: "💬" },
+    { id: "schedule" as Tab, label: t("navigation.schedule"), icon: "ALARM" },
+    { id: "camera" as Tab, label: t("navigation.camera"), icon: "CAM" },
+    { id: "chat" as Tab, label: t("navigation.chat"), icon: "CHAT" },
   ];
 
   return (
