@@ -40,7 +40,9 @@ export function LanguageProvider({
         i18n.changeLanguage(savedLanguage);
       }
     } catch (error) {
-      // Error loading language
+      console.error("Failed to load saved language:", error);
+      setCurrentLanguage("en");
+      i18n.changeLanguage("en");
     }
   };
 
@@ -50,7 +52,9 @@ export function LanguageProvider({
       setCurrentLanguage(lang);
       i18n.changeLanguage(lang);
     } catch (error) {
-      // Error saving language
+      console.error("Failed to save language preference:", error);
+      setCurrentLanguage(lang);
+      i18n.changeLanguage(lang);
     }
   };
 
