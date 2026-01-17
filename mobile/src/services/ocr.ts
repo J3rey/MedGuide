@@ -72,9 +72,11 @@ export async function extractTextFromImage(uri: string): Promise<string> {
         parts: [
           {
             text:
-              "Read all text visible in this image. This may be printed text or handwritten text on medicine labels, packages, or paper. " +
-              "Extract and return ONLY the actual text you see - drug names, dosages, or any words. " +
-              "Do not add explanations, just the text itself. If handwritten, do your best to read it.",
+              "Extract ONLY medication/drug names from this image. Look for drug names on medicine labels, packages, boxes, or prescriptions. " +
+              "Return each drug name on a new line, nothing else. Examples: Paracetamol, Ibuprofen, Aspirin, Amoxicillin. " +
+              "Do NOT include: dosages (500mg), forms (tablet), instructions, brand names mixed with other text. " +
+              "If you see 'Panadol 500mg tablets', return only 'Panadol'. " +
+              "If handwritten, do your best to read medication names only.",
           },
           {
             inlineData: {
