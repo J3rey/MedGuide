@@ -21,13 +21,72 @@ export async function searchDrugs(query: string): Promise<Drug[]> {
     }
 
     console.log("[DrugSearch] Found", data?.length ?? 0, "results");
-    console.log("[DrugSearch] Raw data:", JSON.stringify(data, null, 2));
 
-    // Data already matches Drug type structure
     return data || [];
   } catch (error) {
     console.error("[DrugSearch] Search failed:", error);
-    // Return empty array on error rather than throwing
+    return [];
+  }
+}
+
+// Batch search for multiple candidates - much faster than sequential queries
+// Now with fuzzy matching support
+export async function batchSearchDrugs(candidates: string[]): Promise<Drug[]> {
+  if (!candidates || candidates.length === 0) return [];
+
+  console.log("[DrugSearch] Batch searching for", candidates.length, "candidates");
+
+  try {
+    // Build OR conditions for all candidates with fuzzy matching
+    // Using both ILIKE for exact substring matches and similarity for fuzzy matches
+    const orConditions = candidates
+      .filter(c => c && c.length >= 3)
+      .map(c => `drug_name.ilike.%${c}%`)
+      .join(',');
+
+    if (!orConditions) return [];
+
+    // First try exact/substring matches
+    const { data: exactMatches, error: exactError } = await supabase
+      .from("drugs")
+      .select("*")
+      .or(orConditions);
+
+    if (exactError) {
+      console.error("[DrugSearch] Exact search error:", exactError);
+    }
+
+    // Then try fuzzy matches for typos (similarity > 0.3 means at least 30% similar)
+    // Build separate queries for each candidate with similarity
+    const fuzzyPromises = candidates
+      .filter(c => c && c.length >= 3)
+      .map(async (c) => {
+        const { data } = await supabase
+          .rpc('search_drugs_fuzzy', { search_term: c, threshold: 0.3 })
+          .limit(5);
+        return data || [];
+      });
+
+    let fuzzyMatches: any[] = [];
+    try {
+      const fuzzyResults = await Promise.all(fuzzyPromises);
+      fuzzyMatches = fuzzyResults.flat();
+    } catch (fuzzyError) {
+      console.log("[DrugSearch] Fuzzy search not available (requires pg_trgm)");
+      // Fuzzy search is optional, continue with exact matches
+    }
+
+    // Combine and deduplicate results
+    const allMatches = [...(exactMatches || []), ...fuzzyMatches];
+    const uniqueData = allMatches.filter((drug, index, self) =>
+      index === self.findIndex(d => d.id === drug.id)
+    );
+
+    console.log("[DrugSearch] Found", exactMatches?.length || 0, "exact +", fuzzyMatches.length, "fuzzy matches");
+
+    return uniqueData || [];
+  } catch (error) {
+    console.error("[DrugSearch] Batch search failed:", error);
     return [];
   }
 }
