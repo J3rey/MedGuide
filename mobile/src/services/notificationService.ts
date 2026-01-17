@@ -228,7 +228,7 @@ export async function snoozeAlarm(
 
   const notificationId = await Notifications.scheduleNotificationAsync({
     content: {
-      title: '💊 MEDICATION ALARM (Snoozed)',
+      title: 'MEDICATION ALARM (Snoozed)',
       body: `Time to take ${medicationName}`,
       sound: true,
       priority: Notifications.AndroidNotificationPriority.MAX,
