@@ -24,8 +24,11 @@ export function buildCandidates(ocrText: string): string[] {
     .map((l) => normalize(l))
     .filter(Boolean);
 
-  // tokens from all text
-  const allTokens = normalize(ocrText).split(" ").filter(Boolean);
+  // Split on spaces AND common separators to catch more individual words
+  const allTokens = normalize(ocrText)
+    .split(/[\s,;:|/\\]+/) // Split on spaces, commas, semicolons, pipes, slashes
+    .filter(Boolean)
+    .filter((t) => t.length >= 3); // Filter out very short tokens
 
   // n-grams (2-4 words) catch multi-word drug names like "panadol osteo"
   const ngrams: string[] = [];
@@ -37,14 +40,11 @@ export function buildCandidates(ocrText: string): string[] {
     }
   }
 
-  // include single tokens too (catch "paracetamol")
-  const singles = allTokens;
+  // Prioritize: full lines, then n-grams, then individual words
+  const candidates = unique([...lines, ...ngrams, ...allTokens])
+    .filter((c) => c.length >= 3) // Minimum 3 characters
+    .sort((a, b) => b.length - a.length); // Longer matches first
 
-  // prioritize longer phrases first (often more specific)
-  const candidates = unique([...lines, ...ngrams, ...singles])
-    .filter((c) => c.length >= 2)
-    .sort((a, b) => b.length - a.length);
-
-  // Keep it sane (avoid sending 500 candidates)
-  return candidates.slice(0, 40);
+  // Keep it sane (avoid sending too many candidates)
+  return candidates.slice(0, 50);
 }

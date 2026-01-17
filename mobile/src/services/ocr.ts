@@ -27,7 +27,7 @@ export async function extractTextFromImage(uri: string): Promise<string> {
   // Get API key from Expo Constants (supports both app.json extra and .env)
   const apiKey = Constants.expoConfig?.extra?.geminiApiKey || 
                  process.env.EXPO_PUBLIC_GEMINI_API_KEY ||
-                 'AIzaSyD7b5odDV4A9SsTCk9OUWPWBAUsxOYMaWg'; // Fallback to your key
+                 'AIzaSyB4Ad46m4epzoVblnQ5TtvRpZXZPnsA5rc'; // Fallback to your key
   
   if (!apiKey) {
     throw new Error("Missing Gemini API key. Check app.json extra.geminiApiKey or EXPO_PUBLIC_GEMINI_API_KEY");

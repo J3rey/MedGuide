@@ -39,11 +39,16 @@ function uniqueDrugsById(items: Drug[]): Drug[] {
 }
 
 function extractTokenFallbacks(ocrText: string): string[] {
-  // If OCR contains paracetamol-like tokens inside longer lines, pull them out
-  const cleaned = normalize(ocrText);
-  const tokens = cleaned.split(" ").filter((t) => t.length >= 4);
-  // pick top tokens (you can expand this later)
-  return tokens.slice(0, 10);
+  // Aggressively extract ALL individual words, strip spaces completely
+  const cleaned = ocrText.toLowerCase();
+  
+  // Split on any non-alphabetic character to get individual words
+  const tokens = cleaned
+    .split(/[^a-z]+/)
+    .filter((t) => t.length >= 3); // Keep words 3+ characters
+  
+  // Return all unique words with no spaces
+  return uniqueStrings(tokens);
 }
 
 export async function findDrugMatchesFromImage(
@@ -55,18 +60,25 @@ export async function findDrugMatchesFromImage(
 }> {
   const ocrText = await extractTextFromImage(uri);
 
-  // 1) Build candidates from your existing logic, then normalize/dedupe
+  // 1) Extract ALL individual words first (no spaces) - highest priority
+  const individualWords = extractTokenFallbacks(ocrText);
+
+  // 2) Build n-gram candidates from existing logic (for multi-word drugs)
   const rawCandidates = buildCandidates(ocrText);
-  const cleanedCandidates = rawCandidates.map(normalize).filter((c: string) => c.length >= 3);
+  const cleanedCandidates = rawCandidates
+    .map(normalize)
+    .map(c => c.replace(/\s+/g, '')) // Remove all spaces for better matching
+    .filter((c: string) => c.length >= 3);
 
-  // 2) Add fallback tokens extracted from OCR text itself
-  const fallbackTokens = extractTokenFallbacks(ocrText);
-
-  // 3) Combine, dedupe, limit (avoid spamming API)
-  const candidates = uniqueStrings([...cleanedCandidates, ...fallbackTokens]).slice(0, 20);
+  // 3) Prioritize individual words first, then multi-word candidates
+  const allCandidates = uniqueStrings([...individualWords, ...cleanedCandidates]);
+  
+  // Keep all candidates (no space-based matching issues)
+  const candidates = allCandidates.slice(0, 100); // Increased to catch all possibilities
 
   console.log("OCR TEXT:\n", ocrText);
-  console.log("CANDIDATES:", candidates);
+  console.log("TOTAL CANDIDATES:", candidates.length);
+  console.log("TOP 20 CANDIDATES:", candidates.slice(0, 20));
 
   // 4) Query DB using candidates (union results)
   const allResults: Drug[] = [];
