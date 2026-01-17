@@ -2,6 +2,8 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import chatRoutes from './routes/chat';
+import alarmRoutes from './routes/alarms';
+import drugRoutes from './routes/drugs';
 
 // Load environment variables
 dotenv.config();
@@ -20,6 +22,8 @@ app.get('/health', (req: Request, res: Response) => {
 
 // API Routes
 app.use('/api', chatRoutes);
+app.use('/api', alarmRoutes);
+app.use('/api', drugRoutes);
 
 // Start server
 app.listen(PORT, () => {
