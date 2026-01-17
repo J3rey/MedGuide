@@ -1,10 +1,10 @@
-# 🚨 Medication Alarm System
+# Medication Alarm System
 
 The MedGuide app now features a **full alarm system** instead of basic notifications. This ensures users never miss their medication with critical alerts, persistent sounds, and mandatory interaction.
 
 ## Key Features
 
-### ✅ Alarm-Like Behavior
+### Alarm-Like Behavior
 
 - **Critical Priority**: Maximum importance notifications that bypass Do Not Disturb
 - **Full-Screen Alerts**: Prominent red alarm screen when alarm fires
@@ -12,13 +12,13 @@ The MedGuide app now features a **full alarm system** instead of basic notificat
 - **Enhanced Vibration**: Longer vibration pattern (6 pulses instead of 3)
 - **Sticky Notifications**: Cannot be swiped away accidentally
 
-### ✅ Snooze Functionality
+### Snooze Functionality
 
 - **Multiple Snooze Options**: 5, 10, or 15 minutes
 - **Snooze Tracking**: Backend tracks how many times each alarm was snoozed
 - **Quick Actions**: Snooze directly from notification (5 or 10 min)
 
-### ✅ User Interaction Required
+### User Interaction Required
 
 - **Mandatory Dismissal**: User must actively dismiss or snooze
 - **Full-Screen UI**: Bright red screen with large buttons
@@ -128,7 +128,7 @@ Users can also snooze from the notification tray:
 - `allowAlert: true`
 - `allowBadge: true`
 - `allowSound: true`
-- `allowCriticalAlerts: true` ⚠️ Requires special entitlement
+- `allowCriticalAlerts: true` **WARNING:** Requires special entitlement
 
 ### Android
 
@@ -275,4 +275,4 @@ backgroundColor: "#d32f2f"; // Red for urgent
 
 ---
 
-**Built with ❤️ for better medication adherence**
+**Built with care for better medication adherence**

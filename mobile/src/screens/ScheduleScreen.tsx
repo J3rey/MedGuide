@@ -327,7 +327,7 @@ export default function ScheduleScreen(): React.JSX.Element {
       >
         <View style={[styles.header, { paddingHorizontal: containerPadding }]}>
           <View style={styles.headerLeft}>
-            <Text style={styles.bellIcon}>🔔</Text>
+            <Text style={styles.bellIcon}>ALARM</Text>
             <Text style={styles.title}>{t("schedule.title")}</Text>
           </View>
           <TouchableOpacity
@@ -374,7 +374,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                 <Text style={styles.pickerButtonText}>
                   {formatTime(newAlarmTime)}
                 </Text>
-                <Text style={styles.pickerArrow}>🕐</Text>
+                <Text style={styles.pickerArrow}>TIME</Text>
               </TouchableOpacity>
             </View>
 
@@ -437,7 +437,7 @@ export default function ScheduleScreen(): React.JSX.Element {
         >
           {loading ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyIcon}>⏳</Text>
+              <Text style={styles.emptyIcon}>...</Text>
               <Text style={styles.emptyText}>Loading alarms...</Text>
             </View>
           ) : (
@@ -491,13 +491,13 @@ export default function ScheduleScreen(): React.JSX.Element {
                       onPress={() => startEditAlarm(alarm)}
                       style={styles.editButton}
                     >
-                      <Text style={styles.editIcon}>✏️</Text>
+                      <Text style={styles.editIcon}>EDIT</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => removeAlarm(alarm)}
                       style={styles.deleteButton}
                     >
-                      <Text style={styles.deleteIcon}>🗑️</Text>
+                      <Text style={styles.deleteIcon}>DEL</Text>
                     </TouchableOpacity>
                     <Switch
                       value={alarm.enabled}
@@ -517,7 +517,7 @@ export default function ScheduleScreen(): React.JSX.Element {
 
         {!loading && alarms.length === 0 && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>⏰</Text>
+            <Text style={styles.emptyIcon}>CLOCK</Text>
             <Text style={styles.emptyText}>No alarms set</Text>
             <Text style={styles.emptySubtext}>Tap the + button to add one</Text>
           </View>

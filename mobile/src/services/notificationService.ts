@@ -88,7 +88,7 @@ export async function scheduleAlarmNotification(
   if (days.includes('Daily') || days.length === 7) {
     const notificationId = await Notifications.scheduleNotificationAsync({
       content: {
-        title: '💊 MEDICATION ALARM',
+        title: 'MEDICATION ALARM',
         body: `Time to take ${medicationName}`,
         sound: true,
         priority: Notifications.AndroidNotificationPriority.MAX,
@@ -119,7 +119,7 @@ export async function scheduleAlarmNotification(
   for (const weekday of dayNumbers) {
     const notificationId = await Notifications.scheduleNotificationAsync({
       content: {
-        title: '💊 MEDICATION ALARM',
+        title: 'MEDICATION ALARM',
         body: `Time to take ${medicationName}`,
         sound: true,
         priority: Notifications.AndroidNotificationPriority.MAX,
@@ -223,7 +223,7 @@ export async function snoozeAlarm(
 
   const notificationId = await Notifications.scheduleNotificationAsync({
     content: {
-      title: '💊 MEDICATION ALARM (Snoozed)',
+      title: 'MEDICATION ALARM (Snoozed)',
       body: `Time to take ${medicationName}`,
       sound: true,
       priority: Notifications.AndroidNotificationPriority.MAX,

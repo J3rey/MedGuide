@@ -1,5 +1,6 @@
 // src/services/ocr.ts
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
+import Constants from "expo-constants";
 
 function guessMimeType(uri: string): string {
   const lower = uri.toLowerCase();
@@ -23,16 +24,33 @@ type GeminiResponse = {
 };
 
 export async function extractTextFromImage(uri: string): Promise<string> {
-  const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+  // Get API key from Expo Constants (supports both app.json extra and .env)
+  const apiKey = Constants.expoConfig?.extra?.geminiApiKey || 
+                 process.env.EXPO_PUBLIC_GEMINI_API_KEY ||
+                 'AIzaSyD7b5odDV4A9SsTCk9OUWPWBAUsxOYMaWg'; // Fallback to your key
+  
   if (!apiKey) {
-    throw new Error("Missing EXPO_PUBLIC_GEMINI_API_KEY. Add it to your .env and restart Expo with -c.");
+    throw new Error("Missing Gemini API key. Check app.json extra.geminiApiKey or EXPO_PUBLIC_GEMINI_API_KEY");
   }
 
+  console.log("[OCR] API Key found:", apiKey.substring(0, 20) + "...");
   console.log("[OCR] Reading image from:", uri);
 
-  const rawBase64 = await FileSystem.readAsStringAsync(uri, {
-    encoding: "base64",
-  });
+  let rawBase64: string;
+  try {
+    // Try using legacy API first (more reliable)
+    rawBase64 = await FileSystem.readAsStringAsync(uri, {
+      encoding: "base64",
+    });
+  } catch (legacyError) {
+    console.log("[OCR] Legacy API failed, trying new API...");
+    // Fallback to new File API if legacy fails
+    const fileUri = uri.replace('file://', '');
+    const { File } = await import('expo-file-system');
+    const file = new File(fileUri);
+    const content = await file.text();
+    rawBase64 = btoa(content);
+  }
 
   console.log("[OCR] Image read, base64 length:", rawBase64.length);
 
@@ -41,9 +59,11 @@ export async function extractTextFromImage(uri: string): Promise<string> {
 
   console.log("[OCR] Detected mime type:", mimeType);
 
-  // Use a fast model for OCR-style extraction
-  const model = "gemini-1.5-flash"; // reliable default
+  // Use gemini-2.5-flash (stable multimodal model that supports vision)
+  const model = "gemini-2.5-flash";
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+  
+  console.log("[OCR] Sending request to Gemini API...");
 
   const payload = {
     contents: [

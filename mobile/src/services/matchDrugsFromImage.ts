@@ -27,7 +27,7 @@ function uniqueStrings(items: string[]): string[] {
 }
 
 function uniqueDrugsById(items: Drug[]): Drug[] {
-  const seen = new Set<string>();
+  const seen = new Set<number>();
   const out: Drug[] = [];
   for (const d of items) {
     if (!d?.id) continue;
