@@ -1,5 +1,5 @@
 import { extractTextFromImage } from "./ocr";
-import { searchDrugs } from "./drugSearch";
+import { batchSearchDrugs } from "./drugSearch";
 import type { Drug } from "../types/drug";
 import { buildCandidates } from "./match";
 
@@ -80,22 +80,8 @@ export async function findDrugMatchesFromImage(
   console.log("TOTAL CANDIDATES:", candidates.length);
   console.log("TOP 20 CANDIDATES:", candidates.slice(0, 20));
 
-  // 4) Query DB using candidates (union results)
-  const allResults: Drug[] = [];
-
-  for (const c of candidates) {
-    try {
-      const results = await searchDrugs(c);
-      if (Array.isArray(results) && results.length) {
-        allResults.push(...results);
-      }
-    } catch (e) {
-      console.log("searchDrugs failed for candidate:", c, e);
-      // ignore per-candidate failures but log for debugging
-    }
-  }
-
-  const matches = uniqueDrugsById(allResults);
+  // 4) Query DB using batch search (single query instead of 100 sequential queries)
+  const matches = await batchSearchDrugs(candidates);
 
   console.log("MATCHES COUNT:", matches.length);
 
