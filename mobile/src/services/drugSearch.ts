@@ -47,6 +47,8 @@ export async function batchSearchDrugs(candidates: string[]): Promise<Drug[]> {
     if (!orConditions) return [];
 
     // First try exact/substring matches
+    console.log("[DrugSearch] Query conditions:", orConditions);
+    
     const { data: exactMatches, error: exactError } = await supabase
       .from("drugs")
       .select("*")
@@ -54,6 +56,9 @@ export async function batchSearchDrugs(candidates: string[]): Promise<Drug[]> {
 
     if (exactError) {
       console.error("[DrugSearch] Exact search error:", exactError);
+      console.error("[DrugSearch] Error details:", JSON.stringify(exactError, null, 2));
+    } else {
+      console.log("[DrugSearch] Query succeeded, rows:", exactMatches?.length);
     }
 
     // Then try fuzzy matches for typos (similarity > 0.3 means at least 30% similar)
