@@ -7,6 +7,13 @@ yarn.lock
 .env
 .env.local
 .env.*.local
+backend/.env
+mobile/.env
+
+# CRITICAL: Never commit API keys
+**/AIza*
+**/*API_KEY*
+app.json.backup
 
 # Build outputs
 dist/

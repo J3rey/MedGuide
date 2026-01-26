@@ -9,6 +9,7 @@ import {
   ScrollView,
 } from "react-native";
 import { findDrugMatchesFromImage } from "../services/matchDrugsFromImage";
+import { testSupabaseConnection } from "../services/testSupabase";
 import type { Drug } from "../types/drug";
 import theme from "../styles/theme";
 
@@ -37,6 +38,10 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
         setError(null);
         setOcrText("");
         setCandidates([]);
+
+        // Test Supabase connection first
+        console.log("[ScanResults] Testing Supabase connection...");
+        await testSupabaseConnection();
 
         console.log("[ScanResults] Starting scan with URI:", uri);
         const res = await findDrugMatchesFromImage(uri);
