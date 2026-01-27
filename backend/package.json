@@ -18,33 +18,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@google-cloud/vision": "^4.3.3",
+    "@google-cloud/vision": "^4.0.2",
     "@google/generative-ai": "^0.2.1",
-<<<<<<< HEAD
     "@supabase/supabase-js": "^2.90.1",
-    "@types/multer": "^1.4.12",
-    "axios": "^1.13.2",
-=======
-    "@supabase/supabase-js": "^2.38.4",
     "@types/multer": "^2.0.0",
     "axios": "^1.6.2",
->>>>>>> ad0c1ee (feat: Implement secure OCR processing and API key protection by removing hardcoded keys and adding backend integration)
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "expo-constants": "~18.0.13",
     "expo-device": "~8.0.10",
     "expo-notifications": "~0.32.16",
-<<<<<<< HEAD
-    "express": "^4.22.1",
-    "multer": "^1.4.5-lts.1"
-  },
-  "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^4.17.25",
-    "@types/node": "^20.19.28",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.3"
-=======
     "express": "^4.18.2",
     "multer": "^2.0.2"
   },
@@ -53,7 +36,6 @@
     "@types/express": "^4.17.21",
     "@types/node": "^20.9.0",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.3.2"
->>>>>>> ad0c1ee (feat: Implement secure OCR processing and API key protection by removing hardcoded keys and adding backend integration)
+    "typescript": "^5.9.3"
   }
 }
