@@ -30,7 +30,8 @@ app.use('/api', alarmRoutes);
 app.use('/api', drugRoutes);
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV}`);
+  console.log(`📡 Accessible at: http://0.0.0.0:${PORT}`);
 });

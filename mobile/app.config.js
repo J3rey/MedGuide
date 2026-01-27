@@ -44,6 +44,8 @@ export default {
       ],
     ],
     extra: {
+      backendUrl:
+        process.env.EXPO_PUBLIC_BACKEND_URL || "http://192.168.1.68:3000",
       supabaseUrl:
         process.env.SUPABASE_URL || "https://kzqqeodwdpqlsgvydqyb.supabase.co",
       supabaseAnonKey:
