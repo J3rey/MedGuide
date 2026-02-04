@@ -8,17 +8,21 @@ import {
   Platform,
   useWindowDimensions,
 } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Notifications from "expo-notifications";
 import DarkBottomNavigation from "./DarkBottomNavigation";
 import ScheduleScreen from "../screens/ScheduleScreen";
 import CameraScreen from "../screens/CameraScreen";
 import ChatScreen from "../screens/ChatScreen";
+import ScanResultsScreen from "../screens/ScanResultsScreen";
 import AlarmScreen from "../screens/AlarmScreen";
 import { snoozeAlarm, dismissAlarm } from "../services/notificationService";
+import { ScanProvider, useScan } from "../contexts/ScanContext";
 import theme from "../styles/theme";
 
-type Tab = "schedule" | "camera" | "chat";
+type Tab = "schedule" | "camera" | "chat" | "settings";
 
 interface DarkMainAppProps {
   onBack: () => void;
@@ -29,10 +33,22 @@ interface AlarmData {
   notificationId: string;
 }
 
-export default function DarkMainApp({ onBack }: DarkMainAppProps) {
+const CameraStack = createNativeStackNavigator();
+
+function CameraStackScreen() {
+  return (
+    <CameraStack.Navigator screenOptions={{ headerShown: false }}>
+      <CameraStack.Screen name="CameraMain" component={CameraScreen} />
+      <CameraStack.Screen name="ScanResults" component={ScanResultsScreen} />
+    </CameraStack.Navigator>
+  );
+}
+
+function DarkMainAppContent({ onBack }: DarkMainAppProps) {
   const [activeTab, setActiveTab] = useState<Tab>("camera");
   const [showAlarm, setShowAlarm] = useState(false);
   const [currentAlarm, setCurrentAlarm] = useState<AlarmData | null>(null);
+  const { scannedDrug, setScannedDrug } = useScan();
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
   const notificationListener = useRef<Notifications.Subscription | undefined>(
@@ -41,6 +57,16 @@ export default function DarkMainApp({ onBack }: DarkMainAppProps) {
   const responseListener = useRef<Notifications.Subscription | undefined>(
     undefined
   );
+
+  // Listen for scan completion event
+  useEffect(() => {
+    if (scannedDrug) {
+      // Switch to chat tab with the scanned drug
+      setActiveTab("chat");
+      // Clear the scanned drug after a delay so chat can use it
+      setTimeout(() => setScannedDrug(null), 1000);
+    }
+  }, [scannedDrug, setScannedDrug]);
 
   useEffect(() => {
     // Listen for notifications when app is in foreground
@@ -113,36 +139,33 @@ export default function DarkMainApp({ onBack }: DarkMainAppProps) {
       case "schedule":
         return <ScheduleScreen />;
       case "camera":
-        return <CameraScreen />;
+        return (
+          <NavigationContainer independent={true}>
+            <CameraStackScreen />
+          </NavigationContainer>
+        );
       case "chat":
-        return <ChatScreen />;
+        return <ChatScreen initialDrugName={scannedDrug || undefined} />;
+      case "settings":
+        return (
+          <View style={styles.settingsScreen}>
+            <Text style={styles.settingsTitle}>Settings</Text>
+            <TouchableOpacity style={styles.settingsOption} onPress={onBack}>
+              <Text style={styles.settingsOptionText}>🌐 Change Language</Text>
+            </TouchableOpacity>
+          </View>
+        );
       default:
-        return <CameraScreen />;
+        return (
+          <NavigationContainer independent={true}>
+            <CameraStackScreen />
+          </NavigationContainer>
+        );
     }
   };
 
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          styles.header,
-          {
-            paddingTop: Math.max(insets.top, 16) + 8,
-            paddingHorizontal: screenWidth > 768 ? 48 : 24,
-          },
-        ]}
-        pointerEvents="box-none"
-      >
-        <TouchableOpacity
-          style={styles.settingsButton}
-          onPress={onBack}
-          activeOpacity={0.7}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Text style={styles.settingsIcon}>⚙️</Text>
-        </TouchableOpacity>
-      </View>
-
       <View style={styles.content}>{renderContent()}</View>
 
       <DarkBottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
@@ -166,38 +189,36 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.darkColors.background,
   },
-  header: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 999,
-    backgroundColor: "transparent",
-    elevation: 10,
+  settingsScreen: {
+    flex: 1,
+    padding: theme.spacing.xl,
+    paddingTop: 80,
   },
-  settingsButton: {
-    width: 56,
-    height: 56,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(42, 42, 42, 0.9)",
-    borderRadius: 28,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
+  settingsTitle: {
+    fontSize: theme.typography.fontSize.xxl,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.darkColors.foreground,
+    marginBottom: theme.spacing.xl,
   },
-  settingsIcon: {
-    fontSize: 32,
+  settingsOption: {
+    padding: theme.spacing.lg,
+    backgroundColor: theme.darkColors.card,
+    borderRadius: theme.radius.lg,
+    marginBottom: theme.spacing.md,
+  },
+  settingsOptionText: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.darkColors.foreground,
   },
   content: {
     flex: 1,
   },
 });
+
+export default function DarkMainApp(props: DarkMainAppProps) {
+  return (
+    <ScanProvider>
+      <DarkMainAppContent {...props} />
+    </ScanProvider>
+  );
+}

@@ -9,7 +9,7 @@ import {
 import { useTranslation } from "react-i18next";
 import theme from "../styles/theme";
 
-type Tab = "schedule" | "camera" | "chat";
+type Tab = "schedule" | "camera" | "chat" | "settings";
 
 interface DarkBottomNavigationProps {
   activeTab: Tab;
@@ -26,6 +26,7 @@ export default function DarkBottomNavigation({
     { id: "schedule" as Tab, label: t("navigation.schedule"), icon: "⏰" },
     { id: "camera" as Tab, label: t("navigation.camera"), icon: "📷" },
     { id: "chat" as Tab, label: t("navigation.chat"), icon: "💬" },
+    { id: "settings" as Tab, label: "Settings", icon: "⚙️" },
   ];
 
   return (

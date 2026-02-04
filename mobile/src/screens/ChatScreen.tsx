@@ -22,7 +22,11 @@ interface ChatMessage {
   timestamp: Date;
 }
 
-export default function ChatScreen() {
+interface ChatScreenProps {
+  initialDrugName?: string;
+}
+
+export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
   const { t } = useTranslation();
 
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -35,6 +39,7 @@ export default function ChatScreen() {
   ]);
 
   const [inputMessage, setInputMessage] = useState("");
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const scrollViewRef = useRef<ScrollView>(null);
   const { width: screenWidth } = useWindowDimensions();
@@ -44,19 +49,29 @@ export default function ChatScreen() {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  useEffect(() => {
+    if (initialDrugName && !hasInitialized) {
+      setHasInitialized(true);
+      const query = `Tell me about ${initialDrugName}`;
+      sendMessage(query);
+    }
+  }, [initialDrugName, hasInitialized]);
+
+  const sendMessage = async (customMessage?: string) => {
+    const messageText = customMessage || inputMessage;
+    if (!messageText.trim()) return;
 
     const userMessage: ChatMessage = {
       id: Date.now(),
-      text: inputMessage,
+      text: messageText,
       sender: "user",
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    const messageText = inputMessage;
-    setInputMessage("");
+    if (!customMessage) {
+      setInputMessage("");
+    }
 
     try {
       const response = await medicationApi.sendChatMessage(messageText);

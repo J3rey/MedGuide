@@ -115,16 +115,30 @@ export default function ScheduleScreen(): React.JSX.Element {
 
   const fetchAlarms = async (): Promise<void> => {
     try {
+      // Check if supabase is configured
+      if (!supabase) {
+        console.log("Supabase not configured, using empty alarms");
+        setAlarms([]);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("alarms")
         .select("*")
         .order("time", { ascending: true });
 
-      if (error) throw error;
-      setAlarms(data || []);
+      if (error) {
+        console.error("Supabase error:", error);
+        // Don't show alert for connection errors, just log
+        setAlarms([]);
+      } else {
+        setAlarms(data || []);
+      }
     } catch (error) {
       console.error("Error fetching alarms:", error);
-      Alert.alert("Error", "Failed to load alarms");
+      // Set empty alarms instead of showing error
+      setAlarms([]);
     } finally {
       setLoading(false);
     }

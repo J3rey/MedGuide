@@ -1,4 +1,3 @@
-// src/screens/ScanResultsScreen.tsx
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -9,6 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { findDrugMatchesFromImage } from "../services/matchDrugsFromImage";
+import { useScan } from "../contexts/ScanContext";
 import type { Drug } from "../types/drug";
 import theme from "../styles/theme";
 
@@ -19,6 +19,7 @@ type Props = {
 
 export default function ScanResultsScreen({ route, navigation }: Props) {
   const { uri } = route.params;
+  const { setScannedDrug } = useScan();
 
   const [loading, setLoading] = useState(true);
   const [matches, setMatches] = useState<Drug[]>([]);
@@ -35,13 +36,24 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
         const res = await findDrugMatchesFromImage(uri);
 
         if (!mounted) return;
+        
         setMatches(res.matches);
+        setLoading(false);
+        
+        // If we found matches, set the drug and go back
+        if (res.matches && res.matches.length > 0) {
+          const firstMatch = res.matches[0];
+          setTimeout(() => {
+            if (mounted) {
+              setScannedDrug(firstMatch.drug_name);
+              navigation.goBack();
+            }
+          }, 2000);
+        }
       } catch (e: any) {
         if (!mounted) return;
         setError(e?.message ?? "Scan failed. Please try again.");
         setMatches([]);
-      } finally {
-        if (!mounted) return;
         setLoading(false);
       }
     })();
@@ -49,7 +61,7 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
     return () => {
       mounted = false;
     };
-  }, [uri]);
+  }, [uri, navigation, setScannedDrug]);
 
   if (loading) {
     return (
@@ -73,18 +85,17 @@ export default function ScanResultsScreen({ route, navigation }: Props) {
       {hasMatches ? (
         <FlatList
           data={matches}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.row}
-              onPress={() =>
-                navigation.navigate("DrugDetails", { drugId: item.id })
-              }
-            >
-              <Text style={styles.rowTitle}>{item.brandName}</Text>
-              <Text style={styles.rowSubtitle}>{item.genericName}</Text>
-            </TouchableOpacity>
+            <View style={styles.row}>
+              <Text style={styles.rowTitle}>{item.drug_name}</Text>
+              {item.indications && (
+                <Text style={styles.rowSubtitle} numberOfLines={2}>
+                  {item.indications}
+                </Text>
+              )}
+            </View>
           )}
         />
       ) : (
