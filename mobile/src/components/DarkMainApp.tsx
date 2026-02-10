@@ -17,6 +17,7 @@ import ScheduleScreen from "../screens/ScheduleScreen";
 import CameraScreen from "../screens/CameraScreen";
 import ChatScreen from "../screens/ChatScreen";
 import ScanResultsScreen from "../screens/ScanResultsScreen";
+import ManualSearchScreen from "../screens/ManualSearchScreen";
 import AlarmScreen from "../screens/AlarmScreen";
 import { snoozeAlarm, dismissAlarm } from "../services/notificationService";
 import { ScanProvider, useScan } from "../contexts/ScanContext";
@@ -40,6 +41,7 @@ function CameraStackScreen() {
     <CameraStack.Navigator screenOptions={{ headerShown: false }}>
       <CameraStack.Screen name="CameraMain" component={CameraScreen} />
       <CameraStack.Screen name="ScanResults" component={ScanResultsScreen} />
+      <CameraStack.Screen name="ManualSearch" component={ManualSearchScreen} />
     </CameraStack.Navigator>
   );
 }

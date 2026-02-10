@@ -46,5 +46,16 @@
     "placeholder": "Type your question...",
     "greeting": "Hello! I'm your Medguide assistant. How can I help you today?",
     "defaultResponse": "I understand you have a question about your medication. Please consult with your healthcare provider for specific medical advice."
+  },
+  "manualSearch": {
+    "title": "Manual Drug Search",
+    "searchPlaceholder": "Type drug name...",
+    "helperText": "Type at least 2 characters. Suggestions will appear as you type to help with spelling.",
+    "suggestions": "Suggestions:",
+    "noResults": "No drugs found matching",
+    "tryAgain": "Try checking the spelling or use fewer characters",
+    "selectedDrug": "Selected Drug:",
+    "askChatbot": "Ask Chatbot About This Drug",
+    "back": "Back"
   }
 }

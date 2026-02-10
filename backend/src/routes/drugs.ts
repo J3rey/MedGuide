@@ -20,7 +20,7 @@ router.get('/drugs', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-// Search drugs by name or other fields
+// Search drugs by name or other fields with fuzzy matching
 router.get('/drugs/search', async (req: Request, res: Response): Promise<void> => {
   try {
     const { q } = req.query;
@@ -30,15 +30,32 @@ router.get('/drugs/search', async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    const { data, error } = await supabase
+    // First, try to find exact or prefix matches (prioritized)
+    const { data: exactMatches, error: exactError } = await supabase
+      .from('drugs')
+      .select('*')
+      .or(`drug_name.ilike.${q}%`)
+      .limit(5);
+
+    if (exactError) throw exactError;
+
+    // Then, find partial matches anywhere in the name
+    const { data: partialMatches, error: partialError } = await supabase
       .from('drugs')
       .select('*')
       .or(`drug_name.ilike.%${q}%,counseling.ilike.%${q}%,indications.ilike.%${q}%`)
       .limit(15);
 
-    if (error) throw error;
+    if (partialError) throw partialError;
 
-    res.json(data || []);
+    // Combine results, avoiding duplicates
+    const exactIds = new Set((exactMatches || []).map(d => d.id));
+    const combined = [
+      ...(exactMatches || []),
+      ...(partialMatches || []).filter(d => !exactIds.has(d.id))
+    ].slice(0, 15);
+
+    res.json(combined);
   } catch (error) {
     console.error('Error searching drugs:', error instanceof Error ? error.message : error);
     res.status(500).json({ error: 'Failed to search drugs' });
