@@ -21,25 +21,33 @@ const medicationDatabase: Record<string, MedicationInfo> = {
     usage: 'Pain relief, fever reduction, anti-inflammatory',
     dosage: '325-650mg every 4-6 hours as needed',
     sideEffects: 'Stomach upset, heartburn, nausea, increased bleeding risk',
-    counselling: 'Take with food or milk to reduce stomach upset. Take with a full glass of water. Do not lie down for 30 minutes after taking.',
-    warnings: 'Do not use if allergic to aspirin or NSAIDs. Consult doctor if you have bleeding disorders.'
+    counselling:
+      'Take with food or milk to reduce stomach upset. Take with a full glass of water. Do not lie down for 30 minutes after taking.',
+    warnings:
+      'Do not use if allergic to aspirin or NSAIDs. Consult doctor if you have bleeding disorders.',
   },
   ibuprofen: {
     name: 'Ibuprofen',
     usage: 'Pain relief, fever reduction, inflammation',
     dosage: '200-400mg every 4-6 hours as needed',
-    sideEffects: 'Stomach pain, heartburn, nausea, vomiting, gas, diarrhea, constipation, dizziness, headache',
-    counselling: 'Take with food or milk. Do not exceed 1200mg in 24 hours without medical supervision.',
-    warnings: 'May increase risk of heart attack or stroke. Avoid if you have kidney problems.'
+    sideEffects:
+      'Stomach pain, heartburn, nausea, vomiting, gas, diarrhea, constipation, dizziness, headache',
+    counselling:
+      'Take with food or milk. Do not exceed 1200mg in 24 hours without medical supervision.',
+    warnings:
+      'May increase risk of heart attack or stroke. Avoid if you have kidney problems.',
   },
   acetaminophen: {
     name: 'Acetaminophen (Tylenol)',
     usage: 'Pain relief and fever reduction',
     dosage: '325-650mg every 4-6 hours, max 3000mg per day',
-    sideEffects: 'Generally well-tolerated. Rare: allergic reactions, liver damage with overdose',
-    counselling: 'Do not exceed recommended dose. Avoid alcohol while taking this medication.',
-    warnings: 'Overdose can cause severe liver damage. Read labels carefully as many products contain acetaminophen.'
-  }
+    sideEffects:
+      'Generally well-tolerated. Rare: allergic reactions, liver damage with overdose',
+    counselling:
+      'Do not exceed recommended dose. Avoid alcohol while taking this medication.',
+    warnings:
+      'Overdose can cause severe liver damage. Read labels carefully as many products contain acetaminophen.',
+  },
 };
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -48,20 +56,40 @@ const model = genAI.getGenerativeModel({ model: '/gemini-2.5-flash' });
 // Search database for medication info
 function searchDatabase(query: string): string {
   const lowerQuery = query.toLowerCase();
-  
+
   // Find medication in database
   for (const [key, med] of Object.entries(medicationDatabase)) {
-    if (lowerQuery.includes(key) || lowerQuery.includes(med.name.toLowerCase())) {
+    if (
+      lowerQuery.includes(key) ||
+      lowerQuery.includes(med.name.toLowerCase())
+    ) {
       // Determine what information the user is asking for
-      if (lowerQuery.includes('dose') || lowerQuery.includes('dosage') || lowerQuery.includes('how much')) {
+      if (
+        lowerQuery.includes('dose') ||
+        lowerQuery.includes('dosage') ||
+        lowerQuery.includes('how much')
+      ) {
         return `${med.name} Dosage: ${med.dosage}`;
-      } else if (lowerQuery.includes('side effect') || lowerQuery.includes('adverse')) {
+      } else if (
+        lowerQuery.includes('side effect') ||
+        lowerQuery.includes('adverse')
+      ) {
         return `${med.name} Side Effects: ${med.sideEffects}`;
-      } else if (lowerQuery.includes('warning') || lowerQuery.includes('caution')) {
+      } else if (
+        lowerQuery.includes('warning') ||
+        lowerQuery.includes('caution')
+      ) {
         return `${med.name} Warnings: ${med.warnings}`;
-      } else if (lowerQuery.includes('counsel') || lowerQuery.includes('how to take')) {
+      } else if (
+        lowerQuery.includes('counsel') ||
+        lowerQuery.includes('how to take')
+      ) {
         return `${med.name} Counselling: ${med.counselling}`;
-      } else if (lowerQuery.includes('use') || lowerQuery.includes('what is') || lowerQuery.includes('what does')) {
+      } else if (
+        lowerQuery.includes('use') ||
+        lowerQuery.includes('what is') ||
+        lowerQuery.includes('what does')
+      ) {
         return `${med.name} - Usage: ${med.usage}`;
       } else {
         // Return general info
@@ -69,14 +97,14 @@ function searchDatabase(query: string): string {
       }
     }
   }
-  
+
   return 'No medication information found in database. Please ask about Aspirin, Ibuprofen, or Acetaminophen.';
 }
 
 async function chat(userMessage: string): Promise<string> {
   // First, search the database
   const dbInfo = searchDatabase(userMessage);
-  
+
   // If no info found, provide helpful guidance
   if (dbInfo.includes('No medication information found')) {
     const prompt = `You are a helpful medical information assistant chatbot. A user asked: "${userMessage}"
@@ -89,12 +117,12 @@ Politely explain that:
 3. Suggest they rephrase their question to ask about one of these medications
 
 Be friendly, professional, and concise (2-3 sentences).`;
-    
+
     const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text();
   }
-  
+
   // Use Gemini to format the database information in a friendly way
   const prompt = `You are a helpful medical information assistant. A user asked: "${userMessage}"
 
@@ -102,11 +130,11 @@ The database contains the following information:
 ${dbInfo}
 
 Format this information in a clear, friendly, and professional response. Keep it concise (2-3 paragraphs maximum). Only use the information provided from the database - do not add external medical advice.`;
-  
+
   const result = await model.generateContent(prompt);
   const response = await result.response;
   const text = response.text();
-  
+
   return text;
 }
 
@@ -125,35 +153,36 @@ async function main() {
 
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   });
 
   const askQuestion = () => {
     rl.question('You: ', async (userInput) => {
       const input = userInput.trim();
-      
+
       if (!input) {
         askQuestion();
         return;
       }
-      
+
       if (input.toLowerCase() === 'exit' || input.toLowerCase() === 'quit') {
         console.log('\n👋 Thank you for using MedGuide Chatbot. Stay healthy!');
         rl.close();
         return;
       }
-      
+
       try {
         console.log('\n🤖 Assistant: ');
         const response = await chat(input);
         console.log(response);
         console.log('\n' + '-'.repeat(70) + '\n');
       } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
+        const message =
+          error instanceof Error ? error.message : 'Unknown error';
         console.error('❌ Error:', message);
         console.log();
       }
-      
+
       askQuestion();
     });
   };

@@ -23,7 +23,9 @@ async function searchDrugsInDatabase(query: string): Promise<Drug[]> {
     const { data, error } = await supabase
       .from('drugs')
       .select('*')
-      .or(`drug_name.ilike.%${query}%,counseling.ilike.%${query}%,indications.ilike.%${query}%,adverse_effects.ilike.%${query}%`)
+      .or(
+        `drug_name.ilike.%${query}%,counseling.ilike.%${query}%,indications.ilike.%${query}%,adverse_effects.ilike.%${query}%`
+      )
       .limit(10);
 
     if (error) {
@@ -46,7 +48,9 @@ function formatDrugData(drugs: Drug[]): string {
     return 'No medication information found in the database.';
   }
 
-  return drugs.map(drug => `
+  return drugs
+    .map(
+      (drug) => `
 MEDICATION: ${drug.drug_name}
 ID: ${drug.id}
 INDICATIONS: ${drug.indications || 'Not available'}
@@ -55,15 +59,20 @@ ADVERSE EFFECTS: ${drug.adverse_effects || 'Not available'}
 PREGNANCY PRECAUTIONS: ${drug.precautions_pregnancy || 'Not available'}
 CHILDREN PRECAUTIONS: ${drug.precautions_children || 'Not available'}
 BREASTFEEDING PRECAUTIONS: ${drug.precautions_breastfeeding || 'Not available'}
----`).join('\n');
+---`
+    )
+    .join('\n');
 }
 
 /**
  * Chat with constrained database context
  */
-export const chat = async (message: string, language: string = 'en'): Promise<string> => {
+export const chat = async (
+  message: string,
+  language: string = 'en'
+): Promise<string> => {
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-  
+
   // Search for relevant drugs in the database
   const drugs = await searchDrugsInDatabase(message);
   const drugData = formatDrugData(drugs);
@@ -91,6 +100,6 @@ Remember: Answer ONLY based on the database information above. If the informatio
   const result = await model.generateContent(prompt);
   const response = await result.response;
   const text = response.text();
-  
+
   return text;
 };

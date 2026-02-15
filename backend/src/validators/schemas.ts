@@ -3,7 +3,10 @@ import { z } from 'zod';
 // Chat message validation
 export const chatMessageSchema = z.object({
   body: z.object({
-    message: z.string().min(1, 'Message cannot be empty').max(1000, 'Message too long'),
+    message: z
+      .string()
+      .min(1, 'Message cannot be empty')
+      .max(1000, 'Message too long'),
     language: z.enum(['en', 'es', 'zh', 'ko', 'it']).default('en'),
     medications: z.array(z.string()).optional(),
   }),
@@ -12,7 +15,10 @@ export const chatMessageSchema = z.object({
 // Drug search validation
 export const drugSearchSchema = z.object({
   query: z.object({
-    query: z.string().min(1, 'Search query cannot be empty').max(200, 'Query too long'),
+    query: z
+      .string()
+      .min(1, 'Search query cannot be empty')
+      .max(200, 'Query too long'),
   }),
 });
 
@@ -20,7 +26,12 @@ export const drugSearchSchema = z.object({
 export const alarmCreateSchema = z.object({
   body: z.object({
     medication_name: z.string().min(1, 'Medication name is required').max(100),
-    time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:MM)'),
+    time: z
+      .string()
+      .regex(
+        /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
+        'Invalid time format (HH:MM)'
+      ),
     days: z.array(z.string()).min(1, 'At least one day must be selected'),
     enabled: z.boolean().default(true),
     notification_id: z.string().optional(),
@@ -34,7 +45,10 @@ export const alarmUpdateSchema = z.object({
   }),
   body: z.object({
     medication_name: z.string().min(1).max(100).optional(),
-    time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).optional(),
+    time: z
+      .string()
+      .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+      .optional(),
     days: z.array(z.string()).min(1).optional(),
     enabled: z.boolean().optional(),
     notification_id: z.string().optional(),

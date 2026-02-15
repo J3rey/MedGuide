@@ -16,7 +16,9 @@ async function checkDatabase() {
   if (testError) {
     console.error('❌ Query Error:', testError);
     console.error('\n⚠️  This might be a Row Level Security (RLS) issue.');
-    console.error('   Check if RLS is enabled and add a policy to allow SELECT.');
+    console.error(
+      '   Check if RLS is enabled and add a policy to allow SELECT.'
+    );
     return;
   }
 
