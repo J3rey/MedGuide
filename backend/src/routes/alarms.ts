@@ -1,7 +1,14 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../services/supabase';
+import { AlarmUpdateInput } from '../types/alarms';
+import { validate } from '../middleware/validation';
+import { alarmCreateSchema, alarmUpdateSchema, alarmIdSchema } from '../validators/schemas';
+import { alarmsLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
+
+// Apply rate limiting to all alarm routes
+router.use(alarmsLimiter);
 
 // Get all alarms
 router.get('/alarms', async (req: Request, res: Response): Promise<void> => {
@@ -21,14 +28,9 @@ router.get('/alarms', async (req: Request, res: Response): Promise<void> => {
 });
 
 // Create a new alarm
-router.post('/alarms', async (req: Request, res: Response): Promise<void> => {
+router.post('/alarms', validate(alarmCreateSchema), async (req: Request, res: Response): Promise<void> => {
   try {
     const { medication_name, time, days, enabled, notification_id } = req.body;
-
-    if (!medication_name || !time || !days) {
-      res.status(400).json({ error: 'Missing required fields' });
-      return;
-    }
 
     const { data, error } = await supabase
       .from('alarms')
@@ -53,20 +55,12 @@ router.post('/alarms', async (req: Request, res: Response): Promise<void> => {
 });
 
 // Update an alarm
-router.put('/alarms/:id', async (req: Request, res: Response): Promise<void> => {
+router.put('/alarms/:id', validate(alarmUpdateSchema), async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { medication_name, time, days, enabled, notification_id } = req.body;
 
-    const updateData: Partial<{
-      medication_name: string;
-      time: string;
-      days: string[];
-      enabled: boolean;
-      notification_id: string;
-      snooze_count: number;
-      last_snoozed: string;
-    }> = {};
+    const updateData: Partial<AlarmUpdateInput> = {};
     if (medication_name !== undefined) updateData.medication_name = medication_name;
     if (time !== undefined) updateData.time = time;
     if (days !== undefined) updateData.days = days;
@@ -90,7 +84,7 @@ router.put('/alarms/:id', async (req: Request, res: Response): Promise<void> => 
 });
 
 // Delete an alarm
-router.delete('/alarms/:id', async (req: Request, res: Response): Promise<void> => {
+router.delete('/alarms/:id', validate(alarmIdSchema), async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 

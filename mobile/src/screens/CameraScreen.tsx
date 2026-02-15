@@ -2,8 +2,9 @@ import React, { useRef, useState } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import theme from "../styles/theme";
+import { CameraScreenProps } from "../types/navigation";
 
-export default function CameraScreen({ navigation }: any) {
+export default function CameraScreen({ navigation }: CameraScreenProps) {
   const cameraRef = useRef<CameraView | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
 

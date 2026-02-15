@@ -12,7 +12,9 @@ import {
   Alert,
   Modal,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import theme from "../styles/theme";
@@ -69,7 +71,10 @@ export default function ScheduleScreen(): React.JSX.Element {
     }
   };
 
-  const onTimeChange = (event: any, selectedDate?: Date): void => {
+  const onTimeChange = (
+    event: DateTimePickerEvent,
+    selectedDate?: Date
+  ): void => {
     const currentDate = selectedDate || newAlarmTime;
     setShowTimePicker(Platform.OS === "ios");
     setNewAlarmTime(currentDate);
@@ -117,7 +122,6 @@ export default function ScheduleScreen(): React.JSX.Element {
     try {
       // Check if supabase is configured
       if (!supabase) {
-        console.log("Supabase not configured, using empty alarms");
         setAlarms([]);
         setLoading(false);
         return;

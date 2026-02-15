@@ -11,13 +11,12 @@ import { findDrugMatchesFromImage } from "../services/matchDrugsFromImage";
 import { useScan } from "../contexts/ScanContext";
 import type { Drug } from "../types/drug";
 import theme from "../styles/theme";
+import { ScanResultsScreenProps } from "../types/navigation";
 
-type Props = {
-  route: { params: { uri: string } };
-  navigation: any;
-};
-
-export default function ScanResultsScreen({ route, navigation }: Props) {
+export default function ScanResultsScreen({
+  route,
+  navigation,
+}: ScanResultsScreenProps) {
   const { uri } = route.params;
   const { setScannedDrug } = useScan();
 

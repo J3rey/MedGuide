@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
+import { AxiosError } from "axios";
 import theme from "../styles/theme";
 import { medicationApi } from "../services/api";
 
@@ -58,14 +59,8 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
   }, [initialDrugName, hasInitialized]);
 
   const sendMessage = async (customMessage?: string) => {
-    console.log("=== sendMessage called ===");
     const messageText = customMessage || inputMessage;
-    console.log("Message text:", messageText);
-
-    if (!messageText.trim()) {
-      console.log("Message empty, returning");
-      return;
-    }
+    if (!messageText.trim()) return;
 
     const userMessage: ChatMessage = {
       id: Date.now(),
@@ -74,18 +69,13 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
       timestamp: new Date(),
     };
 
-    console.log("Adding user message to state");
     setMessages((prev) => [...prev, userMessage]);
-
     if (!customMessage) {
-      console.log("Clearing input");
       setInputMessage("");
     }
 
     try {
-      console.log("Calling API...");
       const response = await medicationApi.sendChatMessage(messageText);
-      console.log("API response received:", response);
 
       const botMessage: ChatMessage = {
         id: Date.now() + 1,
@@ -95,25 +85,27 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
       };
 
       setMessages((prev) => [...prev, botMessage]);
-    } catch (error: any) {
-      // Log the full error for debugging
-      console.log("Chat error:", error);
-      console.log("Error response:", error?.response);
-      console.log("Error response data:", error?.response?.data);
-
-      // Handle specific quota errors with a helpful message
+    } catch (error: unknown) {
       let errorText = t("chat.defaultResponse");
 
-      if (
-        error?.response?.status === 429 ||
-        error?.response?.data?.error === "quota_exceeded"
-      ) {
-        errorText =
-          error?.response?.data?.response ||
-          "I'm currently experiencing high demand. Please try again later.";
-      } else if (error?.message) {
-        // Show network errors
+      if (error instanceof AxiosError) {
+        console.error("Chat error:", error.response?.data || error.message);
+
+        if (
+          error.response?.status === 429 ||
+          error.response?.data?.error === "quota_exceeded"
+        ) {
+          errorText =
+            error.response?.data?.response ||
+            "I'm currently experiencing high demand. Please try again later.";
+        } else if (error.message) {
+          errorText = `Error: ${error.message}. Please check your connection.`;
+        }
+      } else if (error instanceof Error) {
+        console.error("Chat error:", error.message);
         errorText = `Error: ${error.message}. Please check your connection.`;
+      } else {
+        console.error("Unknown error:", error);
       }
 
       const botMessage: ChatMessage = {
@@ -216,10 +208,7 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
         <TextInput
           style={styles.input}
           value={inputMessage}
-          onChangeText={(text) => {
-            console.log("Input changed:", text);
-            setInputMessage(text);
-          }}
+          onChangeText={setInputMessage}
           placeholder={t("chat.placeholder")}
           placeholderTextColor={theme.darkColors.mutedForeground}
           multiline
@@ -227,10 +216,7 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
         />
 
         <TouchableOpacity
-          onPress={() => {
-            console.log("Send button pressed");
-            sendMessage();
-          }}
+          onPress={() => sendMessage()}
           style={[
             styles.sendButton,
             !inputMessage.trim() && styles.sendButtonDisabled,

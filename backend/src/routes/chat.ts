@@ -1,5 +1,8 @@
 import { Router, Request, Response } from 'express';
 import { chat } from '../services/gemini';
+import { validate } from '../middleware/validation';
+import { chatMessageSchema } from '../validators/schemas';
+import { chatLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
@@ -7,31 +10,15 @@ const router = Router();
  * POST /chat
  * Database-constrained chatbot that only provides information from the medications database
  */
-router.post('/chat', async (req: Request, res: Response): Promise<void> => {
+router.post('/chat', chatLimiter, validate(chatMessageSchema), async (req: Request, res: Response): Promise<void> => {
   try {
     const { message, language = 'en' } = req.body;
     
-    if (!message) {
-      res.status(400).json({ error: 'Message is required' });
-      return;
-    }
-
-    if (typeof message !== 'string' || message.trim().length === 0) {
-      res.status(400).json({ error: 'Message must be a non-empty string' });
-      return;
-    }
-
-    // Validate language parameter
-    const supportedLanguages = ['en', 'es', 'zh', 'ko', 'it'];
-    const lang = supportedLanguages.includes(language) ? language : 'en';
-    
-    console.log(`Chat request: "${message.substring(0, 50)}..." in ${lang}`);
-    
-    const response = await chat(message, lang);
+    const response = await chat(message, language);
     
     res.json({ 
       response,
-      language: lang,
+      language,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
