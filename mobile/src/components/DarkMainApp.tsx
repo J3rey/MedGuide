@@ -1,27 +1,27 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   useWindowDimensions,
-} from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import * as Notifications from "expo-notifications";
-import DarkBottomNavigation from "./DarkBottomNavigation";
-import ScheduleScreen from "../screens/ScheduleScreen";
-import CameraScreen from "../screens/CameraScreen";
-import ChatScreen from "../screens/ChatScreen";
-import ScanResultsScreen from "../screens/ScanResultsScreen";
-import ManualSearchScreen from "../screens/ManualSearchScreen";
-import AlarmScreen from "../screens/AlarmScreen";
-import { snoozeAlarm, dismissAlarm } from "../services/notificationService";
-import { ScanProvider, useScan } from "../contexts/ScanContext";
-import theme from "../styles/theme";
+} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Notifications from 'expo-notifications';
+import DarkBottomNavigation from './DarkBottomNavigation';
+import ScheduleScreen from '../screens/ScheduleScreen';
+import CameraScreen from '../screens/CameraScreen';
+import ChatScreen from '../screens/ChatScreen';
+import ScanResultsScreen from '../screens/ScanResultsScreen';
+import ManualSearchScreen from '../screens/ManualSearchScreen';
+import AlarmScreen from '../screens/AlarmScreen';
+import { snoozeAlarm, dismissAlarm } from '../services/notificationService';
+import { ScanProvider, useScan } from '../contexts/ScanContext';
+import theme from '../styles/theme';
 
-type Tab = "schedule" | "camera" | "chat" | "settings";
+type Tab = 'schedule' | 'camera' | 'chat' | 'settings';
 
 interface DarkMainAppProps {
   onBack: () => void;
@@ -45,24 +45,24 @@ function CameraStackScreen() {
 }
 
 function DarkMainAppContent({ onBack }: DarkMainAppProps) {
-  const [activeTab, setActiveTab] = useState<Tab>("camera");
+  const [activeTab, setActiveTab] = useState<Tab>('camera');
   const [showAlarm, setShowAlarm] = useState(false);
   const [currentAlarm, setCurrentAlarm] = useState<AlarmData | null>(null);
   const { scannedDrug, setScannedDrug } = useScan();
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
   const notificationListener = useRef<Notifications.Subscription | undefined>(
-    undefined,
+    undefined
   );
   const responseListener = useRef<Notifications.Subscription | undefined>(
-    undefined,
+    undefined
   );
 
   // Listen for scan completion event
   useEffect(() => {
     if (scannedDrug) {
       // Switch to chat tab with the scanned drug
-      setActiveTab("chat");
+      setActiveTab('chat');
       // Clear the scanned drug after a delay so chat can use it
       setTimeout(() => setScannedDrug(null), 1000);
     }
@@ -90,18 +90,18 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
           const actionId = response.actionIdentifier;
 
           if (data.isAlarm) {
-            if (actionId === "SNOOZE_5") {
+            if (actionId === 'SNOOZE_5') {
               await handleSnooze(data.medicationName as string, 5);
-            } else if (actionId === "SNOOZE_10") {
+            } else if (actionId === 'SNOOZE_10') {
               await handleSnooze(data.medicationName as string, 10);
             } else if (
-              actionId === "DISMISS" ||
+              actionId === 'DISMISS' ||
               actionId === Notifications.DEFAULT_ACTION_IDENTIFIER
             ) {
               await dismissAlarm(response.notification.request.identifier);
             }
           }
-        },
+        }
       );
 
     return () => {
@@ -124,7 +124,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
 
   const handleSnooze = async (
     medicationName: string,
-    minutes: number,
+    minutes: number
   ): Promise<void> => {
     if (currentAlarm) {
       await dismissAlarm(currentAlarm.notificationId);
@@ -136,17 +136,17 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
 
   const renderContent = (): React.JSX.Element => {
     switch (activeTab) {
-      case "schedule":
+      case 'schedule':
         return <ScheduleScreen />;
-      case "camera":
+      case 'camera':
         return (
           <NavigationContainer independent={true}>
             <CameraStackScreen />
           </NavigationContainer>
         );
-      case "chat":
+      case 'chat':
         return <ChatScreen initialDrugName={scannedDrug || undefined} />;
-      case "settings": {
+      case 'settings': {
         const containerPadding = screenWidth > 768 ? 48 : 24;
         return (
           <View style={styles.settingsScreen}>
@@ -225,13 +225,13 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.base,
   },
   headerContent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing.sm,
   },
   settingsIcon: {

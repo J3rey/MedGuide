@@ -35,21 +35,30 @@ export interface ChatResponse {
 }
 
 export const medicationApi = {
-  searchMedication: async (query: string, language?: string): Promise<MedicationInfo[]> => {
+  searchMedication: async (
+    query: string,
+    language?: string
+  ): Promise<MedicationInfo[]> => {
     const response = await api.get('/medications/search', {
       params: { q: query, lang: language || i18n.language },
     });
     return response.data;
   },
 
-  getMedicationInfo: async (medicationId: string, language?: string): Promise<MedicationInfo> => {
+  getMedicationInfo: async (
+    medicationId: string,
+    language?: string
+  ): Promise<MedicationInfo> => {
     const response = await api.get(`/medications/${medicationId}`, {
       params: { lang: language || i18n.language },
     });
     return response.data;
   },
 
-  sendChatMessage: async (message: string, language?: string): Promise<ChatResponse> => {
+  sendChatMessage: async (
+    message: string,
+    language?: string
+  ): Promise<ChatResponse> => {
     const response = await api.post('/chat', {
       message,
       language: language || i18n.language,

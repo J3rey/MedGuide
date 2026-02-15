@@ -1,8 +1,8 @@
-import React, { useRef, useState } from "react";
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
-import { CameraView, useCameraPermissions } from "expo-camera";
-import theme from "../styles/theme";
-import { CameraScreenProps } from "../types/navigation";
+import React, { useRef, useState } from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import theme from '../styles/theme';
+import { CameraScreenProps } from '../types/navigation';
 
 export default function CameraScreen({ navigation }: CameraScreenProps) {
   const cameraRef = useRef<CameraView | null>(null);
@@ -31,7 +31,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 
   const scan = () => {
     if (!photoUri) return;
-    navigation.navigate("ScanResults", { uri: photoUri });
+    navigation.navigate('ScanResults', { uri: photoUri });
   };
 
   // PREVIEW MODE
@@ -66,8 +66,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.darkColors.background },
   center: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
   },
   text: { color: theme.darkColors.foreground, marginBottom: 12 },
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
 
   captureBar: {
     padding: 16,
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: theme.darkColors.background,
   },
   shutter: {
@@ -87,10 +87,10 @@ const styles = StyleSheet.create({
     borderColor: theme.darkColors.foreground,
   },
 
-  preview: { flex: 1, resizeMode: "contain", backgroundColor: "#000" },
+  preview: { flex: 1, resizeMode: 'contain', backgroundColor: '#000' },
   previewActions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     gap: 12, // if gap causes issues, replace with marginLeft on 2nd button
     padding: 16,
   },
@@ -101,19 +101,19 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     borderWidth: 1,
     borderColor: theme.darkColors.border,
-    alignItems: "center",
+    alignItems: 'center',
   },
-  buttonText: { color: theme.darkColors.foreground, fontWeight: "600" },
+  buttonText: { color: theme.darkColors.foreground, fontWeight: '600' },
 
   buttonPrimary: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: theme.radius.lg,
     backgroundColor: theme.darkColors.primary,
-    alignItems: "center",
+    alignItems: 'center',
   },
   buttonTextPrimary: {
     color: theme.darkColors.primaryForeground,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 });

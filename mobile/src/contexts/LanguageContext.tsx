@@ -4,9 +4,9 @@ import React, {
   useState,
   useEffect,
   ReactNode,
-} from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import i18n from "../i18n/config";
+} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from '../i18n/config';
 
 interface LanguageContextType {
   currentLanguage: string;
@@ -17,7 +17,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
   undefined
 );
 
-const LANGUAGE_KEY = "@medguide_language";
+const LANGUAGE_KEY = '@medguide_language';
 
 interface LanguageProviderProps {
   children: ReactNode;
@@ -26,7 +26,7 @@ interface LanguageProviderProps {
 export function LanguageProvider({
   children,
 }: LanguageProviderProps): React.JSX.Element {
-  const [currentLanguage, setCurrentLanguage] = useState<string>("en");
+  const [currentLanguage, setCurrentLanguage] = useState<string>('en');
 
   useEffect(() => {
     loadSavedLanguage();
@@ -40,9 +40,9 @@ export function LanguageProvider({
         i18n.changeLanguage(savedLanguage);
       }
     } catch (error) {
-      console.error("Failed to load saved language:", error);
-      setCurrentLanguage("en");
-      i18n.changeLanguage("en");
+      console.error('Failed to load saved language:', error);
+      setCurrentLanguage('en');
+      i18n.changeLanguage('en');
     }
   };
 
@@ -52,7 +52,7 @@ export function LanguageProvider({
       setCurrentLanguage(lang);
       i18n.changeLanguage(lang);
     } catch (error) {
-      console.error("Failed to save language preference:", error);
+      console.error('Failed to save language preference:', error);
       setCurrentLanguage(lang);
       i18n.changeLanguage(lang);
     }
@@ -68,7 +68,7 @@ export function LanguageProvider({
 export function useLanguage(): LanguageContextType {
   const context = useContext(LanguageContext);
   if (!context) {
-    throw new Error("useLanguage must be used within LanguageProvider");
+    throw new Error('useLanguage must be used within LanguageProvider');
   }
   return context;
 }

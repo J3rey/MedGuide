@@ -7,21 +7,19 @@ import es from './locales/es.json';
 import ko from './locales/ko.json';
 import it from './locales/it.json';
 
-i18n
-  .use(initReactI18next)
-  .init({
-    resources: {
-      en: { translation: en },
-      zh: { translation: zh },
-      es: { translation: es },
-      ko: { translation: ko },
-      it: { translation: it },
-    },
-    lng: 'en',
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false,
-    },
-  });
+i18n.use(initReactI18next).init({
+  resources: {
+    en: { translation: en },
+    zh: { translation: zh },
+    es: { translation: es },
+    ko: { translation: ko },
+    it: { translation: it },
+  },
+  lng: 'en',
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false,
+  },
+});
 
 export default i18n;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,18 +9,18 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { searchDrugs } from "../services/drugSearch";
-import { useScan } from "../contexts/ScanContext";
-import type { Drug } from "../types/drug";
-import theme from "../styles/theme";
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { searchDrugs } from '../services/drugSearch';
+import { useScan } from '../contexts/ScanContext';
+import type { Drug } from '../types/drug';
+import theme from '../styles/theme';
 
 export default function ManualSearchScreen() {
   const navigation = useNavigation();
   const { setScannedDrug } = useScan();
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<Drug[]>([]);
   const [selectedDrug, setSelectedDrug] = useState<Drug | null>(null);
   const [loading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ export default function ManualSearchScreen() {
           const results = await searchDrugs(searchQuery.trim());
           setSuggestions(results);
         } catch (error) {
-          console.error("Search error:", error);
+          console.error('Search error:', error);
           setSuggestions([]);
         } finally {
           setLoading(false);
@@ -68,7 +68,7 @@ export default function ManualSearchScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.header}>
         <TouchableOpacity
@@ -130,23 +130,26 @@ export default function ManualSearchScreen() {
         </View>
       )}
 
-      {showSuggestions && !loading && suggestions.length === 0 && searchQuery.trim().length >= 2 && (
-        <View style={styles.noResultsContainer}>
-          <Text style={styles.noResultsText}>
-            No drugs found matching "{searchQuery}"
-          </Text>
-          <Text style={styles.noResultsSubtext}>
-            Try checking the spelling or use fewer characters
-          </Text>
-        </View>
-      )}
+      {showSuggestions &&
+        !loading &&
+        suggestions.length === 0 &&
+        searchQuery.trim().length >= 2 && (
+          <View style={styles.noResultsContainer}>
+            <Text style={styles.noResultsText}>
+              No drugs found matching "{searchQuery}"
+            </Text>
+            <Text style={styles.noResultsSubtext}>
+              Try checking the spelling or use fewer characters
+            </Text>
+          </View>
+        )}
 
       {selectedDrug && !showSuggestions && (
         <View style={styles.selectedDrugContainer}>
           <Text style={styles.selectedDrugTitle}>Selected Drug:</Text>
           <View style={styles.drugCard}>
             <Text style={styles.drugName}>{selectedDrug.drug_name}</Text>
-            
+
             {selectedDrug.indications && (
               <View style={styles.drugSection}>
                 <Text style={styles.drugSectionTitle}>Indications:</Text>
@@ -247,8 +250,8 @@ const styles = StyleSheet.create({
     color: theme.darkColors.foreground,
   },
   searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: theme.spacing.base,
     paddingTop: theme.spacing.base,
   },
@@ -273,7 +276,7 @@ const styles = StyleSheet.create({
   helperTextContent: {
     fontSize: theme.typography.fontSize.xs,
     color: theme.darkColors.mutedForeground,
-    fontStyle: "italic",
+    fontStyle: 'italic',
   },
   suggestionsContainer: {
     flex: 1,
@@ -306,20 +309,20 @@ const styles = StyleSheet.create({
   },
   noResultsContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: theme.spacing.xl,
   },
   noResultsText: {
     fontSize: theme.typography.fontSize.base,
     color: theme.darkColors.foreground,
-    textAlign: "center",
+    textAlign: 'center',
     marginBottom: theme.spacing.sm,
   },
   noResultsSubtext: {
     fontSize: theme.typography.fontSize.sm,
     color: theme.darkColors.mutedForeground,
-    textAlign: "center",
+    textAlign: 'center',
   },
   selectedDrugContainer: {
     flex: 1,
@@ -365,11 +368,11 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.base,
     paddingHorizontal: theme.spacing.lg,
     borderRadius: theme.radius.md,
-    alignItems: "center",
+    alignItems: 'center',
   },
   chatButtonText: {
     fontSize: theme.typography.fontSize.base,
     fontWeight: theme.typography.fontWeight.semibold,
-    color: "#ffffff",
+    color: '#ffffff',
   },
 });

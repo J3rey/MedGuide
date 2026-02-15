@@ -1,7 +1,7 @@
-import { Drug } from "../types/drug";
-import { extractTextFromImage } from "./ocr";
-import { buildCandidates } from "./match";
-import { searchDrugs } from "./drugSearch";
+import { Drug } from '../types/drug';
+import { extractTextFromImage } from './ocr';
+import { buildCandidates } from './match';
+import { searchDrugs } from './drugSearch';
 
 function dedupeById(drugs: Drug[]): Drug[] {
   const seen = new Set<string>();

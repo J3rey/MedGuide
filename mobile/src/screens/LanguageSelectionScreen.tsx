@@ -1,13 +1,13 @@
-import React from "react";
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-} from "react-native";
-import { useTranslation } from "react-i18next";
-import theme from "../styles/theme";
+} from 'react-native';
+import { useTranslation } from 'react-i18next';
+import theme from '../styles/theme';
 
 interface Language {
   code: string;
@@ -16,11 +16,11 @@ interface Language {
 }
 
 const languages: Language[] = [
-  { code: "en", name: "English", flag: "🇬🇧" },
-  { code: "zh", name: "中文", flag: "🇨🇳" },
-  { code: "ko", name: "한국어", flag: "🇰🇷" },
-  { code: "es", name: "Español", flag: "🇪🇸" },
-  { code: "it", name: "Italiano", flag: "🇮🇹" },
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
+  { code: 'ko', name: '한국어', flag: '🇰🇷' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
 ];
 
 interface LanguageSelectionScreenProps {
@@ -35,8 +35,8 @@ export default function LanguageSelectionScreen({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t("languageSelection.title")}</Text>
-        <Text style={styles.subtitle}>{t("languageSelection.subtitle")}</Text>
+        <Text style={styles.title}>{t('languageSelection.title')}</Text>
+        <Text style={styles.subtitle}>{t('languageSelection.subtitle')}</Text>
       </View>
 
       <ScrollView
@@ -63,18 +63,18 @@ export default function LanguageSelectionScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EBF4FF",
+    backgroundColor: '#EBF4FF',
   },
   header: {
-    alignItems: "center",
-    paddingTop: theme.spacing["5xl"],
-    paddingBottom: theme.spacing["4xl"],
+    alignItems: 'center',
+    paddingTop: theme.spacing['5xl'],
+    paddingBottom: theme.spacing['4xl'],
     paddingHorizontal: theme.spacing.xl,
   },
   title: {
-    fontSize: theme.typography.fontSize["3xl"],
+    fontSize: theme.typography.fontSize['3xl'],
     fontWeight: theme.typography.fontWeight.bold,
-    color: "#2563eb",
+    color: '#2563eb',
     marginBottom: theme.spacing.sm,
   },
   subtitle: {
@@ -94,8 +94,8 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.xl,
     paddingVertical: theme.spacing.lg,
     paddingHorizontal: theme.spacing.xl,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing.base,
     ...theme.shadows.base,
   },

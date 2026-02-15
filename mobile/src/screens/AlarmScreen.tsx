@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,8 @@ import {
   Animated,
   Vibration,
   Modal,
-} from "react-native";
-import theme from "../styles/theme";
+} from 'react-native';
+import theme from '../styles/theme';
 
 interface AlarmScreenProps {
   visible: boolean;
@@ -124,86 +124,86 @@ export default function AlarmScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#d32f2f",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#d32f2f',
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: theme.spacing.xl,
   },
   content: {
-    width: "100%",
+    width: '100%',
     maxWidth: 400,
-    alignItems: "center",
+    alignItems: 'center',
   },
   iconContainer: {
-    marginBottom: theme.spacing["3xl"],
+    marginBottom: theme.spacing['3xl'],
   },
   icon: {
     fontSize: 120,
   },
   title: {
-    fontSize: theme.typography.fontSize["3xl"],
+    fontSize: theme.typography.fontSize['3xl'],
     fontWeight: theme.typography.fontWeight.bold,
-    color: "#ffffff",
+    color: '#ffffff',
     marginBottom: theme.spacing.base,
-    textAlign: "center",
+    textAlign: 'center',
     letterSpacing: 2,
   },
   medicationName: {
-    fontSize: theme.typography.fontSize["2xl"],
+    fontSize: theme.typography.fontSize['2xl'],
     fontWeight: theme.typography.fontWeight.semibold,
-    color: "#ffffff",
+    color: '#ffffff',
     marginBottom: theme.spacing.sm,
-    textAlign: "center",
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: theme.typography.fontSize.lg,
-    color: "rgba(255, 255, 255, 0.9)",
-    marginBottom: theme.spacing["4xl"],
-    textAlign: "center",
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: theme.spacing['4xl'],
+    textAlign: 'center',
   },
   buttonContainer: {
-    width: "100%",
+    width: '100%',
     gap: theme.spacing.xl,
   },
   button: {
     paddingVertical: theme.spacing.lg,
     paddingHorizontal: theme.spacing.xl,
     borderRadius: theme.radius.xl,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   dismissButton: {
-    backgroundColor: "#ffffff",
+    backgroundColor: '#ffffff',
     minHeight: 70,
   },
   dismissButtonText: {
     fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
-    color: "#d32f2f",
+    color: '#d32f2f',
   },
   snoozeContainer: {
-    width: "100%",
+    width: '100%',
     gap: theme.spacing.base,
   },
   snoozeLabel: {
     fontSize: theme.typography.fontSize.base,
-    color: "rgba(255, 255, 255, 0.9)",
-    textAlign: "center",
+    color: 'rgba(255, 255, 255, 0.9)',
+    textAlign: 'center',
   },
   snoozeButtons: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: theme.spacing.sm,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   snoozeButton: {
     flex: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderWidth: 2,
-    borderColor: "rgba(255, 255, 255, 0.5)",
+    borderColor: 'rgba(255, 255, 255, 0.5)',
   },
   snoozeButtonText: {
     fontSize: theme.typography.fontSize.base,
     fontWeight: theme.typography.fontWeight.semibold,
-    color: "#ffffff",
+    color: '#ffffff',
   },
 });
