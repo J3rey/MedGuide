@@ -58,8 +58,14 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
   }, [initialDrugName, hasInitialized]);
 
   const sendMessage = async (customMessage?: string) => {
+    console.log("=== sendMessage called ===");
     const messageText = customMessage || inputMessage;
-    if (!messageText.trim()) return;
+    console.log("Message text:", messageText);
+
+    if (!messageText.trim()) {
+      console.log("Message empty, returning");
+      return;
+    }
 
     const userMessage: ChatMessage = {
       id: Date.now(),
@@ -68,13 +74,18 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
       timestamp: new Date(),
     };
 
+    console.log("Adding user message to state");
     setMessages((prev) => [...prev, userMessage]);
+
     if (!customMessage) {
+      console.log("Clearing input");
       setInputMessage("");
     }
 
     try {
+      console.log("Calling API...");
       const response = await medicationApi.sendChatMessage(messageText);
+      console.log("API response received:", response);
 
       const botMessage: ChatMessage = {
         id: Date.now() + 1,
@@ -85,6 +96,11 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
 
       setMessages((prev) => [...prev, botMessage]);
     } catch (error: any) {
+      // Log the full error for debugging
+      console.log("Chat error:", error);
+      console.log("Error response:", error?.response);
+      console.log("Error response data:", error?.response?.data);
+
       // Handle specific quota errors with a helpful message
       let errorText = t("chat.defaultResponse");
 
@@ -95,6 +111,9 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
         errorText =
           error?.response?.data?.response ||
           "I'm currently experiencing high demand. Please try again later.";
+      } else if (error?.message) {
+        // Show network errors
+        errorText = `Error: ${error.message}. Please check your connection.`;
       }
 
       const botMessage: ChatMessage = {
@@ -197,7 +216,10 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
         <TextInput
           style={styles.input}
           value={inputMessage}
-          onChangeText={setInputMessage}
+          onChangeText={(text) => {
+            console.log("Input changed:", text);
+            setInputMessage(text);
+          }}
           placeholder={t("chat.placeholder")}
           placeholderTextColor={theme.darkColors.mutedForeground}
           multiline
@@ -205,8 +227,14 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
         />
 
         <TouchableOpacity
-          onPress={sendMessage}
-          style={styles.sendButton}
+          onPress={() => {
+            console.log("Send button pressed");
+            sendMessage();
+          }}
+          style={[
+            styles.sendButton,
+            !inputMessage.trim() && styles.sendButtonDisabled,
+          ]}
           disabled={!inputMessage.trim()}
         >
           <Text style={styles.sendText}>Send</Text>
@@ -308,6 +336,10 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     alignItems: "center",
     justifyContent: "center",
+  },
+  sendButtonDisabled: {
+    backgroundColor: "#6b7280",
+    opacity: 0.5,
   },
   sendText: {
     color: "#ffffff",
