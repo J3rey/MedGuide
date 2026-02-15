@@ -8,7 +8,12 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "check-db": "ts-node src/scripts/check-database.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,json}\"",
+    "type-check": "tsc --noEmit"
   },
   "keywords": [
     "medguide",
@@ -34,6 +39,11 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.25",
     "@types/node": "^20.19.28",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react-native": "^5.0.0",
+    "prettier": "^3.8.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   }
