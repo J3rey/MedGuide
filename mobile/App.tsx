@@ -1,36 +1,40 @@
 // App.tsx
-import React from "react";
-import "./src/i18n/index"; // MUST be here
+import React from 'react';
+import './src/i18n/index'; // MUST be here
 
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import LanguageSelectionScreen from "./src/screens/LanguageSelectionScreen";
-import CameraScreen from "./src/screens/CameraScreen";
-import ScanResultsScreen from "./src/screens/ScanResultsScreen";
-import ManualSearchScreen from "./src/screens/ManualSearchScreen";
-import DrugDetailsScreen from "./src/screens/DrugDetailsScreen";
+import LanguageSelectionScreen from './src/screens/LanguageSelectionScreen';
+import DarkMainApp from './src/components/DarkMainApp';
+import { ScanProvider } from './src/contexts/ScanContext';
 
 export type RootStackParamList = {
   Language: undefined;
-  Camera: undefined;
-  ScanResults: { uri: string };
-  ManualSearch: undefined;
-  DrugDetails: { drugId: string };
+  Main: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Language" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Language" component={LanguageSelectionScreen} />
-        <Stack.Screen name="Camera" component={CameraScreen} />
-        <Stack.Screen name="ScanResults" component={ScanResultsScreen} />
-        <Stack.Screen name="ManualSearch" component={ManualSearchScreen} />
-        <Stack.Screen name="DrugDetails" component={DrugDetailsScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <ScanProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName="Language"
+            screenOptions={{ headerShown: false }}
+          >
+            <Stack.Screen name="Language" component={LanguageSelectionScreen} />
+            <Stack.Screen name="Main">
+              {({ navigation }) => (
+                <DarkMainApp onBack={() => navigation.navigate('Language')} />
+              )}
+            </Stack.Screen>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </ScanProvider>
+    </SafeAreaProvider>
   );
 }

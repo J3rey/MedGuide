@@ -34,7 +34,7 @@ export default function LanguageSelectionScreen({
 
   const handleLanguageSelect = async (code: string) => {
     await i18n.changeLanguage(code);
-    navigation.navigate('Camera');
+    navigation.navigate('Main');
   };
 
   return (
