@@ -15,7 +15,8 @@
   "navigation": {
     "schedule": "Horario",
     "camera": "Cámara",
-    "chat": "Chat"
+    "chat": "Chat",
+    "settings": "Ajustes"
   },
   "schedule": {
     "title": "Horario de Medicamentos",
@@ -45,7 +46,8 @@
     "subtitle": "Pregunte sobre sus medicamentos",
     "placeholder": "Escriba su pregunta...",
     "greeting": "¡Hola! Soy su asistente de Medguide. ¿Cómo puedo ayudarle hoy?",
-    "defaultResponse": "Entiendo que tiene una pregunta sobre su medicamento. Por favor consulte con su proveedor de atención médica para obtener asesoramiento médico específico."  },
+    "defaultResponse": "Entiendo que tiene una pregunta sobre su medicamento. Por favor consulte con su proveedor de atención médica para obtener asesoramiento médico específico."
+  },
   "manualSearch": {
     "title": "Búsqueda Manual de Medicamentos",
     "searchPlaceholder": "Escribe el nombre del medicamento...",
@@ -55,5 +57,6 @@
     "tryAgain": "Intenta verificar la ortografía o usa menos caracteres",
     "selectedDrug": "Medicamento Seleccionado:",
     "askChatbot": "Preguntar al Chatbot Sobre Este Medicamento",
-    "back": "Atrás"  }
+    "back": "Atrás"
+  }
 }

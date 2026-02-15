@@ -15,7 +15,8 @@
   "navigation": {
     "schedule": "日程",
     "camera": "相机",
-    "chat": "聊天"
+    "chat": "聊天",
+    "settings": "设置"
   },
   "schedule": {
     "title": "用药时间表",

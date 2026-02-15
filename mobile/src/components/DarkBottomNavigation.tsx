@@ -87,10 +87,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.darkColors.accent,
   },
   icon: {
-    fontSize: 22,
+    fontSize: 24,
   },
   label: {
-    fontSize: 9,
+    fontSize: 11,
     color: theme.darkColors.mutedForeground,
     textAlign: "center",
     width: "100%",

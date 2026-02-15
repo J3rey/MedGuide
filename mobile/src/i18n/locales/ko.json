@@ -15,7 +15,8 @@
   "navigation": {
     "schedule": "일정",
     "camera": "카메라",
-    "chat": "채팅"
+    "chat": "채팅",
+    "settings": "설정"
   },
   "schedule": {
     "title": "약물 일정",

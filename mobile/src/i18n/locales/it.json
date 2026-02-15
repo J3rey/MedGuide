@@ -15,7 +15,8 @@
   "navigation": {
     "schedule": "Programma",
     "camera": "Fotocamera",
-    "chat": "Chat"
+    "chat": "Chat",
+    "settings": "Impostazioni"
   },
   "schedule": {
     "title": "Programma Farmaci",

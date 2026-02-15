@@ -15,7 +15,8 @@
   "navigation": {
     "schedule": "Schedule",
     "camera": "Camera",
-    "chat": "Chat"
+    "chat": "Chat",
+    "settings": "Settings"
   },
   "schedule": {
     "title": "Medication Schedule",
