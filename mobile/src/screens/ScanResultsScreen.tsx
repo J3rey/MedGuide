@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { findDrugMatchesFromImage } from '../services/matchDrugsFromImage';
 import { useScan } from '../contexts/ScanContext';
 import type { Drug } from '../types/drug';
@@ -66,17 +67,17 @@ export default function ScanResultsScreen({
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['top']}>
         <ActivityIndicator />
         <Text style={styles.subtleText}>Scanning...</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   const hasMatches = matches.length > 0;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <Text style={styles.title}>
         {hasMatches ? 'Possible matches' : 'No matches found'}
       </Text>
@@ -121,7 +122,7 @@ export default function ScanResultsScreen({
           <Text style={styles.buttonText}>Manual search</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
