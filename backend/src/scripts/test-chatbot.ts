@@ -25,10 +25,7 @@ async function testChat(message: string, language = 'en') {
   } catch (error: unknown) {
     console.error('\n❌ Error:');
     if (error && typeof error === 'object' && 'response' in error) {
-      console.error(
-        (error as { response?: { data?: unknown } }).response?.data ||
-          (error as Error).message
-      );
+      console.error((error as { response?: { data?: unknown } }).response?.data);
     } else if (error instanceof Error) {
       console.error(error.message);
     } else {

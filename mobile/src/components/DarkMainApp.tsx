@@ -20,6 +20,7 @@ import AlarmScreen from '../screens/AlarmScreen';
 import { snoozeAlarm, dismissAlarm } from '../services/notificationService';
 import { ScanProvider, useScan } from '../contexts/ScanContext';
 import theme from '../styles/theme';
+import { CameraStackParamList } from '../types/navigation';
 
 type Tab = 'schedule' | 'camera' | 'chat' | 'settings';
 
@@ -32,7 +33,7 @@ interface AlarmData {
   notificationId: string;
 }
 
-const CameraStack = createNativeStackNavigator();
+const CameraStack = createNativeStackNavigator<CameraStackParamList>();
 
 function CameraStackScreen() {
   return (
