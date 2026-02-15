@@ -62,7 +62,7 @@ BREASTFEEDING PRECAUTIONS: ${drug.precautions_breastfeeding || 'Not available'}
  * Chat with constrained database context
  */
 export const chat = async (message: string, language: string = 'en'): Promise<string> => {
-  const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   
   // Search for relevant drugs in the database
   const drugs = await searchDrugsInDatabase(message);
