@@ -54,10 +54,10 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
   const notificationListener = useRef<Notifications.Subscription | undefined>(
-    undefined
+    undefined,
   );
   const responseListener = useRef<Notifications.Subscription | undefined>(
-    undefined
+    undefined,
   );
 
   // Listen for scan completion event
@@ -103,7 +103,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
               await dismissAlarm(response.notification.request.identifier);
             }
           }
-        }
+        },
       );
 
     return () => {
@@ -126,7 +126,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
 
   const handleSnooze = async (
     medicationName: string,
-    minutes: number
+    minutes: number,
   ): Promise<void> => {
     if (currentAlarm) {
       await dismissAlarm(currentAlarm.notificationId);
@@ -152,17 +152,34 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
         const containerPadding = screenWidth > 768 ? 48 : 24;
         return (
           <View style={styles.settingsScreen}>
-            <View style={[styles.settingsHeader, { paddingTop: Math.max(insets.top, 16) }]}>
-              <View style={[styles.headerContent, { paddingHorizontal: containerPadding }]}>
+            <View
+              style={[
+                styles.settingsHeader,
+                { paddingTop: Math.max(insets.top, 16) },
+              ]}
+            >
+              <View
+                style={[
+                  styles.headerContent,
+                  { paddingHorizontal: containerPadding },
+                ]}
+              >
                 <View style={styles.headerLeft}>
                   <Text style={styles.settingsIcon}>⚙️</Text>
                   <Text style={styles.settingsTitle}>Settings</Text>
                 </View>
               </View>
             </View>
-            <View style={[styles.settingsContent, { paddingHorizontal: containerPadding }]}>
+            <View
+              style={[
+                styles.settingsContent,
+                { paddingHorizontal: containerPadding },
+              ]}
+            >
               <TouchableOpacity style={styles.settingsOption} onPress={onBack}>
-                <Text style={styles.settingsOptionText}>🌐 Change Language</Text>
+                <Text style={styles.settingsOptionText}>
+                  🌐 Change Language
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
