@@ -108,7 +108,7 @@ export default function ScheduleScreen(): React.JSX.Element {
       console.error("Failed to register for notifications:", error);
       Alert.alert(
         "Alarms Disabled",
-        "Please enable notifications in your device settings to receive medication alarms."
+        "Please enable notifications in your device settings to receive medication alarms.",
       );
     }
   };
@@ -151,8 +151,8 @@ export default function ScheduleScreen(): React.JSX.Element {
       // Update local state immediately for better UX
       setAlarms(
         alarms.map((a) =>
-          a.id === alarm.id ? { ...a, enabled: newEnabled } : a
-        )
+          a.id === alarm.id ? { ...a, enabled: newEnabled } : a,
+        ),
       );
 
       // Handle notification scheduling
@@ -169,7 +169,7 @@ export default function ScheduleScreen(): React.JSX.Element {
           alarm.medication_name,
           hour,
           minute,
-          alarm.days
+          alarm.days,
         );
       } else if (notificationId) {
         await cancelAlarmNotification(notificationId);
@@ -204,7 +204,7 @@ export default function ScheduleScreen(): React.JSX.Element {
         newAlarmMed,
         hour,
         minute,
-        selectedDays
+        selectedDays,
       );
 
       const { data, error } = await supabase
@@ -236,14 +236,14 @@ export default function ScheduleScreen(): React.JSX.Element {
   const startEditAlarm = (alarm: Alarm): void => {
     setEditingAlarm(alarm);
     setNewAlarmMed(alarm.medication_name);
-    
+
     // Parse the 24-hour time string to create a Date object
     const [hours, minutes] = alarm.time.split(":").map(Number);
     const date = new Date();
     date.setHours(hours);
     date.setMinutes(minutes);
     setNewAlarmTime(date);
-    
+
     setSelectedDays(alarm.days);
     setShowAddAlarm(true);
   };
@@ -267,7 +267,7 @@ export default function ScheduleScreen(): React.JSX.Element {
         newAlarmMed,
         hour,
         minute,
-        selectedDays
+        selectedDays,
       );
 
       // Update in database
@@ -337,7 +337,7 @@ export default function ScheduleScreen(): React.JSX.Element {
     <View style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={{ paddingTop: Math.max(insets.top, 16) + 80 }}
+        contentContainerStyle={{ paddingTop: Math.max(insets.top, 16) }}
       >
         <View style={[styles.header, { paddingHorizontal: containerPadding }]}>
           <View style={styles.headerLeft}>
@@ -415,7 +415,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                         {day}
                       </Text>
                     </TouchableOpacity>
-                  )
+                  ),
                 )}
               </View>
             </View>

@@ -110,7 +110,7 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
           styles.header,
           {
             paddingHorizontal: containerPadding,
-            paddingTop: Math.max(insets.top, 16) + 80,
+            paddingTop: Math.max(insets.top, 16),
           },
         ]}
       >

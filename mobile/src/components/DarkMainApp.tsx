@@ -149,12 +149,22 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
       case "chat":
         return <ChatScreen initialDrugName={scannedDrug || undefined} />;
       case "settings":
+        const containerPadding = screenWidth > 768 ? 48 : 24;
         return (
           <View style={styles.settingsScreen}>
-            <Text style={styles.settingsTitle}>Settings</Text>
-            <TouchableOpacity style={styles.settingsOption} onPress={onBack}>
-              <Text style={styles.settingsOptionText}>🌐 Change Language</Text>
-            </TouchableOpacity>
+            <View style={[styles.settingsHeader, { paddingTop: Math.max(insets.top, 16) }]}>
+              <View style={[styles.headerContent, { paddingHorizontal: containerPadding }]}>
+                <View style={styles.headerLeft}>
+                  <Text style={styles.settingsIcon}>⚙️</Text>
+                  <Text style={styles.settingsTitle}>Settings</Text>
+                </View>
+              </View>
+            </View>
+            <View style={[styles.settingsContent, { paddingHorizontal: containerPadding }]}>
+              <TouchableOpacity style={styles.settingsOption} onPress={onBack}>
+                <Text style={styles.settingsOptionText}>🌐 Change Language</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         );
       default:
@@ -193,14 +203,31 @@ const styles = StyleSheet.create({
   },
   settingsScreen: {
     flex: 1,
-    padding: theme.spacing.xl,
-    paddingTop: 80,
+  },
+  settingsHeader: {
+    paddingVertical: theme.spacing.base,
+    marginBottom: theme.spacing.base,
+  },
+  headerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.sm,
+  },
+  settingsIcon: {
+    fontSize: 32,
   },
   settingsTitle: {
-    fontSize: theme.typography.fontSize.xxl,
+    fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.darkColors.foreground,
-    marginBottom: theme.spacing.xl,
+  },
+  settingsContent: {
+    flex: 1,
   },
   settingsOption: {
     padding: theme.spacing.lg,
