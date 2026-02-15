@@ -4,7 +4,7 @@ import i18n from '../i18n/config';
 // Use your local IP or localhost - update this based on your setup
 // For Android emulator use 10.0.2.2, for iOS simulator use localhost
 // For physical device use your computer's local IP (e.g., 192.168.1.x)
-const API_URL = process.env.API_URL || 'http://192.168.1.67:3000';
+const API_URL = process.env.API_URL || 'http://192.168.1.6:3000';
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,

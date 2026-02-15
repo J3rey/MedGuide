@@ -84,10 +84,22 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
       };
 
       setMessages((prev) => [...prev, botMessage]);
-    } catch {
+    } catch (error: any) {
+      // Handle specific quota errors with a helpful message
+      let errorText = t("chat.defaultResponse");
+
+      if (
+        error?.response?.status === 429 ||
+        error?.response?.data?.error === "quota_exceeded"
+      ) {
+        errorText =
+          error?.response?.data?.response ||
+          "I'm currently experiencing high demand. Please try again later.";
+      }
+
       const botMessage: ChatMessage = {
         id: Date.now() + 1,
-        text: t("chat.defaultResponse"),
+        text: errorText,
         sender: "bot",
         timestamp: new Date(),
       };
