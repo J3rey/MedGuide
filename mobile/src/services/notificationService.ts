@@ -33,7 +33,9 @@ export interface AlarmAction {
 /**
  * Request notification permissions
  */
-export async function registerForPushNotificationsAsync(): Promise<string | undefined> {
+export async function registerForPushNotificationsAsync(): Promise<
+  string | undefined
+> {
   let token;
 
   if (Platform.OS === 'android') {
@@ -51,9 +53,10 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
   }
 
   if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
-    
+
     if (existingStatus !== 'granted') {
       const { status } = await Notifications.requestPermissionsAsync({
         ios: {
@@ -66,7 +69,7 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
       });
       finalStatus = status;
     }
-    
+
     if (finalStatus !== 'granted') {
       throw new Error('Permission not granted for alarm notifications');
     }
@@ -95,7 +98,7 @@ export async function scheduleAlarmNotification(
         vibrate: [0, 250, 250, 250],
         sticky: true,
         autoDismiss: false,
-        data: { 
+        data: {
           medicationName,
           isAlarm: true,
           timestamp: Date.now(),
@@ -115,7 +118,7 @@ export async function scheduleAlarmNotification(
   // For specific days, schedule multiple notifications (one per day)
   const dayNumbers = getDayNumbers(days);
   const notificationIds: string[] = [];
-  
+
   for (const weekday of dayNumbers) {
     const notificationId = await Notifications.scheduleNotificationAsync({
       content: {
@@ -126,7 +129,7 @@ export async function scheduleAlarmNotification(
         vibrate: [0, 250, 250, 250],
         sticky: true,
         autoDismiss: false,
-        data: { 
+        data: {
           medicationName,
           isAlarm: true,
           timestamp: Date.now(),
@@ -151,7 +154,9 @@ export async function scheduleAlarmNotification(
 /**
  * Cancel a scheduled notification
  */
-export async function cancelAlarmNotification(notificationId: string): Promise<void> {
+export async function cancelAlarmNotification(
+  notificationId: string
+): Promise<void> {
   try {
     // Check if it's a JSON array of IDs
     const ids = JSON.parse(notificationId);
@@ -275,7 +280,10 @@ function getDayNumbers(days: string[]): number[] {
 /**
  * Parse time string (HH:MM) to hour and minute
  */
-export function parseTime(timeString: string): { hour: number; minute: number } {
+export function parseTime(timeString: string): {
+  hour: number;
+  minute: number;
+} {
   const [hour, minute] = timeString.split(':').map(Number);
   return { hour, minute };
 }

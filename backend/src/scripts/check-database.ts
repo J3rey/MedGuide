@@ -8,7 +8,7 @@ async function checkDatabase() {
   console.log(`Using URL: ${process.env.SUPABASE_URL}\n`);
 
   // Test connection with detailed error info
-  const { data: testData, error: testError } = await supabase
+  const { error: testError } = await supabase
     .from('drugs')
     .select('*')
     .limit(1);
@@ -16,7 +16,9 @@ async function checkDatabase() {
   if (testError) {
     console.error('❌ Query Error:', testError);
     console.error('\n⚠️  This might be a Row Level Security (RLS) issue.');
-    console.error('   Check if RLS is enabled and add a policy to allow SELECT.');
+    console.error(
+      '   Check if RLS is enabled and add a policy to allow SELECT.'
+    );
     return;
   }
 

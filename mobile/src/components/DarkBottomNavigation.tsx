@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react';
 import {
   View,
   TouchableOpacity,
   Text,
   StyleSheet,
   Platform,
-} from "react-native";
-import { useTranslation } from "react-i18next";
-import theme from "../styles/theme";
+} from 'react-native';
+import { useTranslation } from 'react-i18next';
+import theme from '../styles/theme';
 
-type Tab = "schedule" | "camera" | "chat" | "settings";
+type Tab = 'schedule' | 'camera' | 'chat' | 'settings';
 
 interface DarkBottomNavigationProps {
   activeTab: Tab;
@@ -23,10 +23,10 @@ export default function DarkBottomNavigation({
   const { t } = useTranslation();
 
   const tabs = [
-    { id: "schedule" as Tab, label: t("navigation.schedule"), icon: "⏰" },
-    { id: "camera" as Tab, label: t("navigation.camera"), icon: "📷" },
-    { id: "chat" as Tab, label: t("navigation.chat"), icon: "💬" },
-    { id: "settings" as Tab, label: t("navigation.settings"), icon: "⚙️" },
+    { id: 'schedule' as Tab, label: t('navigation.schedule'), icon: '⏰' },
+    { id: 'camera' as Tab, label: t('navigation.camera'), icon: '📷' },
+    { id: 'chat' as Tab, label: t('navigation.chat'), icon: '💬' },
+    { id: 'settings' as Tab, label: t('navigation.settings'), icon: '⚙️' },
   ];
 
   return (
@@ -62,21 +62,21 @@ const styles = StyleSheet.create({
     backgroundColor: theme.darkColors.card,
     borderTopWidth: 1,
     borderTopColor: theme.darkColors.border,
-    paddingBottom: Platform.OS === "ios" ? 20 : 10,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
   },
   tabBar: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
     paddingHorizontal: 8,
     paddingVertical: theme.spacing.base,
-    width: "100%",
+    width: '100%',
   },
   tab: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 4,
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: 4,
@@ -92,8 +92,8 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     color: theme.darkColors.mutedForeground,
-    textAlign: "center",
-    width: "100%",
+    textAlign: 'center',
+    width: '100%',
   },
   activeLabel: {
     color: theme.darkColors.primary,

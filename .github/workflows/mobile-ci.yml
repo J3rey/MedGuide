@@ -2,12 +2,12 @@ name: Mobile CI
 
 on:
   push:
-    branches: [ main, develop ]
-    paths: 
+    branches: [main, develop]
+    paths:
       - 'mobile/**'
       - '.github/workflows/mobile-ci.yml'
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
       - 'mobile/**'
       - '.github/workflows/mobile-ci.yml'
@@ -17,31 +17,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: mobile/package-lock.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: mobile/package-lock.json
 
-    - name: Install dependencies
-      working-directory: ./mobile
-      run: npm ci
+      - name: Install dependencies
+        working-directory: ./mobile
+        run: npm ci
 
-    - name: Run type check
-      working-directory: ./mobile
-      run: npm run type-check
+      - name: Run type check
+        working-directory: ./mobile
+        run: npm run type-check
 
-    - name: Run linter
-      working-directory: ./mobile
-      run: npm run lint
+      - name: Run linter
+        working-directory: ./mobile
+        run: npm run lint
 
-    - name: Check formatting
-      working-directory: ./mobile
-      run: npm run format:check
+      - name: Check formatting
+        working-directory: ./mobile
+        run: npm run format:check
 
-    - name: Run tests
-      working-directory: ./mobile
-      run: npm test
+      - name: Run tests
+        working-directory: ./mobile
+        run: npm test

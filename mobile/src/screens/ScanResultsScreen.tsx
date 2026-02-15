@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,12 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-} from "react-native";
-import { findDrugMatchesFromImage } from "../services/matchDrugsFromImage";
-import { useScan } from "../contexts/ScanContext";
-import type { Drug } from "../types/drug";
-import theme from "../styles/theme";
-import { ScanResultsScreenProps } from "../types/navigation";
+} from 'react-native';
+import { findDrugMatchesFromImage } from '../services/matchDrugsFromImage';
+import { useScan } from '../contexts/ScanContext';
+import type { Drug } from '../types/drug';
+import theme from '../styles/theme';
+import { ScanResultsScreenProps } from '../types/navigation';
 
 export default function ScanResultsScreen({
   route,
@@ -49,9 +49,11 @@ export default function ScanResultsScreen({
             }
           }, 2000);
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         if (!mounted) return;
-        setError(e?.message ?? "Scan failed. Please try again.");
+        const message =
+          e instanceof Error ? e.message : 'Scan failed. Please try again.';
+        setError(message);
         setMatches([]);
         setLoading(false);
       }
@@ -76,7 +78,7 @@ export default function ScanResultsScreen({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        {hasMatches ? "Possible matches" : "No matches found"}
+        {hasMatches ? 'Possible matches' : 'No matches found'}
       </Text>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -114,7 +116,7 @@ export default function ScanResultsScreen({
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("ManualSearch")}
+          onPress={() => navigation.navigate('ManualSearch')}
         >
           <Text style={styles.buttonText}>Manual search</Text>
         </TouchableOpacity>
@@ -131,8 +133,8 @@ const styles = StyleSheet.create({
   },
   center: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: theme.spacing.base,
     backgroundColor: theme.darkColors.background,
   },
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: theme.radius.lg,
     borderColor: theme.darkColors.border,
-    alignItems: "center",
+    alignItems: 'center',
   },
   buttonText: {
     fontSize: theme.typography.fontSize.sm,

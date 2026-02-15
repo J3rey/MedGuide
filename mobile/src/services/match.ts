@@ -1,8 +1,8 @@
 function normalize(s: string): string {
   return s
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
@@ -20,12 +20,12 @@ function unique(arr: string[]): string[] {
 
 export function buildCandidates(ocrText: string): string[] {
   const lines = ocrText
-    .split("\n")
+    .split('\n')
     .map((l) => normalize(l))
     .filter(Boolean);
 
   // tokens from all text
-  const allTokens = normalize(ocrText).split(" ").filter(Boolean);
+  const allTokens = normalize(ocrText).split(' ').filter(Boolean);
 
   // n-grams (2-4 words) catch multi-word drug names like "panadol osteo"
   const ngrams: string[] = [];
@@ -33,7 +33,7 @@ export function buildCandidates(ocrText: string): string[] {
   for (let i = 0; i < allTokens.length; i++) {
     for (let n = 2; n <= maxN; n++) {
       const slice = allTokens.slice(i, i + n);
-      if (slice.length === n) ngrams.push(slice.join(" "));
+      if (slice.length === n) ngrams.push(slice.join(' '));
     }
   }
 

@@ -2,8 +2,8 @@ name: Deploy
 
 on:
   push:
-    branches: [ main ]
-    paths: 
+    branches: [main]
+    paths:
       - 'backend/**'
   workflow_dispatch:
 
@@ -13,31 +13,31 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: backend/package-lock.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
 
-    - name: Install dependencies
-      working-directory: ./backend
-      run: npm ci
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
 
-    - name: Build
-      working-directory: ./backend
-      run: npm run build
+      - name: Build
+        working-directory: ./backend
+        run: npm run build
 
-    - name: Deploy to Render
-      env:
-        RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-        RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
-      run: |
-        curl -X POST \
-          -H "Authorization: Bearer $RENDER_API_KEY" \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys \
-          -d '{}'
+      - name: Deploy to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys \
+            -d '{}'

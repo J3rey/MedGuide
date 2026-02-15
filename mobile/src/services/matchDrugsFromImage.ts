@@ -1,10 +1,10 @@
-import { Drug } from "../types/drug";
-import { extractTextFromImage } from "./ocr";
-import { buildCandidates } from "./match";
-import { searchDrugs } from "./drugSearch";
+import { Drug } from '../types/drug';
+import { extractTextFromImage } from './ocr';
+import { buildCandidates } from './match';
+import { searchDrugs } from './drugSearch';
 
 function dedupeById(drugs: Drug[]): Drug[] {
-  const seen = new Set<string>();
+  const seen = new Set<number>();
   return drugs.filter((d) => (seen.has(d.id) ? false : (seen.add(d.id), true)));
 }
 

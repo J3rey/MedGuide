@@ -12,43 +12,49 @@ async function testChat(message: string, language = 'en') {
   console.log(`Testing: "${message}"`);
   console.log(`Language: ${language}`);
   console.log('='.repeat(60));
-  
+
   try {
     const response = await axios.post(API_URL, {
       message,
-      language
+      language,
     });
-    
+
     console.log('\n✅ Response:');
     console.log(response.data.response);
     console.log(`\nTimestamp: ${response.data.timestamp}`);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('\n❌ Error:');
-    console.error(error.response?.data || error.message);
+    if (error && typeof error === 'object' && 'response' in error) {
+      console.error((error as { response?: { data?: unknown } }).response?.data);
+    } else if (error instanceof Error) {
+      console.error(error.message);
+    } else {
+      console.error('Unknown error occurred');
+    }
   }
 }
 
 async function runTests() {
   console.log('🧪 Starting Chatbot Tests...\n');
-  
+
   // Test 1: Query for a drug that might be in database
   await testChat('What is acetaminophen used for?', 'en');
-  
+
   // Test 2: Query in Spanish
   await testChat('¿Cuáles son los efectos secundarios del paracetamol?', 'es');
-  
+
   // Test 3: Query for multiple drugs
   await testChat('Tell me about any pain medications in the database', 'en');
-  
+
   // Test 4: Query for drug not in database (should refuse politely)
   await testChat('What is the dosage for aspirin?', 'en');
-  
+
   // Test 5: General medical question (should redirect to healthcare professional)
   await testChat('I have a headache, what should I take?', 'en');
-  
+
   // Test 6: Query in Chinese
   await testChat('数据库中有哪些药物？', 'zh');
-  
+
   console.log('\n\n✨ Tests completed!\n');
 }
 

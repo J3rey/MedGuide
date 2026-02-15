@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,22 +11,21 @@ import {
   Platform,
   Alert,
   Modal,
-} from "react-native";
+} from 'react-native';
 import DateTimePicker, {
   DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTranslation } from "react-i18next";
-import theme from "../styles/theme";
-import { supabase } from "../services/supabase";
+} from '@react-native-community/datetimepicker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
+import theme from '../styles/theme';
+import { supabase } from '../services/supabase';
 import {
   registerForPushNotificationsAsync,
   scheduleAlarmNotification,
   cancelAlarmNotification,
   parseTime,
   setupAlarmCategories,
-  snoozeAlarm,
-} from "../services/notificationService";
+} from '../services/notificationService';
 
 interface Alarm {
   id: number;
@@ -48,8 +47,8 @@ export default function ScheduleScreen(): React.JSX.Element {
   const [showAddAlarm, setShowAddAlarm] = useState(false);
   const [newAlarmTime, setNewAlarmTime] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [newAlarmMed, setNewAlarmMed] = useState("");
-  const [selectedDays, setSelectedDays] = useState<string[]>(["Daily"]);
+  const [newAlarmMed, setNewAlarmMed] = useState('');
+  const [selectedDays, setSelectedDays] = useState<string[]>(['Daily']);
   const [editingAlarm, setEditingAlarm] = useState<Alarm | null>(null);
 
   useEffect(() => {
@@ -58,13 +57,13 @@ export default function ScheduleScreen(): React.JSX.Element {
   }, []);
 
   const toggleDay = (day: string): void => {
-    if (day === "Daily") {
-      setSelectedDays(["Daily"]);
+    if (day === 'Daily') {
+      setSelectedDays(['Daily']);
     } else {
-      const withoutDaily = selectedDays.filter((d) => d !== "Daily");
+      const withoutDaily = selectedDays.filter((d) => d !== 'Daily');
       if (withoutDaily.includes(day)) {
         const newDays = withoutDaily.filter((d) => d !== day);
-        setSelectedDays(newDays.length === 0 ? ["Daily"] : newDays);
+        setSelectedDays(newDays.length === 0 ? ['Daily'] : newDays);
       } else {
         setSelectedDays([...withoutDaily, day]);
       }
@@ -73,33 +72,33 @@ export default function ScheduleScreen(): React.JSX.Element {
 
   const onTimeChange = (
     event: DateTimePickerEvent,
-    selectedDate?: Date,
+    selectedDate?: Date
   ): void => {
     const currentDate = selectedDate || newAlarmTime;
-    setShowTimePicker(Platform.OS === "ios");
+    setShowTimePicker(Platform.OS === 'ios');
     setNewAlarmTime(currentDate);
   };
 
   const formatTime = (date: Date): string => {
     let hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
     hours = hours ? hours : 12; // the hour '0' should be '12'
     return `${hours}:${minutes} ${ampm}`;
   };
 
   const formatTime24 = (date: Date): string => {
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
   };
 
   const displayTime = (time24: string): string => {
-    const [hoursStr, minutesStr] = time24.split(":");
+    const [hoursStr, minutesStr] = time24.split(':');
     let hours = parseInt(hoursStr, 10);
     const minutes = minutesStr;
-    const ampm = hours >= 12 ? "PM" : "AM";
+    const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
     hours = hours ? hours : 12;
     return `${hours}:${minutes} ${ampm}`;
@@ -110,10 +109,10 @@ export default function ScheduleScreen(): React.JSX.Element {
       await registerForPushNotificationsAsync();
       await setupAlarmCategories();
     } catch (error) {
-      console.error("Failed to register for notifications:", error);
+      console.error('Failed to register for notifications:', error);
       Alert.alert(
-        "Alarms Disabled",
-        "Please enable notifications in your device settings to receive medication alarms.",
+        'Alarms Disabled',
+        'Please enable notifications in your device settings to receive medication alarms.'
       );
     }
   };
@@ -128,19 +127,19 @@ export default function ScheduleScreen(): React.JSX.Element {
       }
 
       const { data, error } = await supabase
-        .from("alarms")
-        .select("*")
-        .order("time", { ascending: true });
+        .from('alarms')
+        .select('*')
+        .order('time', { ascending: true });
 
       if (error) {
-        console.error("Supabase error:", error);
+        console.error('Supabase error:', error);
         // Don't show alert for connection errors, just log
         setAlarms([]);
       } else {
         setAlarms(data || []);
       }
     } catch (error) {
-      console.error("Error fetching alarms:", error);
+      console.error('Error fetching alarms:', error);
       // Set empty alarms instead of showing error
       setAlarms([]);
     } finally {
@@ -155,8 +154,8 @@ export default function ScheduleScreen(): React.JSX.Element {
       // Update local state immediately for better UX
       setAlarms(
         alarms.map((a) =>
-          a.id === alarm.id ? { ...a, enabled: newEnabled } : a,
-        ),
+          a.id === alarm.id ? { ...a, enabled: newEnabled } : a
+        )
       );
 
       // Handle notification scheduling
@@ -173,7 +172,7 @@ export default function ScheduleScreen(): React.JSX.Element {
           alarm.medication_name,
           hour,
           minute,
-          alarm.days,
+          alarm.days
         );
       } else if (notificationId) {
         await cancelAlarmNotification(notificationId);
@@ -182,22 +181,22 @@ export default function ScheduleScreen(): React.JSX.Element {
 
       // Update backend
       const { error } = await supabase
-        .from("alarms")
+        .from('alarms')
         .update({ enabled: newEnabled, notification_id: notificationId })
-        .eq("id", alarm.id);
+        .eq('id', alarm.id);
 
       if (error) throw error;
     } catch (error) {
-      console.error("Error toggling alarm:", error);
+      console.error('Error toggling alarm:', error);
       // Revert on error
       setAlarms(alarms.map((a) => (a.id === alarm.id ? alarm : a)));
-      Alert.alert("Error", "Failed to update alarm");
+      Alert.alert('Error', 'Failed to update alarm');
     }
   };
 
   const addAlarm = async (): Promise<void> => {
     if (!newAlarmMed.trim()) {
-      Alert.alert("Error", "Please select a medication");
+      Alert.alert('Error', 'Please select a medication');
       return;
     }
 
@@ -208,11 +207,11 @@ export default function ScheduleScreen(): React.JSX.Element {
         newAlarmMed,
         hour,
         minute,
-        selectedDays,
+        selectedDays
       );
 
       const { data, error } = await supabase
-        .from("alarms")
+        .from('alarms')
         .insert({
           medication_name: newAlarmMed,
           time: timeString24,
@@ -226,14 +225,14 @@ export default function ScheduleScreen(): React.JSX.Element {
       if (error) throw error;
 
       setAlarms([...alarms, data]);
-      setNewAlarmMed("");
+      setNewAlarmMed('');
       setNewAlarmTime(new Date());
-      setSelectedDays(["Daily"]);
+      setSelectedDays(['Daily']);
       setShowAddAlarm(false);
       setEditingAlarm(null);
     } catch (error) {
-      console.error("Error adding alarm:", error);
-      Alert.alert("Error", "Failed to create alarm");
+      console.error('Error adding alarm:', error);
+      Alert.alert('Error', 'Failed to create alarm');
     }
   };
 
@@ -242,7 +241,7 @@ export default function ScheduleScreen(): React.JSX.Element {
     setNewAlarmMed(alarm.medication_name);
 
     // Parse the 24-hour time string to create a Date object
-    const [hours, minutes] = alarm.time.split(":").map(Number);
+    const [hours, minutes] = alarm.time.split(':').map(Number);
     const date = new Date();
     date.setHours(hours);
     date.setMinutes(minutes);
@@ -254,7 +253,7 @@ export default function ScheduleScreen(): React.JSX.Element {
 
   const updateAlarm = async (): Promise<void> => {
     if (!newAlarmMed.trim() || !editingAlarm) {
-      Alert.alert("Error", "Please enter a medication");
+      Alert.alert('Error', 'Please enter a medication');
       return;
     }
 
@@ -271,19 +270,19 @@ export default function ScheduleScreen(): React.JSX.Element {
         newAlarmMed,
         hour,
         minute,
-        selectedDays,
+        selectedDays
       );
 
       // Update in database
       const { data, error } = await supabase
-        .from("alarms")
+        .from('alarms')
         .update({
           medication_name: newAlarmMed,
           time: timeString24,
           days: selectedDays,
           notification_id: notificationId,
         })
-        .eq("id", editingAlarm.id)
+        .eq('id', editingAlarm.id)
         .select()
         .single();
 
@@ -291,21 +290,21 @@ export default function ScheduleScreen(): React.JSX.Element {
 
       // Update local state
       setAlarms(alarms.map((a) => (a.id === editingAlarm.id ? data : a)));
-      setNewAlarmMed("");
+      setNewAlarmMed('');
       setNewAlarmTime(new Date());
-      setSelectedDays(["Daily"]);
+      setSelectedDays(['Daily']);
       setShowAddAlarm(false);
       setEditingAlarm(null);
     } catch (error) {
-      console.error("Error updating alarm:", error);
-      Alert.alert("Error", "Failed to update alarm");
+      console.error('Error updating alarm:', error);
+      Alert.alert('Error', 'Failed to update alarm');
     }
   };
 
   const cancelEdit = (): void => {
-    setNewAlarmMed("");
+    setNewAlarmMed('');
     setNewAlarmTime(new Date());
-    setSelectedDays(["Daily"]);
+    setSelectedDays(['Daily']);
     setShowAddAlarm(false);
     setEditingAlarm(null);
   };
@@ -319,17 +318,17 @@ export default function ScheduleScreen(): React.JSX.Element {
 
       // Delete from backend
       const { error } = await supabase
-        .from("alarms")
+        .from('alarms')
         .delete()
-        .eq("id", alarm.id);
+        .eq('id', alarm.id);
 
       if (error) throw error;
 
       // Update local state
       setAlarms(alarms.filter((a) => a.id !== alarm.id));
     } catch (error) {
-      console.error("Error removing alarm:", error);
-      Alert.alert("Error", "Failed to delete alarm");
+      console.error('Error removing alarm:', error);
+      Alert.alert('Error', 'Failed to delete alarm');
     }
   };
 
@@ -346,7 +345,7 @@ export default function ScheduleScreen(): React.JSX.Element {
         <View style={[styles.header, { paddingHorizontal: containerPadding }]}>
           <View style={styles.headerLeft}>
             <Text style={styles.bellIcon}>🔔</Text>
-            <Text style={styles.title}>{t("schedule.title")}</Text>
+            <Text style={styles.title}>{t('schedule.title')}</Text>
           </View>
           <TouchableOpacity
             onPress={() => setShowAddAlarm(!showAddAlarm)}
@@ -360,16 +359,15 @@ export default function ScheduleScreen(): React.JSX.Element {
           <View
             style={[
               styles.addAlarmCard,
+              styles.responsiveContainer,
               {
                 marginHorizontal: containerPadding,
                 maxWidth: maxContentWidth,
-                alignSelf: "center",
-                width: "100%",
               },
             ]}
           >
             <Text style={styles.addAlarmTitle}>
-              {editingAlarm ? "Edit Alarm" : "Add New Alarm"}
+              {editingAlarm ? 'Edit Alarm' : 'Add New Alarm'}
             </Text>
 
             <View style={styles.inputGroup}>
@@ -399,7 +397,7 @@ export default function ScheduleScreen(): React.JSX.Element {
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Repeat</Text>
               <View style={styles.daysSelector}>
-                {["Daily", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                {['Daily', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(
                   (day) => (
                     <TouchableOpacity
                       key={day}
@@ -419,7 +417,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                         {day}
                       </Text>
                     </TouchableOpacity>
-                  ),
+                  )
                 )}
               </View>
             </View>
@@ -429,7 +427,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                 style={[styles.button, styles.addButtonStyle]}
               >
                 <Text style={styles.buttonText}>
-                  {editingAlarm ? "Update Alarm" : "Add Alarm"}
+                  {editingAlarm ? 'Update Alarm' : 'Add Alarm'}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -445,11 +443,10 @@ export default function ScheduleScreen(): React.JSX.Element {
         <View
           style={[
             styles.alarmsList,
+            styles.responsiveContainer,
             {
               paddingHorizontal: containerPadding,
               maxWidth: maxContentWidth,
-              alignSelf: "center",
-              width: "100%",
             },
           ]}
         >
@@ -522,7 +519,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                       onValueChange={() => toggleAlarm(alarm)}
                       trackColor={{
                         false: theme.darkColors.border,
-                        true: "#3b82f6",
+                        true: '#3b82f6',
                       }}
                       thumbColor="#ffffff"
                     />
@@ -544,7 +541,7 @@ export default function ScheduleScreen(): React.JSX.Element {
 
       {/* Time Picker Modal */}
       {showTimePicker &&
-        (Platform.OS === "ios" ? (
+        (Platform.OS === 'ios' ? (
           <Modal
             visible={showTimePicker}
             transparent={true}
@@ -602,16 +599,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: theme.spacing.xl,
     paddingVertical: theme.spacing.base,
     marginBottom: theme.spacing.base,
   },
   headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing.sm,
   },
   bellIcon: {
@@ -623,17 +620,21 @@ const styles = StyleSheet.create({
     color: theme.darkColors.foreground,
   },
   addButton: {
-    backgroundColor: "#3b82f6",
+    backgroundColor: '#3b82f6',
     width: 48,
     height: 48,
     borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   addButtonText: {
     fontSize: 32,
     color: theme.darkColors.foreground,
     fontWeight: theme.typography.fontWeight.bold,
+  },
+  responsiveContainer: {
+    alignSelf: 'center',
+    width: '100%',
   },
   addAlarmCard: {
     backgroundColor: theme.darkColors.card,
@@ -669,17 +670,17 @@ const styles = StyleSheet.create({
     color: theme.darkColors.foreground,
   },
   buttonRow: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: theme.spacing.sm,
   },
   button: {
     flex: 1,
     paddingVertical: theme.spacing.sm,
     borderRadius: theme.radius.lg,
-    alignItems: "center",
+    alignItems: 'center',
   },
   addButtonStyle: {
-    backgroundColor: "#3b82f6",
+    backgroundColor: '#3b82f6',
   },
   cancelButton: {
     backgroundColor: theme.darkColors.accent,
@@ -702,9 +703,9 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
   },
   alarmContent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     gap: theme.spacing.base,
   },
   alarmInfo: {
@@ -718,7 +719,7 @@ const styles = StyleSheet.create({
   },
   alarmMedication: {
     fontSize: theme.typography.fontSize.sm,
-    color: "#60a5fa",
+    color: '#60a5fa',
     marginBottom: theme.spacing.sm,
   },
   disabledText: {
@@ -728,9 +729,9 @@ const styles = StyleSheet.create({
     color: theme.darkColors.mutedForeground,
   },
   daysContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: theme.spacing.xs,
-    flexWrap: "wrap",
+    flexWrap: 'wrap',
   },
   dayBadge: {
     paddingHorizontal: theme.spacing.xs,
@@ -738,7 +739,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
   },
   dayBadgeActive: {
-    backgroundColor: "rgba(59, 130, 246, 0.2)",
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
   },
   dayBadgeInactive: {
     backgroundColor: theme.darkColors.accent,
@@ -747,14 +748,14 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.xs,
   },
   dayTextActive: {
-    color: "#60a5fa",
+    color: '#60a5fa',
   },
   dayTextInactive: {
     color: theme.darkColors.mutedForeground,
   },
   alarmActions: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing.sm,
   },
   editButton: {
@@ -770,8 +771,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   emptyState: {
-    alignItems: "center",
-    paddingVertical: theme.spacing["5xl"],
+    alignItems: 'center',
+    paddingVertical: theme.spacing['5xl'],
   },
   emptyIcon: {
     fontSize: 64,
@@ -794,24 +795,21 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     paddingHorizontal: theme.spacing.base,
     paddingVertical: theme.spacing.sm,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   pickerButtonText: {
     fontSize: theme.typography.fontSize.base,
     color: theme.darkColors.foreground,
-  },
-  placeholderText: {
-    color: theme.darkColors.mutedForeground,
   },
   pickerArrow: {
     fontSize: theme.typography.fontSize.sm,
     color: theme.darkColors.mutedForeground,
   },
   daysSelector: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: theme.spacing.xs,
   },
   dayButton: {
@@ -823,57 +821,21 @@ const styles = StyleSheet.create({
     borderColor: theme.darkColors.border,
   },
   dayButtonActive: {
-    backgroundColor: "#3b82f6",
-    borderColor: "#3b82f6",
+    backgroundColor: '#3b82f6',
+    borderColor: '#3b82f6',
   },
   dayButtonText: {
     fontSize: theme.typography.fontSize.xs,
     color: theme.darkColors.mutedForeground,
   },
   dayButtonTextActive: {
-    color: "#ffffff",
+    color: '#ffffff',
     fontWeight: theme.typography.fontWeight.semibold,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    backgroundColor: theme.darkColors.card,
-    borderTopLeftRadius: theme.radius.xl,
-    borderTopRightRadius: theme.radius.xl,
-    maxHeight: "70%",
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: theme.spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.darkColors.border,
-  },
-  modalTitle: {
-    fontSize: theme.typography.fontSize.lg,
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.darkColors.foreground,
-  },
-  modalClose: {
-    fontSize: 24,
-    color: theme.darkColors.mutedForeground,
-  },
-  medicationList: {
-    padding: theme.spacing.base,
-  },
-  medicationItem: {
-    paddingVertical: theme.spacing.base,
-    paddingHorizontal: theme.spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.darkColors.border,
-  },
-  medicationItemText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.darkColors.foreground,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
   },
   timePickerContainer: {
     backgroundColor: theme.darkColors.card,
@@ -882,15 +844,15 @@ const styles = StyleSheet.create({
     paddingBottom: theme.spacing.xl,
   },
   timePickerHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     padding: theme.spacing.base,
     borderBottomWidth: 1,
     borderBottomColor: theme.darkColors.border,
   },
   timePickerButton: {
     fontSize: theme.typography.fontSize.base,
-    color: "#3b82f6",
+    color: '#3b82f6',
     padding: theme.spacing.sm,
   },
   timePickerDone: {
