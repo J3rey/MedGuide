@@ -35,10 +35,10 @@ export default function ScanResultsScreen({
         const res = await findDrugMatchesFromImage(uri);
 
         if (!mounted) return;
-        
+
         setMatches(res.matches);
         setLoading(false);
-        
+
         // If we found matches, set the drug and go back
         if (res.matches && res.matches.length > 0) {
           const firstMatch = res.matches[0];
@@ -99,8 +99,8 @@ export default function ScanResultsScreen({
         />
       ) : (
         <Text style={styles.bodyText}>
-          Try another photo with better lighting or less glare, or search for the
-          drug manually.
+          Try another photo with better lighting or less glare, or search for
+          the drug manually.
         </Text>
       )}
 

@@ -73,7 +73,7 @@ export default function ScheduleScreen(): React.JSX.Element {
 
   const onTimeChange = (
     event: DateTimePickerEvent,
-    selectedDate?: Date
+    selectedDate?: Date,
   ): void => {
     const currentDate = selectedDate || newAlarmTime;
     setShowTimePicker(Platform.OS === "ios");

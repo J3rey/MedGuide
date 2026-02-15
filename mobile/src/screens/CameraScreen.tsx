@@ -64,7 +64,12 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.darkColors.background },
-  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
   text: { color: theme.darkColors.foreground, marginBottom: 12 },
 
   camera: { flex: 1 },
@@ -107,5 +112,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.darkColors.primary,
     alignItems: "center",
   },
-  buttonTextPrimary: { color: theme.darkColors.primaryForeground, fontWeight: "700" },
+  buttonTextPrimary: {
+    color: theme.darkColors.primaryForeground,
+    fontWeight: "700",
+  },
 });
