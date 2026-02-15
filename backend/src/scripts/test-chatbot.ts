@@ -22,9 +22,15 @@ async function testChat(message: string, language = 'en') {
     console.log('\n✅ Response:');
     console.log(response.data.response);
     console.log(`\nTimestamp: ${response.data.timestamp}`);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('\n❌ Error:');
-    console.error(error.response?.data || error.message);
+    if (error && typeof error === 'object' && 'response' in error) {
+      console.error((error as { response?: { data?: unknown } }).response?.data || (error as Error).message);
+    } else if (error instanceof Error) {
+      console.error(error.message);
+    } else {
+      console.error('Unknown error occurred');
+    }
   }
 }
 

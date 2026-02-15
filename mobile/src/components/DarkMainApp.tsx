@@ -4,8 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
-  Platform,
   useWindowDimensions,
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -148,7 +146,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
         );
       case "chat":
         return <ChatScreen initialDrugName={scannedDrug || undefined} />;
-      case "settings":
+      case "settings": {
         const containerPadding = screenWidth > 768 ? 48 : 24;
         return (
           <View style={styles.settingsScreen}>
@@ -184,6 +182,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
             </View>
           </View>
         );
+      }
       default:
         return (
           <NavigationContainer independent={true}>

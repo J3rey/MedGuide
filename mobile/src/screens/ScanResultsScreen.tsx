@@ -49,9 +49,10 @@ export default function ScanResultsScreen({
             }
           }, 2000);
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         if (!mounted) return;
-        setError(e?.message ?? "Scan failed. Please try again.");
+        const message = e instanceof Error ? e.message : "Scan failed. Please try again.";
+        setError(message);
         setMatches([]);
         setLoading(false);
       }

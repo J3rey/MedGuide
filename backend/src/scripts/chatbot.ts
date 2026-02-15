@@ -5,8 +5,17 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 // Load environment variables
 dotenv.config();
 
+interface MedicationInfo {
+  name: string;
+  usage: string;
+  dosage: string;
+  sideEffects: string;
+  counselling: string;
+  warnings: string;
+}
+
 // Mock database with medication information
-const medicationDatabase: Record<string, any> = {
+const medicationDatabase: Record<string, MedicationInfo> = {
   aspirin: {
     name: 'Aspirin',
     usage: 'Pain relief, fever reduction, anti-inflammatory',
@@ -139,8 +148,9 @@ async function main() {
         const response = await chat(input);
         console.log(response);
         console.log('\n' + '-'.repeat(70) + '\n');
-      } catch (error: any) {
-        console.error('❌ Error:', error.message);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error('❌ Error:', message);
         console.log();
       }
       

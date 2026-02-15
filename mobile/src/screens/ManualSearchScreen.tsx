@@ -11,7 +11,6 @@ import {
   Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useTranslation } from "react-i18next";
 import { searchDrugs } from "../services/drugSearch";
 import { useScan } from "../contexts/ScanContext";
 import type { Drug } from "../types/drug";
@@ -19,7 +18,6 @@ import theme from "../styles/theme";
 
 export default function ManualSearchScreen() {
   const navigation = useNavigation();
-  const { t } = useTranslation();
   const { setScannedDrug } = useScan();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,13 +62,6 @@ export default function ManualSearchScreen() {
       setScannedDrug(selectedDrug.drug_name);
       // Navigate back to main app, which will switch to chat tab
       navigation.goBack();
-    }
-  };
-
-  const handleViewDetails = () => {
-    if (selectedDrug) {
-      // Show drug details inline
-      // You could also navigate to a details screen if you create one
     }
   };
 

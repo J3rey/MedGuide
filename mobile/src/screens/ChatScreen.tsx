@@ -150,11 +150,10 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
         style={styles.messagesContainer}
         contentContainerStyle={[
           styles.messagesContent,
+          styles.responsiveContent,
           {
             paddingHorizontal: containerPadding,
             maxWidth: maxContentWidth,
-            alignSelf: "center",
-            width: "100%",
           },
         ]}
         onContentSizeChange={() =>
@@ -197,11 +196,10 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
       <View
         style={[
           styles.inputContainer,
+          styles.responsiveContent,
           {
             paddingHorizontal: containerPadding,
             maxWidth: maxContentWidth,
-            alignSelf: "center",
-            width: "100%",
           },
         ]}
       >
@@ -261,6 +259,10 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.base,
     paddingHorizontal: theme.spacing.xl,
     gap: theme.spacing.base,
+  },
+  responsiveContent: {
+    alignSelf: "center",
+    width: "100%",
   },
   messageWrapper: {
     width: "100%",

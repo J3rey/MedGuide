@@ -8,7 +8,7 @@ async function checkDatabase() {
   console.log(`Using URL: ${process.env.SUPABASE_URL}\n`);
 
   // Test connection with detailed error info
-  const { data: testData, error: testError } = await supabase
+  const { error: testError } = await supabase
     .from('drugs')
     .select('*')
     .limit(1);

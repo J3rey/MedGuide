@@ -25,7 +25,6 @@ import {
   cancelAlarmNotification,
   parseTime,
   setupAlarmCategories,
-  snoozeAlarm,
 } from "../services/notificationService";
 
 interface Alarm {
@@ -360,11 +359,10 @@ export default function ScheduleScreen(): React.JSX.Element {
           <View
             style={[
               styles.addAlarmCard,
+              styles.responsiveContainer,
               {
                 marginHorizontal: containerPadding,
                 maxWidth: maxContentWidth,
-                alignSelf: "center",
-                width: "100%",
               },
             ]}
           >
@@ -445,11 +443,10 @@ export default function ScheduleScreen(): React.JSX.Element {
         <View
           style={[
             styles.alarmsList,
+            styles.responsiveContainer,
             {
               paddingHorizontal: containerPadding,
               maxWidth: maxContentWidth,
-              alignSelf: "center",
-              width: "100%",
             },
           ]}
         >
@@ -635,6 +632,10 @@ const styles = StyleSheet.create({
     color: theme.darkColors.foreground,
     fontWeight: theme.typography.fontWeight.bold,
   },
+  responsiveContainer: {
+    alignSelf: "center",
+    width: "100%",
+  },
   addAlarmCard: {
     backgroundColor: theme.darkColors.card,
     borderRadius: theme.radius.xl,
@@ -802,9 +803,6 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.base,
     color: theme.darkColors.foreground,
   },
-  placeholderText: {
-    color: theme.darkColors.mutedForeground,
-  },
   pickerArrow: {
     fontSize: theme.typography.fontSize.sm,
     color: theme.darkColors.mutedForeground,
@@ -838,42 +836,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "flex-end",
-  },
-  modalContent: {
-    backgroundColor: theme.darkColors.card,
-    borderTopLeftRadius: theme.radius.xl,
-    borderTopRightRadius: theme.radius.xl,
-    maxHeight: "70%",
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: theme.spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.darkColors.border,
-  },
-  modalTitle: {
-    fontSize: theme.typography.fontSize.lg,
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.darkColors.foreground,
-  },
-  modalClose: {
-    fontSize: 24,
-    color: theme.darkColors.mutedForeground,
-  },
-  medicationList: {
-    padding: theme.spacing.base,
-  },
-  medicationItem: {
-    paddingVertical: theme.spacing.base,
-    paddingHorizontal: theme.spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.darkColors.border,
-  },
-  medicationItemText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.darkColors.foreground,
   },
   timePickerContainer: {
     backgroundColor: theme.darkColors.card,
