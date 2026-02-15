@@ -7,7 +7,9 @@ import {
   ScrollView,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import theme from '../styles/theme';
+import { RootStackParamList } from '../../App';
 
 interface Language {
   code: string;
@@ -23,14 +25,17 @@ const languages: Language[] = [
   { code: 'it', name: 'Italiano', flag: '🇮🇹' },
 ];
 
-interface LanguageSelectionScreenProps {
-  onLanguageSelect: (code: string) => void;
-}
+type Props = NativeStackScreenProps<RootStackParamList, 'Language'>;
 
 export default function LanguageSelectionScreen({
-  onLanguageSelect,
-}: LanguageSelectionScreenProps): React.JSX.Element {
-  const { t } = useTranslation();
+  navigation,
+}: Props): React.JSX.Element {
+  const { t, i18n } = useTranslation();
+
+  const handleLanguageSelect = async (code: string) => {
+    await i18n.changeLanguage(code);
+    navigation.navigate('Camera');
+  };
 
   return (
     <View style={styles.container}>
@@ -47,7 +52,7 @@ export default function LanguageSelectionScreen({
         {languages.map((language) => (
           <TouchableOpacity
             key={language.code}
-            onPress={() => onLanguageSelect(language.code)}
+            onPress={() => handleLanguageSelect(language.code)}
             style={styles.languageButton}
             activeOpacity={0.7}
           >
