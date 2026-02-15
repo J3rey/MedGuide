@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
+import { AxiosError } from "axios";
 import theme from "../styles/theme";
 import { medicationApi } from "../services/api";
 
@@ -22,7 +23,11 @@ interface ChatMessage {
   timestamp: Date;
 }
 
-export default function ChatScreen() {
+interface ChatScreenProps {
+  initialDrugName?: string;
+}
+
+export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
   const { t } = useTranslation();
 
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -35,6 +40,7 @@ export default function ChatScreen() {
   ]);
 
   const [inputMessage, setInputMessage] = useState("");
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const scrollViewRef = useRef<ScrollView>(null);
   const { width: screenWidth } = useWindowDimensions();
@@ -44,19 +50,29 @@ export default function ChatScreen() {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  useEffect(() => {
+    if (initialDrugName && !hasInitialized) {
+      setHasInitialized(true);
+      const query = `Tell me about ${initialDrugName}`;
+      sendMessage(query);
+    }
+  }, [initialDrugName, hasInitialized]);
+
+  const sendMessage = async (customMessage?: string) => {
+    const messageText = customMessage || inputMessage;
+    if (!messageText.trim()) return;
 
     const userMessage: ChatMessage = {
       id: Date.now(),
-      text: inputMessage,
+      text: messageText,
       sender: "user",
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    const messageText = inputMessage;
-    setInputMessage("");
+    if (!customMessage) {
+      setInputMessage("");
+    }
 
     try {
       const response = await medicationApi.sendChatMessage(messageText);
@@ -69,10 +85,32 @@ export default function ChatScreen() {
       };
 
       setMessages((prev) => [...prev, botMessage]);
-    } catch {
+    } catch (error: unknown) {
+      let errorText = t("chat.defaultResponse");
+
+      if (error instanceof AxiosError) {
+        console.error("Chat error:", error.response?.data || error.message);
+
+        if (
+          error.response?.status === 429 ||
+          error.response?.data?.error === "quota_exceeded"
+        ) {
+          errorText =
+            error.response?.data?.response ||
+            "I'm currently experiencing high demand. Please try again later.";
+        } else if (error.message) {
+          errorText = `Error: ${error.message}. Please check your connection.`;
+        }
+      } else if (error instanceof Error) {
+        console.error("Chat error:", error.message);
+        errorText = `Error: ${error.message}. Please check your connection.`;
+      } else {
+        console.error("Unknown error:", error);
+      }
+
       const botMessage: ChatMessage = {
         id: Date.now() + 1,
-        text: t("chat.defaultResponse"),
+        text: errorText,
         sender: "bot",
         timestamp: new Date(),
       };
@@ -95,7 +133,7 @@ export default function ChatScreen() {
           styles.header,
           {
             paddingHorizontal: containerPadding,
-            paddingTop: Math.max(insets.top, 16) + 80,
+            paddingTop: Math.max(insets.top, 16),
           },
         ]}
       >
@@ -178,8 +216,11 @@ export default function ChatScreen() {
         />
 
         <TouchableOpacity
-          onPress={sendMessage}
-          style={styles.sendButton}
+          onPress={() => sendMessage()}
+          style={[
+            styles.sendButton,
+            !inputMessage.trim() && styles.sendButtonDisabled,
+          ]}
           disabled={!inputMessage.trim()}
         >
           <Text style={styles.sendText}>Send</Text>
@@ -281,6 +322,10 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     alignItems: "center",
     justifyContent: "center",
+  },
+  sendButtonDisabled: {
+    backgroundColor: "#6b7280",
+    opacity: 0.5,
   },
   sendText: {
     color: "#ffffff",

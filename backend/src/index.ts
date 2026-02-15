@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import chatRoutes from './routes/chat';
 import alarmRoutes from './routes/alarms';
 import drugRoutes from './routes/drugs';
+import { apiLimiter } from './middleware/rateLimiter';
 
 // Load environment variables
 dotenv.config();
@@ -14,6 +15,9 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Apply rate limiting to all API routes
+app.use('/api', apiLimiter);
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {

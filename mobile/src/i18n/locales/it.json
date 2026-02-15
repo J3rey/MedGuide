@@ -15,7 +15,8 @@
   "navigation": {
     "schedule": "Programma",
     "camera": "Fotocamera",
-    "chat": "Chat"
+    "chat": "Chat",
+    "settings": "Impostazioni"
   },
   "schedule": {
     "title": "Programma Farmaci",
@@ -46,5 +47,16 @@
     "placeholder": "Digita la tua domanda...",
     "greeting": "Ciao! Sono il tuo assistente Medguide. Come posso aiutarti oggi?",
     "defaultResponse": "Capisco che hai una domanda sui tuoi farmaci. Si prega di consultare il proprio medico per consigli medici specifici."
+  },
+  "manualSearch": {
+    "title": "Ricerca Manuale Farmaci",
+    "searchPlaceholder": "Digita il nome del farmaco...",
+    "helperText": "Digita almeno 2 caratteri. Appariranno suggerimenti per aiutare con l'ortografia.",
+    "suggestions": "Suggerimenti:",
+    "noResults": "Nessun farmaco trovato corrispondente",
+    "tryAgain": "Prova a controllare l'ortografia o usa meno caratteri",
+    "selectedDrug": "Farmaco Selezionato:",
+    "askChatbot": "Chiedi al Chatbot Su Questo Farmaco",
+    "back": "Indietro"
   }
 }

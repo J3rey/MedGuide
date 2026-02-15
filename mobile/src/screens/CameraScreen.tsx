@@ -2,8 +2,9 @@ import React, { useRef, useState } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import theme from "../styles/theme";
+import { CameraScreenProps } from "../types/navigation";
 
-export default function CameraScreen({ navigation }: any) {
+export default function CameraScreen({ navigation }: CameraScreenProps) {
   const cameraRef = useRef<CameraView | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -63,7 +64,12 @@ export default function CameraScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.darkColors.background },
-  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
   text: { color: theme.darkColors.foreground, marginBottom: 12 },
 
   camera: { flex: 1 },
@@ -106,5 +112,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.darkColors.primary,
     alignItems: "center",
   },
-  buttonTextPrimary: { color: theme.darkColors.primaryForeground, fontWeight: "700" },
+  buttonTextPrimary: {
+    color: theme.darkColors.primaryForeground,
+    fontWeight: "700",
+  },
 });

@@ -12,7 +12,9 @@ import {
   Alert,
   Modal,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import theme from "../styles/theme";
@@ -69,7 +71,10 @@ export default function ScheduleScreen(): React.JSX.Element {
     }
   };
 
-  const onTimeChange = (event: any, selectedDate?: Date): void => {
+  const onTimeChange = (
+    event: DateTimePickerEvent,
+    selectedDate?: Date,
+  ): void => {
     const currentDate = selectedDate || newAlarmTime;
     setShowTimePicker(Platform.OS === "ios");
     setNewAlarmTime(currentDate);
@@ -108,23 +113,36 @@ export default function ScheduleScreen(): React.JSX.Element {
       console.error("Failed to register for notifications:", error);
       Alert.alert(
         "Alarms Disabled",
-        "Please enable notifications in your device settings to receive medication alarms."
+        "Please enable notifications in your device settings to receive medication alarms.",
       );
     }
   };
 
   const fetchAlarms = async (): Promise<void> => {
     try {
+      // Check if supabase is configured
+      if (!supabase) {
+        setAlarms([]);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("alarms")
         .select("*")
         .order("time", { ascending: true });
 
-      if (error) throw error;
-      setAlarms(data || []);
+      if (error) {
+        console.error("Supabase error:", error);
+        // Don't show alert for connection errors, just log
+        setAlarms([]);
+      } else {
+        setAlarms(data || []);
+      }
     } catch (error) {
       console.error("Error fetching alarms:", error);
-      Alert.alert("Error", "Failed to load alarms");
+      // Set empty alarms instead of showing error
+      setAlarms([]);
     } finally {
       setLoading(false);
     }
@@ -137,8 +155,8 @@ export default function ScheduleScreen(): React.JSX.Element {
       // Update local state immediately for better UX
       setAlarms(
         alarms.map((a) =>
-          a.id === alarm.id ? { ...a, enabled: newEnabled } : a
-        )
+          a.id === alarm.id ? { ...a, enabled: newEnabled } : a,
+        ),
       );
 
       // Handle notification scheduling
@@ -155,7 +173,7 @@ export default function ScheduleScreen(): React.JSX.Element {
           alarm.medication_name,
           hour,
           minute,
-          alarm.days
+          alarm.days,
         );
       } else if (notificationId) {
         await cancelAlarmNotification(notificationId);
@@ -190,7 +208,7 @@ export default function ScheduleScreen(): React.JSX.Element {
         newAlarmMed,
         hour,
         minute,
-        selectedDays
+        selectedDays,
       );
 
       const { data, error } = await supabase
@@ -222,14 +240,14 @@ export default function ScheduleScreen(): React.JSX.Element {
   const startEditAlarm = (alarm: Alarm): void => {
     setEditingAlarm(alarm);
     setNewAlarmMed(alarm.medication_name);
-    
+
     // Parse the 24-hour time string to create a Date object
     const [hours, minutes] = alarm.time.split(":").map(Number);
     const date = new Date();
     date.setHours(hours);
     date.setMinutes(minutes);
     setNewAlarmTime(date);
-    
+
     setSelectedDays(alarm.days);
     setShowAddAlarm(true);
   };
@@ -253,7 +271,7 @@ export default function ScheduleScreen(): React.JSX.Element {
         newAlarmMed,
         hour,
         minute,
-        selectedDays
+        selectedDays,
       );
 
       // Update in database
@@ -323,7 +341,7 @@ export default function ScheduleScreen(): React.JSX.Element {
     <View style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={{ paddingTop: Math.max(insets.top, 16) + 80 }}
+        contentContainerStyle={{ paddingTop: Math.max(insets.top, 16) }}
       >
         <View style={[styles.header, { paddingHorizontal: containerPadding }]}>
           <View style={styles.headerLeft}>
@@ -401,7 +419,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                         {day}
                       </Text>
                     </TouchableOpacity>
-                  )
+                  ),
                 )}
               </View>
             </View>

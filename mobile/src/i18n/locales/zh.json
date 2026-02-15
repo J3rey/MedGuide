@@ -15,7 +15,8 @@
   "navigation": {
     "schedule": "日程",
     "camera": "相机",
-    "chat": "聊天"
+    "chat": "聊天",
+    "settings": "设置"
   },
   "schedule": {
     "title": "用药时间表",
@@ -46,5 +47,16 @@
     "placeholder": "输入您的问题...",
     "greeting": "您好！我是您的医疗指南助手。今天我能帮您什么？",
     "defaultResponse": "我了解您对药物有疑问。请咨询您的医疗保健提供者以获取具体的医疗建议。"
+  },
+  "manualSearch": {
+    "title": "手动药物搜索",
+    "searchPlaceholder": "输入药物名称...",
+    "helperText": "至少输入2个字符。输入时会出现建议以帮助拼写。",
+    "suggestions": "建议：",
+    "noResults": "未找到匹配的药物",
+    "tryAgain": "请检查拼写或使用更少的字符",
+    "selectedDrug": "选定的药物：",
+    "askChatbot": "向聊天机器人询问此药物",
+    "back": "返回"
   }
 }
