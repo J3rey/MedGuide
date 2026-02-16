@@ -24,7 +24,12 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-        cache-dependency-path: backend/package.json
+          cache-dependency-path: backend/package.json
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
       - name: Run type check
         working-directory: ./backend
         run: npm run type-check
