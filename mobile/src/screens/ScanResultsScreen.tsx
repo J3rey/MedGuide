@@ -77,9 +77,7 @@ export default function ScanResultsScreen({
       </Text>
 
       {hasMatches && (
-        <Text style={styles.subtitle}>
-          Tap a medication to learn more
-        </Text>
+        <Text style={styles.subtitle}>Tap a medication to learn more</Text>
       )}
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -90,7 +88,7 @@ export default function ScanResultsScreen({
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.row}
               onPress={() => selectMedication(item)}
             >
