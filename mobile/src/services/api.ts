@@ -8,7 +8,7 @@ const getBackendUrl = () => {
   if (Constants.expoConfig?.extra?.backendUrl) {
     return Constants.expoConfig.extra.backendUrl;
   }
-  
+
   // Default URLs for different platforms
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:3000'; // Android emulator

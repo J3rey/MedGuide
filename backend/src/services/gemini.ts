@@ -20,26 +20,44 @@ interface Drug {
 async function searchDrugsInDatabase(query: string): Promise<Drug[]> {
   try {
     console.log('[Gemini] Searching database for:', query);
-    
+
     // Clean and prepare search query
     const searchTerm = query.toLowerCase().trim();
-    
+
     // Extract potential drug names (remove common words)
-    const commonWords = ['tell', 'me', 'about', 'what', 'is', 'the', 'a', 'an', 'for', 'information', 'on', 'drug', 'medication','medicine'];
+    const commonWords = [
+      'tell',
+      'me',
+      'about',
+      'what',
+      'is',
+      'the',
+      'a',
+      'an',
+      'for',
+      'information',
+      'on',
+      'drug',
+      'medication',
+      'medicine',
+    ];
     const keywords = searchTerm
       .split(/\s+/)
-      .filter(word => !commonWords.includes(word) && word.length > 2);
-    
+      .filter((word) => !commonWords.includes(word) && word.length > 2);
+
     console.log('[Gemini] Search keywords:', keywords);
-    
+
     // Search using fuzzy matching and keywords
     const { data, error } = await supabase
       .from('drugs')
       .select('*')
       .or(
-        keywords.map(kw => 
-          `drug_name.ilike.%${kw}%,counseling.ilike.%${kw}%,indications.ilike.%${kw}%,adverse_effects.ilike.%${kw}%`
-        ).join(',')
+        keywords
+          .map(
+            (kw) =>
+              `drug_name.ilike.%${kw}%,counseling.ilike.%${kw}%,indications.ilike.%${kw}%,adverse_effects.ilike.%${kw}%`
+          )
+          .join(',')
       )
       .limit(10);
 
@@ -50,7 +68,10 @@ async function searchDrugsInDatabase(query: string): Promise<Drug[]> {
 
     console.log('[Gemini] Found', data?.length || 0, 'drugs');
     if (data && data.length > 0) {
-      console.log('[Gemini] Drug names:', data.map(d => d.drug_name).join(', '));
+      console.log(
+        '[Gemini] Drug names:',
+        data.map((d) => d.drug_name).join(', ')
+      );
     }
 
     return data || [];
@@ -63,7 +84,10 @@ async function searchDrugsInDatabase(query: string): Promise<Drug[]> {
 /**
  * Format drug data for the AI prompt
  */
-function formatDrugData(drugs: Drug[], infoType: 'indications' | 'full' = 'full'): string {
+function formatDrugData(
+  drugs: Drug[],
+  infoType: 'indications' | 'full' = 'full'
+): string {
   if (drugs.length === 0) {
     return 'No medication information found in the database.';
   }
@@ -106,12 +130,12 @@ export const chat = async (
 ): Promise<string> => {
   console.log('[Gemini Chat] User message:', message);
   console.log('[Gemini Chat] Language:', language);
-  
+
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   // Check if this is an initial "Tell me about" query
   const isInitialQuery = /^tell me about/i.test(message.trim());
-  
+
   // Define valid keywords for specific information
   const validKeywords = [
     'counseling',
@@ -122,16 +146,18 @@ export const chat = async (
     'children precautions',
     'children',
     'breastfeeding precautions',
-    'breastfeeding'
+    'breastfeeding',
   ];
-  
+
   // Check if user query contains valid keywords
   const messageLower = message.toLowerCase();
-  const hasValidKeyword = validKeywords.some(keyword => messageLower.includes(keyword));
+  const hasValidKeyword = validKeywords.some((keyword) =>
+    messageLower.includes(keyword)
+  );
 
   // Search for relevant drugs in the database
   const drugs = await searchDrugsInDatabase(message);
-  
+
   console.log('[Gemini Chat] Database search returned', drugs.length, 'drugs');
 
   // If no drugs found
@@ -142,7 +168,7 @@ export const chat = async (
   // For initial queries, only show indications
   if (isInitialQuery) {
     const drugData = formatDrugData(drugs, 'indications');
-    
+
     const prompt = `You are MedGuide Assistant. Provide a brief, clear explanation of what this medication is used for based on the INDICATIONS information below.
 
 LANGUAGE: Respond in ${language}
@@ -169,7 +195,7 @@ Instructions:
 
   // For keyword-based queries, provide full information
   const drugData = formatDrugData(drugs, 'full');
-  
+
   const prompt = `You are MedGuide Assistant. Answer the user's question using ONLY the information from the database below.
 
 CRITICAL RULES:
@@ -188,7 +214,7 @@ USER QUESTION: ${message}`;
   const result = await model.generateContent(prompt);
   const response = await result.response;
   const text = response.text();
-  
+
   console.log('[Gemini Chat] Response generated, length:', text.length);
 
   return text;

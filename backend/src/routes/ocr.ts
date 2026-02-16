@@ -5,9 +5,9 @@ import multer from 'multer';
 const router = Router();
 
 // Configure multer for file uploads (in-memory storage)
-const upload = multer({ 
+const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
 });
 
 // Initialize Gemini API
@@ -23,7 +23,9 @@ router.post('/ocr/extract', async (req: Request, res: Response) => {
     }
 
     if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ error: 'Server configuration error: Missing API key' });
+      return res
+        .status(500)
+        .json({ error: 'Server configuration error: Missing API key' });
     }
 
     console.log('[OCR Extract] Processing base64 image');
@@ -52,72 +54,81 @@ If handwritten, do your best to read medication names only.`;
 
     console.log('[OCR Extract] Extracted text:', text);
 
-    res.json({ 
-      success: true, 
-      text: text.trim() 
+    res.json({
+      success: true,
+      text: text.trim(),
     });
-
   } catch (error: any) {
     console.error('[OCR Extract] Error:', error);
-    res.status(500).json({ 
-      error: 'OCR processing failed', 
-      message: error.message 
+    res.status(500).json({
+      error: 'OCR processing failed',
+      message: error.message,
     });
   }
 });
 
-router.post('/ocr/upload', upload.single('image'), async (req: Request, res: Response) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No image file provided' });
-    }
+router.post(
+  '/ocr/upload',
+  upload.single('image'),
+  async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No image file provided' });
+      }
 
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ error: 'Server configuration error: Missing API key' });
-    }
+      if (!process.env.GEMINI_API_KEY) {
+        return res
+          .status(500)
+          .json({ error: 'Server configuration error: Missing API key' });
+      }
 
-    console.log('[OCR] Processing image:', req.file.originalname, req.file.size, 'bytes');
+      console.log(
+        '[OCR] Processing image:',
+        req.file.originalname,
+        req.file.size,
+        'bytes'
+      );
 
-    // Convert buffer to base64
-    const base64Image = req.file.buffer.toString('base64');
-    const mimeType = req.file.mimetype || 'image/jpeg';
+      // Convert buffer to base64
+      const base64Image = req.file.buffer.toString('base64');
+      const mimeType = req.file.mimetype || 'image/jpeg';
 
-    // Use gemini-2.5-flash model for vision
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+      // Use gemini-2.5-flash model for vision
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-    const prompt = `Extract ONLY medication/drug names from this image. Look for drug names on medicine labels, packages, boxes, or prescriptions. 
+      const prompt = `Extract ONLY medication/drug names from this image. Look for drug names on medicine labels, packages, boxes, or prescriptions. 
 Return each drug name on a new line, nothing else. 
 Do NOT include: dosages (500mg), forms (tablet, capsule), instructions, or other text. 
 Extract only the primary drug or brand name. For example, if you see 'Drug Name 500mg tablets', return only 'Drug Name'. 
 If handwritten, do your best to read medication names only.`;
 
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          mimeType,
-          data: base64Image,
+      const result = await model.generateContent([
+        prompt,
+        {
+          inlineData: {
+            mimeType,
+            data: base64Image,
+          },
         },
-      },
-    ]);
+      ]);
 
-    const response = await result.response;
-    const text = response.text();
+      const response = await result.response;
+      const text = response.text();
 
-    console.log('[OCR] Extracted text:', text);
+      console.log('[OCR] Extracted text:', text);
 
-    res.json({ 
-      success: true, 
-      text: text.trim() 
-    });
-
-  } catch (error: any) {
-    console.error('[OCR] Error:', error);
-    res.status(500).json({ 
-      error: 'OCR processing failed', 
-      message: error.message 
-    });
+      res.json({
+        success: true,
+        text: text.trim(),
+      });
+    } catch (error: any) {
+      console.error('[OCR] Error:', error);
+      res.status(500).json({
+        error: 'OCR processing failed',
+        message: error.message,
+      });
+    }
   }
-});
+);
 
 export default router;
