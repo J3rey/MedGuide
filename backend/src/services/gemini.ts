@@ -63,11 +63,24 @@ async function searchDrugsInDatabase(query: string): Promise<Drug[]> {
 /**
  * Format drug data for the AI prompt
  */
-function formatDrugData(drugs: Drug[]): string {
+function formatDrugData(drugs: Drug[], infoType: 'indications' | 'full' = 'full'): string {
   if (drugs.length === 0) {
     return 'No medication information found in the database.';
   }
 
+  if (infoType === 'indications') {
+    // Only show indications (what the medication is used for)
+    return drugs
+      .map(
+        (drug) => `
+MEDICATION: ${drug.drug_name}
+INDICATIONS (What it's used for): ${drug.indications || 'Not available'}
+---`
+      )
+      .join('\n');
+  }
+
+  // Full information
   return drugs
     .map(
       (drug) => `
@@ -96,22 +109,41 @@ export const chat = async (
   
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
+  // Check if this is an initial "Tell me about" query
+  const isInitialQuery = /^tell me about/i.test(message.trim());
+  
+  // Define valid keywords for specific information
+  const validKeywords = [
+    'counseling',
+    'adverse effects',
+    'side effects',
+    'pregnancy precautions',
+    'pregnancy',
+    'children precautions',
+    'children',
+    'breastfeeding precautions',
+    'breastfeeding'
+  ];
+  
+  // Check if user query contains valid keywords
+  const messageLower = message.toLowerCase();
+  const hasValidKeyword = validKeywords.some(keyword => messageLower.includes(keyword));
+
   // Search for relevant drugs in the database
   const drugs = await searchDrugsInDatabase(message);
-  const drugData = formatDrugData(drugs);
   
   console.log('[Gemini Chat] Database search returned', drugs.length, 'drugs');
 
-  // Create a strict prompt that constrains the AI to only use database information
-  const prompt = `You are MedGuide Assistant, a medication information chatbot. Your role is to help users understand their medications based ONLY on information from our database.
+  // If no drugs found
+  if (drugs.length === 0) {
+    return "I don't have information about that medication in my database. Please consult a healthcare professional.";
+  }
 
-CRITICAL RULES:
-1. You can ONLY provide information that is explicitly present in the DATABASE INFORMATION section below
-2. If the database does not contain information about a medication the user asks about, you MUST say: "I don't have information about that medication in my database. Please consult a healthcare professional."
-3. NEVER provide medical information from your general knowledge
-4. NEVER make up or infer information that isn't in the database
-5. Always include a disclaimer that this is for informational purposes only and they should consult healthcare professionals
-6. If the user asks about drug interactions, side effects, or specific medical advice that isn't in the database, direct them to consult a healthcare professional
+  // For initial queries, only show indications
+  if (isInitialQuery) {
+    const drugData = formatDrugData(drugs, 'indications');
+    
+    const prompt = `You are MedGuide Assistant. Provide a brief, clear explanation of what this medication is used for based on the INDICATIONS information below.
 
 LANGUAGE: Respond in ${language}
 
@@ -120,7 +152,38 @@ ${drugData}
 
 USER QUESTION: ${message}
 
-Remember: Answer ONLY based on the database information above. If the information isn't there, say so clearly.`;
+Instructions:
+- Explain what the medication is used for in a friendly, conversational way
+- Keep it concise (2-3 sentences)
+- Add this at the end: "If you'd like more information, you can ask about: counseling, adverse effects, pregnancy precautions, children precautions, or breastfeeding precautions."`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  }
+
+  // For follow-up queries, check if they used valid keywords
+  if (!hasValidKeyword) {
+    return "I can only provide specific information when you use these keywords in your question:\n\n• Counseling (how to take the medication)\n• Adverse effects (side effects)\n• Pregnancy precautions\n• Children precautions\n• Breastfeeding precautions\n\nFor example, you can ask: 'What are the adverse effects?' or 'Tell me about pregnancy precautions.'";
+  }
+
+  // For keyword-based queries, provide full information
+  const drugData = formatDrugData(drugs, 'full');
+  
+  const prompt = `You are MedGuide Assistant. Answer the user's question using ONLY the information from the database below.
+
+CRITICAL RULES:
+1. Only provide information that is explicitly in the DATABASE INFORMATION section
+2. Focus on the specific aspect the user asked about (counseling, adverse effects, pregnancy precautions, children precautions, or breastfeeding precautions)
+3. Be concise and clear
+4. Always add a disclaimer: "This is for informational purposes only. Please consult your healthcare provider."
+
+LANGUAGE: Respond in ${language}
+
+DATABASE INFORMATION:
+${drugData}
+
+USER QUESTION: ${message}`;
 
   const result = await model.generateContent(prompt);
   const response = await result.response;
