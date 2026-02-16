@@ -24,6 +24,7 @@
     "@types/react": "~19.1.10",
     "@types/react-native": "^0.72.8",
     "expo": "^54.0.31",
+    "intl-pluralrules": "^2.0.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0"
   },
