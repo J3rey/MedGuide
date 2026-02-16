@@ -1,10 +1,10 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import chatRoutes from './routes/chat';
-import alarmRoutes from './routes/alarms';
-import drugRoutes from './routes/drugs';
-import ocrRoutes from './routes/ocr';
+// import chatRoutes from './routes/chat';
+// import alarmRoutes from './routes/alarms';
+// import drugRoutes from './routes/drugs';
+// import ocrRoutes from './routes/ocr';
 import { apiLimiter } from './middleware/rateLimiter';
 
 // Load environment variables
@@ -20,16 +20,22 @@ app.use(express.json());
 // Apply rate limiting to all API routes
 app.use('/api', apiLimiter);
 
-// Health check endpoint
+// Health check endpoint - must be simple and fast
 app.get('/health', (req: Request, res: Response) => {
-  res.json({ status: 'ok', message: 'MedGuide API is running' });
+  console.log('Health check requested');
+  res.status(200).json({ status: 'ok', message: 'MedGuide API is running', timestamp: new Date().toISOString() });
 });
 
-// API Routes
-app.use('/api', chatRoutes);
-app.use('/api', alarmRoutes);
-app.use('/api', drugRoutes);
-app.use('/api', ocrRoutes);
+// API Routes - temporarily commented out for debugging
+// app.use('/api', chatRoutes);
+// app.use('/api', alarmRoutes);
+// app.use('/api', drugRoutes);
+// app.use('/api', ocrRoutes);
+
+// Test endpoint for debugging
+app.get('/test', (req: Request, res: Response) => {
+  res.json({ message: 'Test endpoint working' });
+});
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
