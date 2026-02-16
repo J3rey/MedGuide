@@ -10,7 +10,7 @@ import { apiLimiter } from './middleware/rateLimiter';
 dotenv.config();
 
 const app: Application = express();
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
 
 // Middleware
 app.use(cors());
@@ -32,6 +32,6 @@ app.use('/api', drugRoutes);
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📡 Accessible at: http://0.0.0.0:${PORT}`);
 });

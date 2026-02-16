@@ -26,6 +26,7 @@
     "@google-cloud/vision": "^4.3.3",
     "@google/generative-ai": "^0.2.1",
     "@supabase/supabase-js": "^2.90.1",
+    "@types/multer": "^2.0.0",
     "axios": "^1.13.2",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
@@ -33,7 +34,8 @@
     "expo-device": "~8.0.10",
     "expo-notifications": "~0.32.16",
     "express": "^4.22.1",
-    "express-rate-limit": "^8.2.1"
+    "express-rate-limit": "^8.2.1",
+    "multer": "^2.0.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

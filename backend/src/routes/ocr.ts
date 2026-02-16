@@ -82,16 +82,18 @@ router.post(
           .json({ error: 'Server configuration error: Missing API key' });
       }
 
+      const fileData = req.file as Express.Multer.File;
+
       console.log(
         '[OCR] Processing image:',
-        req.file.originalname,
-        req.file.size,
+        fileData.originalname,
+        fileData.size,
         'bytes'
       );
 
       // Convert buffer to base64
-      const base64Image = req.file.buffer.toString('base64');
-      const mimeType = req.file.mimetype || 'image/jpeg';
+      const base64Image = fileData.buffer.toString('base64');
+      const mimeType = fileData.mimetype || 'image/jpeg';
 
       // Use gemini-2.5-flash model for vision
       const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
