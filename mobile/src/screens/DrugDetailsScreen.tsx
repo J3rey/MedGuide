@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-} from "react-native";
-import { searchDrugs } from "../services/drugSearch";
-import type { Drug } from "../types/drug";
-import theme from "../styles/theme";
+} from 'react-native';
+import { searchDrugs } from '../services/drugSearch';
+import type { Drug } from '../types/drug';
+import theme from '../styles/theme';
 
 type Props = {
   route: { params: { drugId: string } };
@@ -24,34 +24,36 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
   useEffect(() => {
     (async () => {
       try {
-        console.log("[DrugDetails] Fetching drug with ID:", drugId);
+        console.log('[DrugDetails] Fetching drug with ID:', drugId);
         // Import supabase client to fetch by ID
         const { createClient } = await import('@supabase/supabase-js');
         const Constants = await import('expo-constants');
-        
-        const supabaseUrl = Constants.default.expoConfig?.extra?.supabaseUrl || 
-                           process.env.EXPO_PUBLIC_SUPABASE_URL || 
-                           'https://kzqqeodwdpqlsgvydqyb.supabase.co';
-        const supabaseKey = Constants.default.expoConfig?.extra?.supabaseAnonKey || 
-                           process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 
-                           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6cXFlb2R3ZHBxbHNndnlkcXliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc3Mzk0NjEsImV4cCI6MjA1MzMxNTQ2MX0.3rRRlp-0cOTPJX_xAKzA0YWgS1qAy8x1EiOMb8gI1AI';
-        
+
+        const supabaseUrl =
+          Constants.default.expoConfig?.extra?.supabaseUrl ||
+          process.env.EXPO_PUBLIC_SUPABASE_URL ||
+          'https://kzqqeodwdpqlsgvydqyb.supabase.co';
+        const supabaseKey =
+          Constants.default.expoConfig?.extra?.supabaseAnonKey ||
+          process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ||
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6cXFlb2R3ZHBxbHNndnlkcXliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc3Mzk0NjEsImV4cCI6MjA1MzMxNTQ2MX0.3rRRlp-0cOTPJX_xAKzA0YWgS1qAy8x1EiOMb8gI1AI';
+
         const supabase = createClient(supabaseUrl, supabaseKey);
         const { data, error } = await supabase
           .from('drugs')
           .select('*')
           .eq('id', Number(drugId))
           .single();
-        
+
         if (error) {
-          console.error("[DrugDetails] Error:", error);
+          console.error('[DrugDetails] Error:', error);
           setDrug(null);
         } else {
-          console.log("[DrugDetails] Loaded drug:", data);
+          console.log('[DrugDetails] Loaded drug:', data);
           setDrug(data);
         }
       } catch (error) {
-        console.error("[DrugDetails] Failed to load drug details:", error);
+        console.error('[DrugDetails] Failed to load drug details:', error);
         setDrug(null);
       } finally {
         setLoading(false);
@@ -87,7 +89,7 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => {
-          console.log("[DrugDetails] Back button pressed");
+          console.log('[DrugDetails] Back button pressed');
           navigation.goBack();
         }}
       >
@@ -142,8 +144,8 @@ const styles = StyleSheet.create({
   },
   center: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: theme.darkColors.background,
   },
   loadingText: {
@@ -163,7 +165,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     borderWidth: 1,
     borderColor: theme.darkColors.border,
-    alignSelf: "flex-start",
+    alignSelf: 'flex-start',
   },
   backText: {
     color: theme.darkColors.primary,
@@ -171,7 +173,7 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
   },
   brandName: {
-    fontSize: theme.typography.fontSize["2xl"],
+    fontSize: theme.typography.fontSize['2xl'],
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.darkColors.foreground,
     marginBottom: theme.spacing.xs,
