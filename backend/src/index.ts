@@ -1,24 +1,10 @@
 import express, { Application, Request, Response } from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-// import chatRoutes from './routes/chat';
-// import alarmRoutes from './routes/alarms';
-// import drugRoutes from './routes/drugs';
-// import ocrRoutes from './routes/ocr';
-// import { apiLimiter } from './middleware/rateLimiter';
-
-// Load environment variables
-dotenv.config();
 
 const app: Application = express();
-const PORT = parseInt(process.env.PORT || '3000', 10);
+const PORT = parseInt(process.env.PORT || '10000', 10);
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Temporarily removed rate limiting for debugging
-// app.use('/api', apiLimiter);
+console.log('🔧 Creating ultra-minimal Express app...');
+console.log(`📊 PORT from env: ${process.env.PORT}, using: ${PORT}`);
 
 // Health check endpoint - must be simple and fast
 app.get('/health', (req: Request, res: Response) => {
@@ -43,24 +29,55 @@ app.get('/test', (req: Request, res: Response) => {
   res.json({ message: 'Test endpoint working' });
 });
 
-// Start server
+// Start server with detailed logging
+console.log('🚀 Starting server...');
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📡 Accessible at: http://0.0.0.0:${PORT}`);
-  console.log(`🏥 Health check at: http://0.0.0.0:${PORT}/health`);
+  console.log(`✅ Server successfully started!`);
+  console.log(`📍 Running on port: ${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔗 Health check: http://0.0.0.0:${PORT}/health`);
+  console.log(`📦 Process PID: ${process.pid}`);
 });
 
-// Handle server errors
+// Handle server errors with detailed logging
 server.on('error', (error: any) => {
-  console.error('❌ Server error:', error);
+  console.error('❌ Server error occurred:', error);
+  console.error('Error code:', error.code);
+  console.error('Error message:', error.message);
 });
 
-// Graceful shutdown
+server.on('close', () => {
+  console.log('🔒 Server closed');
+});
+
+// Detailed process signal handling
 process.on('SIGTERM', () => {
-  console.log('🛑 Received SIGTERM, shutting down gracefully...');
-  server.close(() => {
-    console.log('✅ Server closed');
+  console.log('⚠️  SIGTERM signal received');
+  console.log('📊 Server status:', server.listening ? 'listening' : 'not listening');
+  console.log('🔄 Attempting graceful shutdown...');
+  
+  server.close((err) => {
+    if (err) {
+      console.error('❌ Error during shutdown:', err);
+      process.exit(1);
+    }
+    console.log('✅ Graceful shutdown complete');
     process.exit(0);
   });
+});
+
+process.on('SIGINT', () => {
+  console.log('⚠️  SIGINT signal received - manual interruption');
+  process.exit(0);
+});
+
+// Catch any uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('💥 Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
 });
