@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import chatRoutes from './routes/chat';
 import alarmRoutes from './routes/alarms';
 import drugRoutes from './routes/drugs';
+import ocrRoutes from './routes/ocr';
 import { apiLimiter } from './middleware/rateLimiter';
 
 // Load environment variables
@@ -28,6 +29,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/api', chatRoutes);
 app.use('/api', alarmRoutes);
 app.use('/api', drugRoutes);
+app.use('/api', ocrRoutes);
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
