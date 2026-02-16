@@ -33,8 +33,11 @@ export async function testSupabaseConnection() {
 
     console.log('[Supabase Test] Sample drug:', data?.[0]?.drug_name);
     return true;
-  } catch (err: any) {
-    console.error('[Supabase Test] Exception:', err.message || err);
+  } catch (err) {
+    console.error(
+      '[Supabase Test] Exception:',
+      err instanceof Error ? err.message : String(err)
+    );
     return false;
   }
 }
