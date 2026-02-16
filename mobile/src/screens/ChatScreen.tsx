@@ -53,10 +53,10 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
   useEffect(() => {
     if (initialDrugName && !hasInitialized) {
       setHasInitialized(true);
-      const query = `Tell me about ${initialDrugName}`;
+      const query = `${t('chat.tellMeAbout')} ${initialDrugName}`;
       sendMessage(query);
     }
-  }, [initialDrugName, hasInitialized]);
+  }, [initialDrugName, hasInitialized, t]);
 
   const sendMessage = async (customMessage?: string) => {
     const messageText = customMessage || inputMessage;

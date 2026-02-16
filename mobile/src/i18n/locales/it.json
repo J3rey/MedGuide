@@ -46,7 +46,8 @@
     "subtitle": "Chiedi informazioni sui tuoi farmaci",
     "placeholder": "Digita la tua domanda...",
     "greeting": "Ciao! Sono il tuo assistente Medguide. Come posso aiutarti oggi?",
-    "defaultResponse": "Capisco che hai una domanda sui tuoi farmaci. Si prega di consultare il proprio medico per consigli medici specifici."
+    "defaultResponse": "Capisco che hai una domanda sui tuoi farmaci. Si prega di consultare il proprio medico per consigli medici specifici.",
+    "tellMeAbout": "Dimmi di"
   },
   "manualSearch": {
     "title": "Ricerca Manuale Farmaci",

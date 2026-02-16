@@ -46,7 +46,8 @@
     "subtitle": "Ask about your medications",
     "placeholder": "Type your question...",
     "greeting": "Hello! I'm your Medguide assistant. How can I help you today?",
-    "defaultResponse": "I understand you have a question about your medication. Please consult with your healthcare provider for specific medical advice."
+    "defaultResponse": "I understand you have a question about your medication. Please consult with your healthcare provider for specific medical advice.",
+    "tellMeAbout": "Tell me about"
   },
   "manualSearch": {
     "title": "Manual Drug Search",
