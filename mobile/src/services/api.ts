@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import i18n from '../i18n/config';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
