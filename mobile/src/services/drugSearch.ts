@@ -1,9 +1,22 @@
 import { Drug } from '../types/drug';
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
-// Use your local IP - update this based on your setup
-// For Android emulator use 10.0.2.2, for iOS simulator use localhost
-// For physical device use your computer's local IP
-const API_BASE = 'http://192.168.1.6:3000/api';
+// Get backend URL from config with platform-specific defaults
+const getBackendUrl = () => {
+  if (Constants.expoConfig?.extra?.backendUrl) {
+    return Constants.expoConfig.extra.backendUrl;
+  }
+  
+  // Default URLs for different platforms
+  if (Platform.OS === 'android') {
+    return 'http://10.0.2.2:3000'; // Android emulator
+  }
+  return 'http://localhost:3000'; // iOS simulator, web
+};
+
+const BACKEND_URL = getBackendUrl();
+const API_BASE = `${BACKEND_URL}/api`;
 
 export async function searchDrugs(query: string): Promise<Drug[]> {
   try {
