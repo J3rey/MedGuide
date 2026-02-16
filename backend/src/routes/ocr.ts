@@ -10,8 +10,13 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
 });
 
-// Initialize Gemini API
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+// Helper to get Gemini AI instance
+function getGeminiAI() {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY environment variable is not set');
+  }
+  return new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+}
 
 // OCR endpoint for JSON-based requests (from mobile app)
 router.post('/ocr/extract', async (req: Request, res: Response) => {
@@ -31,6 +36,7 @@ router.post('/ocr/extract', async (req: Request, res: Response) => {
     console.log('[OCR Extract] Processing base64 image');
 
     // Use gemini-2.5-flash model for vision
+    const genAI = getGeminiAI();
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `Extract ONLY medication/drug names from this image. Look for drug names on medicine labels, packages, boxes, or prescriptions. 
@@ -96,6 +102,7 @@ router.post(
       const mimeType = fileData.mimetype || 'image/jpeg';
 
       // Use gemini-2.5-flash model for vision
+      const genAI = getGeminiAI();
       const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
       const prompt = `Extract ONLY medication/drug names from this image. Look for drug names on medicine labels, packages, boxes, or prescriptions. 
