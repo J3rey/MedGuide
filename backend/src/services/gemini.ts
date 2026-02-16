@@ -19,23 +19,43 @@ interface Drug {
  */
 async function searchDrugsInDatabase(query: string): Promise<Drug[]> {
   try {
-    // Extract potential drug names from the query (simple keyword search)
+    console.log('[Gemini] Searching database for:', query);
+    
+    // Clean and prepare search query
+    const searchTerm = query.toLowerCase().trim();
+    
+    // Extract potential drug names (remove common words)
+    const commonWords = ['tell', 'me', 'about', 'what', 'is', 'the', 'a', 'an', 'for', 'information', 'on', 'drug', 'medication','medicine'];
+    const keywords = searchTerm
+      .split(/\s+/)
+      .filter(word => !commonWords.includes(word) && word.length > 2);
+    
+    console.log('[Gemini] Search keywords:', keywords);
+    
+    // Search using fuzzy matching and keywords
     const { data, error } = await supabase
       .from('drugs')
       .select('*')
       .or(
-        `drug_name.ilike.%${query}%,counseling.ilike.%${query}%,indications.ilike.%${query}%,adverse_effects.ilike.%${query}%`
+        keywords.map(kw => 
+          `drug_name.ilike.%${kw}%,counseling.ilike.%${kw}%,indications.ilike.%${kw}%,adverse_effects.ilike.%${kw}%`
+        ).join(',')
       )
       .limit(10);
 
     if (error) {
-      console.error('Database search error:', error);
+      console.error('[Gemini] Database search error:', error);
       return [];
+    }
+
+    console.log('[Gemini] Found', data?.length || 0, 'drugs');
+    if (data && data.length > 0) {
+      console.log('[Gemini] Drug names:', data.map(d => d.drug_name).join(', '));
     }
 
     return data || [];
   } catch (error) {
-    console.error('Error searching drugs:', error);
+    console.error('[Gemini] Error searching drugs:', error);
     return [];
   }
 }
@@ -71,11 +91,16 @@ export const chat = async (
   message: string,
   language: string = 'en'
 ): Promise<string> => {
+  console.log('[Gemini Chat] User message:', message);
+  console.log('[Gemini Chat] Language:', language);
+  
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   // Search for relevant drugs in the database
   const drugs = await searchDrugsInDatabase(message);
   const drugData = formatDrugData(drugs);
+  
+  console.log('[Gemini Chat] Database search returned', drugs.length, 'drugs');
 
   // Create a strict prompt that constrains the AI to only use database information
   const prompt = `You are MedGuide Assistant, a medication information chatbot. Your role is to help users understand their medications based ONLY on information from our database.
@@ -100,6 +125,8 @@ Remember: Answer ONLY based on the database information above. If the informatio
   const result = await model.generateContent(prompt);
   const response = await result.response;
   const text = response.text();
+  
+  console.log('[Gemini Chat] Response generated, length:', text.length);
 
   return text;
 };
