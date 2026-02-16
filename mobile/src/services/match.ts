@@ -27,7 +27,7 @@ export function buildCandidates(ocrText: string): string[] {
   // tokens from all text
   const allTokens = normalize(ocrText).split(' ').filter(Boolean);
 
-  // n-grams (2-4 words) catch multi-word drug names like "panadol osteo"
+  // n-grams (2-4 words) catch multi-word drug names
   const ngrams: string[] = [];
   const maxN = 4;
   for (let i = 0; i < allTokens.length; i++) {

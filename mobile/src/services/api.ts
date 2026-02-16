@@ -1,10 +1,22 @@
 import axios, { AxiosError } from 'axios';
 import i18n from '../i18n/config';
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
-// Use your local IP or localhost - update this based on your setup
-// For Android emulator use 10.0.2.2, for iOS simulator use localhost
-// For physical device use your computer's local IP (e.g., 192.168.1.x)
-const API_URL = process.env.API_URL || 'http://192.168.1.6:3000';
+// Get backend URL from config with platform-specific defaults
+const getBackendUrl = () => {
+  if (Constants.expoConfig?.extra?.backendUrl) {
+    return Constants.expoConfig.extra.backendUrl;
+  }
+  
+  // Default URLs for different platforms
+  if (Platform.OS === 'android') {
+    return 'http://10.0.2.2:3000'; // Android emulator
+  }
+  return 'http://localhost:3000'; // iOS simulator, web
+};
+
+const API_URL = getBackendUrl();
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
