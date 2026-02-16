@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 // import alarmRoutes from './routes/alarms';
 // import drugRoutes from './routes/drugs';
 // import ocrRoutes from './routes/ocr';
-import { apiLimiter } from './middleware/rateLimiter';
+// import { apiLimiter } from './middleware/rateLimiter';
 
 // Load environment variables
 dotenv.config();
@@ -17,13 +17,19 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 app.use(cors());
 app.use(express.json());
 
-// Apply rate limiting to all API routes
-app.use('/api', apiLimiter);
+// Temporarily removed rate limiting for debugging
+// app.use('/api', apiLimiter);
 
 // Health check endpoint - must be simple and fast
 app.get('/health', (req: Request, res: Response) => {
-  console.log('Health check requested');
-  res.status(200).json({ status: 'ok', message: 'MedGuide API is running', timestamp: new Date().toISOString() });
+  console.log('🔍 Health check requested from:', req.ip);
+  res.status(200).send('OK');
+});
+
+// Simple test endpoint 
+app.get('/', (req: Request, res: Response) => {
+  console.log('🏠 Root endpoint requested');
+  res.send('MedGuide API is running!');
 });
 
 // API Routes - temporarily commented out for debugging
@@ -38,8 +44,23 @@ app.get('/test', (req: Request, res: Response) => {
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📡 Accessible at: http://0.0.0.0:${PORT}`);
+  console.log(`🏥 Health check at: http://0.0.0.0:${PORT}/health`);
+});
+
+// Handle server errors
+server.on('error', (error: any) => {
+  console.error('❌ Server error:', error);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 Received SIGTERM, shutting down gracefully...');
+  server.close(() => {
+    console.log('✅ Server closed');
+    process.exit(0);
+  });
 });
