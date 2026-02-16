@@ -39,17 +39,6 @@ export default function ScanResultsScreen({
 
         setMatches(res.matches);
         setLoading(false);
-
-        // If we found matches, set the drug and go back
-        if (res.matches && res.matches.length > 0) {
-          const firstMatch = res.matches[0];
-          setTimeout(() => {
-            if (mounted) {
-              setScannedDrug(firstMatch.drug_name);
-              navigation.goBack();
-            }
-          }, 2000);
-        }
       } catch (e: unknown) {
         if (!mounted) return;
         const message =
@@ -63,7 +52,7 @@ export default function ScanResultsScreen({
     return () => {
       mounted = false;
     };
-  }, [uri, navigation, setScannedDrug]);
+  }, [uri]);
 
   if (loading) {
     return (
@@ -76,11 +65,22 @@ export default function ScanResultsScreen({
 
   const hasMatches = matches.length > 0;
 
+  const selectMedication = (drug: Drug) => {
+    // Setting scanned drug will trigger tab switch to chat in DarkMainApp
+    setScannedDrug(drug.drug_name);
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <Text style={styles.title}>
         {hasMatches ? 'Possible matches' : 'No matches found'}
       </Text>
+
+      {hasMatches && (
+        <Text style={styles.subtitle}>
+          Tap a medication to learn more
+        </Text>
+      )}
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -90,14 +90,17 @@ export default function ScanResultsScreen({
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
-            <View style={styles.row}>
+            <TouchableOpacity 
+              style={styles.row}
+              onPress={() => selectMedication(item)}
+            >
               <Text style={styles.rowTitle}>{item.drug_name}</Text>
               {item.indications && (
                 <Text style={styles.rowSubtitle} numberOfLines={2}>
                   {item.indications}
                 </Text>
               )}
-            </View>
+            </TouchableOpacity>
           )}
         />
       ) : (
@@ -144,6 +147,11 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.darkColors.foreground,
+    marginBottom: theme.spacing.xs,
+  },
+  subtitle: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.darkColors.mutedForeground,
     marginBottom: theme.spacing.md,
   },
   bodyText: {
@@ -166,8 +174,12 @@ const styles = StyleSheet.create({
 
   row: {
     paddingVertical: theme.spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.darkColors.border,
+    paddingHorizontal: theme.spacing.sm,
+    marginVertical: theme.spacing.xs,
+    borderWidth: 1,
+    borderColor: theme.darkColors.border,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.darkColors.card,
   },
   rowTitle: {
     fontSize: theme.typography.fontSize.base,
