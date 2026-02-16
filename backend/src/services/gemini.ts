@@ -1,7 +1,13 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { supabase } from './supabase';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+// Lazy initialization helper for Gemini AI
+function getGeminiAI() {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY environment variable is not set');
+  }
+  return new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+}
 
 interface Drug {
   id: number;
@@ -187,6 +193,7 @@ export const chat = async (
   console.log('[Gemini Chat] User message:', message);
   console.log('[Gemini Chat] Language:', language);
 
+  const genAI = getGeminiAI();
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   // Define multilingual "Tell me about" phrases
