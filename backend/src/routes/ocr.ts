@@ -58,11 +58,11 @@ If handwritten, do your best to read medication names only.`;
       success: true,
       text: text.trim(),
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('[OCR Extract] Error:', error);
     res.status(500).json({
       error: 'OCR processing failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 });
@@ -121,11 +121,11 @@ If handwritten, do your best to read medication names only.`;
         success: true,
         text: text.trim(),
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('[OCR] Error:', error);
       res.status(500).json({
         error: 'OCR processing failed',
-        message: error.message,
+        message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }

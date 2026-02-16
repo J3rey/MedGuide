@@ -7,13 +7,17 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { searchDrugs } from '../services/drugSearch';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { Drug } from '../types/drug';
 import theme from '../styles/theme';
 
+type RootStackParamList = {
+  DrugDetails: { drugId: string };
+};
+
 type Props = {
   route: { params: { drugId: string } };
-  navigation: any;
+  navigation: NativeStackNavigationProp<RootStackParamList>;
 };
 
 export default function DrugDetailsScreen({ route, navigation }: Props) {
@@ -177,11 +181,6 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.darkColors.foreground,
     marginBottom: theme.spacing.xs,
-  },
-  genericName: {
-    fontSize: theme.typography.fontSize.lg,
-    color: theme.darkColors.mutedForeground,
-    marginBottom: theme.spacing.xl,
   },
   section: {
     marginBottom: theme.spacing.lg,
