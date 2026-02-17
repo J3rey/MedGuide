@@ -10,19 +10,20 @@ import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import theme from '../styles/theme';
 import { RootStackParamList } from '../../App';
+import Logo from '../components/Logo';
 
 interface Language {
   code: string;
   name: string;
-  flag: string;
+  nativeName: string;
 }
 
 const languages: Language[] = [
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'zh', name: '中文', flag: '🇨🇳' },
-  { code: 'ko', name: '한국어', flag: '🇰🇷' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+  { code: 'en', name: 'English', nativeName: 'English' },
+  { code: 'zh', name: 'Chinese', nativeName: '中文' },
+  { code: 'ko', name: 'Korean', nativeName: '한국어' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español' },
+  { code: 'it', name: 'Italian', nativeName: 'Italiano' },
 ];
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Language'>;
@@ -40,6 +41,7 @@ export default function LanguageSelectionScreen({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <Logo size={80} />
         <Text style={styles.title}>{t('languageSelection.title')}</Text>
         <Text style={styles.subtitle}>{t('languageSelection.subtitle')}</Text>
       </View>
@@ -56,8 +58,10 @@ export default function LanguageSelectionScreen({
             style={styles.languageButton}
             activeOpacity={0.7}
           >
-            <Text style={styles.flag}>{language.flag}</Text>
-            <Text style={styles.languageName}>{language.name}</Text>
+            <View style={styles.languageInfo}>
+              <Text style={styles.languageName}>{language.nativeName}</Text>
+              <Text style={styles.languageSubtext}>{language.name}</Text>
+            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -68,23 +72,27 @@ export default function LanguageSelectionScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EBF4FF',
+    backgroundColor: theme.colors.background,
   },
   header: {
     alignItems: 'center',
     paddingTop: theme.spacing['5xl'],
-    paddingBottom: theme.spacing['4xl'],
+    paddingBottom: theme.spacing['3xl'],
     paddingHorizontal: theme.spacing.xl,
   },
   title: {
     fontSize: theme.typography.fontSize['3xl'],
     fontWeight: theme.typography.fontWeight.bold,
-    color: '#2563eb',
-    marginBottom: theme.spacing.sm,
+    color: theme.colors.foreground,
+    marginTop: theme.spacing.lg,
+    marginBottom: theme.spacing.xs,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.mutedForeground,
+    textAlign: 'center',
+    lineHeight: theme.typography.lineHeight.normal * theme.typography.fontSize.base,
   },
   languageList: {
     flex: 1,
@@ -92,24 +100,28 @@ const styles = StyleSheet.create({
   languageListContent: {
     paddingHorizontal: theme.spacing.xl,
     paddingBottom: theme.spacing.xl,
-    gap: theme.spacing.base,
+    gap: theme.spacing.md,
   },
   languageButton: {
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.xl,
     paddingVertical: theme.spacing.lg,
     paddingHorizontal: theme.spacing.xl,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.base,
-    ...theme.shadows.base,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
-  flag: {
-    fontSize: 32,
+  languageInfo: {
+    flexDirection: 'column',
+    gap: 4,
   },
   languageName: {
     fontSize: theme.typography.fontSize.lg,
     color: theme.colors.foreground,
-    fontWeight: theme.typography.fontWeight.medium,
+    fontWeight: theme.typography.fontWeight.semibold,
+  },
+  languageSubtext: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.mutedForeground,
+    fontWeight: theme.typography.fontWeight.normal,
   },
 });

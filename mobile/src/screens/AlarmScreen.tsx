@@ -70,7 +70,7 @@ export default function AlarmScreen({
               { transform: [{ scale: pulseAnim }] },
             ]}
           >
-            <Text style={styles.icon}>PILL</Text>
+            <View style={styles.medicationIcon} />
           </Animated.View>
 
           <Text style={styles.title}>MEDICATION ALARM</Text>
@@ -137,8 +137,13 @@ const styles = StyleSheet.create({
   iconContainer: {
     marginBottom: theme.spacing['3xl'],
   },
-  icon: {
-    fontSize: 120,
+  medicationIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderWidth: 4,
+    borderColor: '#ffffff',
   },
   title: {
     fontSize: theme.typography.fontSize['3xl'],
@@ -166,6 +171,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xl,
   },
   button: {
+    minHeight: 48,
     paddingVertical: theme.spacing.lg,
     paddingHorizontal: theme.spacing.xl,
     borderRadius: theme.radius.xl,
@@ -175,6 +181,7 @@ const styles = StyleSheet.create({
   dismissButton: {
     backgroundColor: '#ffffff',
     minHeight: 70,
+    ...theme.shadows.interactive,
   },
   dismissButtonText: {
     fontSize: theme.typography.fontSize.xl,

@@ -16,6 +16,31 @@ interface DarkBottomNavigationProps {
   onTabChange: (tab: Tab) => void;
 }
 
+// Simple icon components using unicode symbols (non-emoji)
+const ScheduleIcon = ({ active }: { active: boolean }) => (
+  <View style={styles.iconShape}>
+    <View style={[styles.iconCircle, active && styles.iconCircleActive]} />
+  </View>
+);
+
+const CameraIcon = ({ active }: { active: boolean }) => (
+  <View style={styles.iconShape}>
+    <View style={[styles.iconSquare, active && styles.iconSquareActive]} />
+  </View>
+);
+
+const ChatIcon = ({ active }: { active: boolean }) => (
+  <View style={styles.iconShape}>
+    <View style={[styles.iconBubble, active && styles.iconBubbleActive]} />
+  </View>
+);
+
+const SettingsIcon = ({ active }: { active: boolean }) => (
+  <View style={styles.iconShape}>
+    <View style={[styles.iconGear, active && styles.iconGearActive]} />
+  </View>
+);
+
 export default function DarkBottomNavigation({
   activeTab,
   onTabChange,
@@ -23,10 +48,10 @@ export default function DarkBottomNavigation({
   const { t } = useTranslation();
 
   const tabs = [
-    { id: 'schedule' as Tab, label: t('navigation.schedule'), icon: '⏰' },
-    { id: 'camera' as Tab, label: t('navigation.camera'), icon: '📷' },
-    { id: 'chat' as Tab, label: t('navigation.chat'), icon: '💬' },
-    { id: 'settings' as Tab, label: t('navigation.settings'), icon: '⚙️' },
+    { id: 'schedule' as Tab, label: t('navigation.schedule'), Icon: ScheduleIcon },
+    { id: 'camera' as Tab, label: t('navigation.camera'), Icon: CameraIcon },
+    { id: 'chat' as Tab, label: t('navigation.chat'), Icon: ChatIcon },
+    { id: 'settings' as Tab, label: t('navigation.settings'), Icon: SettingsIcon },
   ];
 
   return (
@@ -37,11 +62,13 @@ export default function DarkBottomNavigation({
           return (
             <TouchableOpacity
               key={tab.id}
-              style={[styles.tab, isActive && styles.activeTab]}
+              style={[styles.tab]}
               onPress={() => onTabChange(tab.id)}
               activeOpacity={0.7}
             >
-              <Text style={styles.icon}>{tab.icon}</Text>
+              <View style={isActive ? styles.activeIconContainer : styles.iconContainer}>
+                <tab.Icon active={isActive} />
+              </View>
               <Text
                 style={[styles.label, isActive && styles.activeLabel]}
                 numberOfLines={1}
@@ -59,17 +86,18 @@ export default function DarkBottomNavigation({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.darkColors.card,
+    backgroundColor: theme.colors.card,
     borderTopWidth: 1,
-    borderTopColor: theme.darkColors.border,
-    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+    borderTopColor: theme.colors.border,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
   },
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: theme.spacing.base,
+    paddingHorizontal: theme.spacing.base,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.sm,
     width: '100%',
   },
   tab: {
@@ -78,24 +106,81 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: 4,
-    borderRadius: theme.radius.lg,
+    paddingVertical: theme.spacing.xs,
     maxWidth: 100,
   },
-  activeTab: {
-    backgroundColor: theme.darkColors.accent,
+  iconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  icon: {
-    fontSize: 24,
+  activeIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconShape: {
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconCircle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: theme.colors.mutedForeground,
+  },
+  iconCircleActive: {
+    borderColor: theme.colors.primaryForeground,
+  },
+  iconSquare: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: theme.colors.mutedForeground,
+  },
+  iconSquareActive: {
+    borderColor: theme.colors.primaryForeground,
+  },
+  iconBubble: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: theme.colors.mutedForeground,
+  },
+  iconBubbleActive: {
+    borderColor: theme.colors.primaryForeground,
+  },
+  iconGear: {
+    width: 18,
+    height: 18,
+    borderRadius: 3,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: theme.colors.mutedForeground,
+  },
+  iconGearActive: {
+    borderColor: theme.colors.primaryForeground,
   },
   label: {
-    fontSize: 11,
-    color: theme.darkColors.mutedForeground,
+    fontSize: theme.typography.fontSize.xs,
+    color: theme.colors.mutedForeground,
     textAlign: 'center',
     width: '100%',
+    fontWeight: theme.typography.fontWeight.medium,
   },
   activeLabel: {
-    color: theme.darkColors.primary,
+    color: theme.colors.primary,
+    fontWeight: theme.typography.fontWeight.semibold,
   },
 });

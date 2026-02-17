@@ -14,9 +14,12 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   if (!permission.granted) {
     return (
       <View style={styles.center}>
-        <Text style={styles.text}>We need camera permission</Text>
-        <TouchableOpacity style={styles.button} onPress={requestPermission}>
-          <Text style={styles.buttonText}>Grant permission</Text>
+        <Text style={styles.permissionTitle}>Camera Access Required</Text>
+        <Text style={styles.permissionText}>
+          We need camera permission to scan medications
+        </Text>
+        <TouchableOpacity style={styles.primaryButton} onPress={requestPermission}>
+          <Text style={styles.primaryButtonText}>Grant Permission</Text>
         </TouchableOpacity>
       </View>
     );
@@ -40,11 +43,11 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       <View style={styles.container}>
         <Image source={{ uri: photoUri }} style={styles.preview} />
         <View style={styles.previewActions}>
-          <TouchableOpacity style={styles.button} onPress={retake}>
-            <Text style={styles.buttonText}>Retake</Text>
+          <TouchableOpacity style={styles.secondaryButton} onPress={retake}>
+            <Text style={styles.secondaryButtonText}>Retake</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonPrimary} onPress={scan}>
-            <Text style={styles.buttonTextPrimary}>Scan</Text>
+          <TouchableOpacity style={styles.primaryButton} onPress={scan}>
+            <Text style={styles.primaryButtonText}>Scan Medication</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -56,64 +59,122 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     <View style={styles.container}>
       <CameraView ref={cameraRef} style={styles.camera} />
       <View style={styles.captureBar}>
-        <TouchableOpacity style={styles.shutter} onPress={takePhoto} />
+        <View style={styles.captureContent}>
+          <Text style={styles.captureText}>Position medication in frame</Text>
+          <TouchableOpacity style={styles.shutter} onPress={takePhoto}>
+            <View style={styles.shutterInner} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.darkColors.background },
+  container: { 
+    flex: 1, 
+    backgroundColor: theme.colors.background 
+  },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: theme.spacing.xl,
+    backgroundColor: theme.colors.background,
   },
-  text: { color: theme.darkColors.foreground, marginBottom: 12 },
+  permissionTitle: {
+    fontSize: theme.typography.fontSize['2xl'],
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.foreground,
+    marginBottom: theme.spacing.sm,
+    textAlign: 'center',
+  },
+  permissionText: { 
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.mutedForeground,
+    marginBottom: theme.spacing.xl,
+    textAlign: 'center',
+    lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
+  },
 
   camera: { flex: 1 },
 
   captureBar: {
-    padding: 16,
+    padding: theme.spacing.xl,
+    backgroundColor: theme.colors.card,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  captureContent: {
     alignItems: 'center',
-    backgroundColor: theme.darkColors.background,
+    gap: theme.spacing.base,
+  },
+  captureText: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.mutedForeground,
+    fontWeight: theme.typography.fontWeight.medium,
   },
   shutter: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    borderWidth: 6,
-    borderColor: theme.darkColors.foreground,
+    backgroundColor: theme.colors.card,
+    borderWidth: 4,
+    borderColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 6,
+  },
+  shutterInner: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 30,
+    backgroundColor: theme.colors.primary,
   },
 
-  preview: { flex: 1, resizeMode: 'contain', backgroundColor: '#000' },
+  preview: { 
+    flex: 1, 
+    resizeMode: 'contain', 
+    backgroundColor: '#000' 
+  },
   previewActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 12, // if gap causes issues, replace with marginLeft on 2nd button
-    padding: 16,
+    gap: theme.spacing.md,
+    padding: theme.spacing.xl,
+    backgroundColor: theme.colors.card,
   },
 
-  button: {
+  secondaryButton: {
     flex: 1,
-    paddingVertical: 14,
-    borderRadius: theme.radius.lg,
+    minHeight: 48,
+    paddingVertical: theme.spacing.base,
+    borderRadius: theme.radius.xl,
     borderWidth: 1,
-    borderColor: theme.darkColors.border,
+    borderColor: theme.colors.border,
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.card,
   },
-  buttonText: { color: theme.darkColors.foreground, fontWeight: '600' },
+  secondaryButtonText: { 
+    color: theme.colors.foreground,
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semibold,
+  },
 
-  buttonPrimary: {
+  primaryButton: {
     flex: 1,
-    paddingVertical: 14,
-    borderRadius: theme.radius.lg,
-    backgroundColor: theme.darkColors.primary,
+    minHeight: 48,
+    paddingVertical: theme.spacing.base,
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.primary,
     alignItems: 'center',
+    justifyContent: 'center',
+    ...theme.shadows.interactive,
   },
-  buttonTextPrimary: {
-    color: theme.darkColors.primaryForeground,
-    fontWeight: '700',
+  primaryButtonText: {
+    color: theme.colors.primaryForeground,
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.bold,
   },
 });

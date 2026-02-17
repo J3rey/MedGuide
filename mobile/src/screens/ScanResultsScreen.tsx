@@ -131,41 +131,41 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: theme.spacing.base,
-    backgroundColor: theme.darkColors.background,
+    backgroundColor: theme.colors.background,
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: theme.spacing.base,
-    backgroundColor: theme.darkColors.background,
+    backgroundColor: theme.colors.background,
   },
 
   title: {
     fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
     marginBottom: theme.spacing.xs,
   },
   subtitle: {
     fontSize: theme.typography.fontSize.sm,
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
     marginBottom: theme.spacing.md,
   },
   bodyText: {
     fontSize: theme.typography.fontSize.sm,
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
     marginTop: theme.spacing.sm,
   },
   subtleText: {
     marginTop: theme.spacing.md,
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
   },
 
   error: {
     marginTop: theme.spacing.sm,
     marginBottom: theme.spacing.md,
-    color: theme.darkColors.destructive,
+    color: theme.colors.destructive,
   },
 
   list: { paddingTop: theme.spacing.sm },
@@ -175,33 +175,36 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.sm,
     marginVertical: theme.spacing.xs,
     borderWidth: 1,
-    borderColor: theme.darkColors.border,
+    borderColor: theme.colors.border,
     borderRadius: theme.radius.md,
-    backgroundColor: theme.darkColors.card,
+    backgroundColor: theme.colors.card,
   },
   rowTitle: {
     fontSize: theme.typography.fontSize.base,
     fontWeight: theme.typography.fontWeight.semibold,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
   },
   rowSubtitle: {
     fontSize: theme.typography.fontSize.sm,
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
     marginTop: 3,
   },
 
   actions: { marginTop: theme.spacing.lg },
   button: {
     marginTop: theme.spacing.sm,
+    minHeight: 48,
     paddingVertical: theme.spacing.md,
     borderWidth: 1,
-    borderRadius: theme.radius.lg,
-    borderColor: theme.darkColors.border,
+    borderRadius: theme.radius.xl,
+    borderColor: theme.colors.border,
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.card,
   },
   buttonText: {
-    fontSize: theme.typography.fontSize.sm,
+    fontSize: theme.typography.fontSize.base,
     fontWeight: theme.typography.fontWeight.semibold,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
   },
 });
