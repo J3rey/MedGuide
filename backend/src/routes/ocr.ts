@@ -88,7 +88,11 @@ router.post(
           .json({ error: 'Server configuration error: Missing API key' });
       }
 
-      const fileData = req.file as Express.Multer.File;
+      const fileData = req.file;
+
+      if (!fileData) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
 
       console.log(
         '[OCR] Processing image:',
