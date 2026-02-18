@@ -23,9 +23,10 @@ export async function extractTextFromImage(uri: string): Promise<string> {
 
     // Read the image file as base64
     const base64 = await FileSystem.readAsStringAsync(uri, {
-      encoding: FileSystem.EncodingType.Base64,
+      encoding: 'base64',
     });
 
+    console.log('[OCR] Image read, base64 length:', base64.length);
     console.log('[OCR] Sending to backend API...');
 
     // Send to backend API

@@ -17,6 +17,7 @@ i18n.use(initReactI18next).init({
   },
   lng: 'en',
   fallbackLng: 'en',
+  compatibilityJSON: 'v3', // Use v3 format for better compatibility with polyfill
   interpolation: {
     escapeValue: false,
   },
