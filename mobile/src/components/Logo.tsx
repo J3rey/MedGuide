@@ -8,8 +8,8 @@ interface LogoProps {
 export default function Logo({ size = 60 }: LogoProps): React.JSX.Element {
   return (
     <View style={[styles.container, { width: size, height: size }]}>
-      <Image 
-        source={require('../assets/logo.png')} 
+      <Image
+        source={require('../assets/logo.png')}
         style={{ width: size, height: size }}
         resizeMode="contain"
       />

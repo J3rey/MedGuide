@@ -92,7 +92,8 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.mutedForeground,
     textAlign: 'center',
-    lineHeight: theme.typography.lineHeight.normal * theme.typography.fontSize.base,
+    lineHeight:
+      theme.typography.lineHeight.normal * theme.typography.fontSize.base,
   },
   languageList: {
     flex: 1,

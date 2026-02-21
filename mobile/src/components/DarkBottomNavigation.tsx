@@ -48,10 +48,18 @@ export default function DarkBottomNavigation({
   const { t } = useTranslation();
 
   const tabs = [
-    { id: 'schedule' as Tab, label: t('navigation.schedule'), Icon: ScheduleIcon },
+    {
+      id: 'schedule' as Tab,
+      label: t('navigation.schedule'),
+      Icon: ScheduleIcon,
+    },
     { id: 'camera' as Tab, label: t('navigation.camera'), Icon: CameraIcon },
     { id: 'chat' as Tab, label: t('navigation.chat'), Icon: ChatIcon },
-    { id: 'settings' as Tab, label: t('navigation.settings'), Icon: SettingsIcon },
+    {
+      id: 'settings' as Tab,
+      label: t('navigation.settings'),
+      Icon: SettingsIcon,
+    },
   ];
 
   return (
@@ -66,7 +74,11 @@ export default function DarkBottomNavigation({
               onPress={() => onTabChange(tab.id)}
               activeOpacity={0.7}
             >
-              <View style={isActive ? styles.activeIconContainer : styles.iconContainer}>
+              <View
+                style={
+                  isActive ? styles.activeIconContainer : styles.iconContainer
+                }
+              >
                 <tab.Icon active={isActive} />
               </View>
               <Text

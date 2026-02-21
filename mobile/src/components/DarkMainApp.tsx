@@ -175,9 +175,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
               ]}
             >
               <TouchableOpacity style={styles.settingsOption} onPress={onBack}>
-                <Text style={styles.settingsOptionText}>
-                  Change Language
-                </Text>
+                <Text style={styles.settingsOptionText}>Change Language</Text>
               </TouchableOpacity>
             </View>
           </View>

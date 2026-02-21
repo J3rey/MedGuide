@@ -1,5 +1,12 @@
 import React, { useRef, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import { CameraView, useCameraPermissions, FlashMode } from 'expo-camera';
 import theme from '../styles/theme';
 import { CameraScreenProps } from '../types/navigation';
@@ -22,11 +29,11 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
    */
 
   const toggleCameraFacing = useCallback(() => {
-    setFacing(current => (current === 'back' ? 'front' : 'back'));
+    setFacing((current) => (current === 'back' ? 'front' : 'back'));
   }, []);
 
   const toggleFlash = useCallback(() => {
-    setFlash(current => {
+    setFlash((current) => {
       if (current === 'off') return 'on';
       if (current === 'on') return 'auto';
       return 'off';
@@ -34,7 +41,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   }, []);
 
   const adjustZoom = useCallback((direction: 'in' | 'out') => {
-    setZoom(current => {
+    setZoom((current) => {
       const step = 0.1;
       if (direction === 'in') return Math.min(1, current + step);
       return Math.max(0, current - step);
@@ -59,7 +66,9 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       setPhotoUri(photo.uri);
     } catch (error) {
       console.error('Photo capture error:', error);
-      Alert.alert('Capture Failed', 'Unable to take photo. Please try again.', [{ text: 'OK' }]);
+      Alert.alert('Capture Failed', 'Unable to take photo. Please try again.', [
+        { text: 'OK' },
+      ]);
     } finally {
       setIsCapturing(false);
     }
@@ -90,13 +99,20 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       <View style={[styles.container, styles.center]}>
         <Text style={styles.permissionTitle}>Camera Access Required</Text>
         <Text style={styles.permissionText}>
-          MedGuide needs camera access to scan medication labels and prescriptions accurately.
+          MedGuide needs camera access to scan medication labels and
+          prescriptions accurately.
         </Text>
-        <TouchableOpacity style={styles.primaryButton} onPress={requestPermission} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={requestPermission}
+          activeOpacity={0.8}
+        >
           <Text style={styles.primaryButtonText}>Grant Permission</Text>
         </TouchableOpacity>
         {permission.canAskAgain === false && (
-          <Text style={styles.permissionDeniedText}>Please enable camera access in your device settings.</Text>
+          <Text style={styles.permissionDeniedText}>
+            Please enable camera access in your device settings.
+          </Text>
         )}
       </View>
     );
@@ -107,10 +123,18 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       <View style={styles.container}>
         <Image source={{ uri: photoUri }} style={styles.preview} />
         <View style={styles.previewActions}>
-          <TouchableOpacity style={styles.secondaryButton} onPress={retake} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={retake}
+            activeOpacity={0.8}
+          >
             <Text style={styles.secondaryButtonText}>Retake</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.primaryButton} onPress={scan} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={scan}
+            activeOpacity={0.8}
+          >
             <Text style={styles.primaryButtonText}>Scan Medication</Text>
           </TouchableOpacity>
         </View>
@@ -130,14 +154,28 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       />
 
       <View style={styles.topControls}>
-        <TouchableOpacity style={styles.controlButton} onPress={toggleFlash} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={styles.controlButton}
+          onPress={toggleFlash}
+          activeOpacity={0.7}
+        >
           <Text style={styles.controlButtonText}>
-            {flash === 'off' ? 'Flash: Off' : flash === 'on' ? 'Flash: On' : 'Flash: Auto'}
+            {flash === 'off'
+              ? 'Flash: Off'
+              : flash === 'on'
+                ? 'Flash: On'
+                : 'Flash: Auto'}
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.controlButton} onPress={toggleCameraFacing} activeOpacity={0.7}>
-          <Text style={styles.controlButtonText}>{facing === 'back' ? 'Back' : 'Front'}</Text>
+        <TouchableOpacity
+          style={styles.controlButton}
+          onPress={toggleCameraFacing}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.controlButtonText}>
+            {facing === 'back' ? 'Back' : 'Front'}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -154,7 +192,14 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
           activeOpacity={0.7}
           disabled={zoom <= 0}
         >
-          <Text style={[styles.zoomButtonText, zoom <= 0 && styles.zoomButtonDisabled]}>-</Text>
+          <Text
+            style={[
+              styles.zoomButtonText,
+              zoom <= 0 && styles.zoomButtonDisabled,
+            ]}
+          >
+            -
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.zoomButton}
@@ -162,13 +207,22 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
           activeOpacity={0.7}
           disabled={zoom >= 1}
         >
-          <Text style={[styles.zoomButtonText, zoom >= 1 && styles.zoomButtonDisabled]}>+</Text>
+          <Text
+            style={[
+              styles.zoomButtonText,
+              zoom >= 1 && styles.zoomButtonDisabled,
+            ]}
+          >
+            +
+          </Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.captureBar}>
         <View style={styles.captureContent}>
-          <Text style={styles.captureText}>Position medication label within frame</Text>
+          <Text style={styles.captureText}>
+            Position medication label within frame
+          </Text>
           <TouchableOpacity
             style={[styles.shutter, isCapturing && styles.shutterDisabled]}
             onPress={takePhoto}
@@ -209,7 +263,8 @@ const styles = StyleSheet.create({
     color: theme.colors.mutedForeground,
     marginBottom: theme.spacing.xl,
     textAlign: 'center',
-    lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
+    lineHeight:
+      theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
     paddingHorizontal: theme.spacing.base,
   },
   permissionDeniedText: {

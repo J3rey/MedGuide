@@ -451,7 +451,6 @@ export default function ScheduleScreen(): React.JSX.Element {
         >
           {loading ? (
             <View style={styles.emptyState}>
-
               <Text style={styles.emptyText}>Loading alarms...</Text>
             </View>
           ) : (
@@ -795,7 +794,8 @@ const styles = StyleSheet.create({
     color: theme.colors.mutedForeground,
     marginTop: theme.spacing.sm,
     textAlign: 'center',
-    lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
+    lineHeight:
+      theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
   },
   pickerButton: {
     backgroundColor: theme.colors.inputBackground,
