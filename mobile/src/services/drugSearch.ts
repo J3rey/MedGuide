@@ -8,11 +8,15 @@ const getBackendUrl = () => {
     return Constants.expoConfig.extra.backendUrl;
   }
 
-  // Default URLs for different platforms
+  // Default URLs for different platforms (development fallbacks)
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:3000'; // Android emulator
   }
-  return 'http://localhost:3000'; // iOS simulator, web
+  if (Platform.OS === 'ios') {
+    return 'http://localhost:3000'; // iOS simulator
+  }
+  // For web, we need the production URL - localhost won't work
+  return 'https://medguide-p132.onrender.com';
 };
 
 const BACKEND_URL = getBackendUrl();

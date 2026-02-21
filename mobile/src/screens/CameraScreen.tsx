@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,12 @@ import {
   Image,
   StyleSheet,
   Alert,
+  Platform,
 } from 'react-native';
 import { CameraView, useCameraPermissions, FlashMode } from 'expo-camera';
 import theme from '../styles/theme';
 import { CameraScreenProps } from '../types/navigation';
+import { uriToBase64 } from '../utils/uriToBase64';
 
 type CameraFacing = 'front' | 'back';
 
@@ -23,6 +25,23 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   const [flash, setFlash] = useState<FlashMode>('off');
   const [zoom, setZoom] = useState<number>(0); // 0 = no zoom (closest to standard)
   const [isCapturing, setIsCapturing] = useState<boolean>(false);
+  
+  // Web-only state
+  const [webImageUri, setWebImageUri] = useState<string | null>(null);
+  const [webCameraStream, setWebCameraStream] = useState<MediaStream | null>(null);
+  const [webFacing, setWebFacing] = useState<'user' | 'environment'>('environment');
+  const [webZoom, setWebZoom] = useState<number>(1);
+  const [webFlash, setWebFlash] = useState<'off' | 'on'>('off');
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Cleanup camera stream on unmount
+  useEffect(() => {
+    return () => {
+      if (webCameraStream) {
+        webCameraStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [webCameraStream]);
 
   /**
    * Hooks (callbacks) MUST be declared before any conditional returns.
@@ -78,14 +97,284 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     setPhotoUri(null);
   }, []);
 
+  const runScanFromUri = useCallback(async (uri: string) => {
+    try {
+      // Convert to base64 using platform-specific method
+      const base64 = await uriToBase64(uri);
+      console.log('[CameraScreen] Image converted to base64, length:', base64.length);
+      
+      // Navigate to ScanResults with the URI
+      navigation.navigate('ScanResults', { uri });
+    } catch (error) {
+      console.error('[CameraScreen] Error processing image:', error);
+      Alert.alert('Error', 'Failed to process image. Please try again.', [
+        { text: 'OK' },
+      ]);
+    }
+  }, [navigation]);
+
   const scan = useCallback(() => {
     if (!photoUri) return;
-    navigation.navigate('ScanResults', { uri: photoUri });
-  }, [photoUri, navigation]);
+    runScanFromUri(photoUri);
+  }, [photoUri, runScanFromUri]);
+  
+  // Web camera handlers
+  const startWebCamera = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { 
+          facingMode: webFacing
+        }
+      });
+      setWebCameraStream(stream);
+      
+      // Apply zoom if supported
+      const videoTrack = stream.getVideoTracks()[0];
+      const capabilities = videoTrack.getCapabilities() as any;
+      if (capabilities.zoom && webZoom > 1) {
+        try {
+          await videoTrack.applyConstraints({
+            // @ts-ignore - zoom is not in TypeScript types yet
+            advanced: [{ zoom: webZoom }]
+          });
+        } catch (e) {
+          console.log('Zoom not supported on this device');
+        }
+      }
+      
+      // Wait for video element to be available
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      Alert.alert('Camera Error', 'Unable to access camera. Please check permissions.', [
+        { text: 'OK' },
+      ]);
+    }
+  }, [webFacing, webZoom]);
+
+  const stopWebCamera = useCallback(() => {
+    if (webCameraStream) {
+      webCameraStream.getTracks().forEach(track => track.stop());
+      setWebCameraStream(null);
+    }
+  }, [webCameraStream]);
+
+  const takeWebPhoto = useCallback(() => {
+    if (!videoRef.current) return;
+    
+    const video = videoRef.current;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    ctx.drawImage(video, 0, 0);
+    
+    // Convert to blob URL
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        setWebImageUri(url);
+        stopWebCamera();
+      }
+    }, 'image/jpeg', 0.85);
+  }, [stopWebCamera]);
+
+  const toggleWebCameraFacing = useCallback(() => {
+    stopWebCamera();
+    setWebFacing((current) => (current === 'environment' ? 'user' : 'environment'));
+  }, [stopWebCamera]);
+
+  const adjustWebZoom = useCallback((direction: 'in' | 'out') => {
+    setWebZoom((current) => {
+      const step = 0.5;
+      if (direction === 'in') return Math.min(3, current + step);
+      return Math.max(1, current - step);
+    });
+  }, []);
+
+  const toggleWebFlash = useCallback(async () => {
+    setWebFlash((current) => (current === 'off' ? 'on' : 'off'));
+    
+    // Try to enable torch mode if available
+    if (webCameraStream) {
+      const videoTrack = webCameraStream.getVideoTracks()[0];
+      const capabilities = videoTrack.getCapabilities() as any;
+      
+      if (capabilities.torch) {
+        try {
+          await videoTrack.applyConstraints({
+            // @ts-ignore - torch is not in TypeScript types yet
+            advanced: [{ torch: webFlash === 'off' }]
+          });
+        } catch (e) {
+          console.log('Flash/torch not supported on this device');
+        }
+      }
+    }
+  }, [webCameraStream, webFlash]);
+
+  // Restart camera when facing or zoom changes
+  useEffect(() => {
+    if (webCameraStream && Platform.OS === 'web') {
+      startWebCamera();
+    }
+  }, [webFacing, webZoom]);
 
   /**
    * Conditional rendering AFTER hooks
    */
+  
+  // Web platform: show camera capture UI
+  if (Platform.OS === 'web') {
+    if (webImageUri) {
+      // Show preview after capture
+      return (
+        <View style={styles.container}>
+          <Image source={{ uri: webImageUri }} style={styles.preview} />
+          <View style={styles.previewActions}>
+            <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={() => setWebImageUri(null)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.secondaryButtonText}>Retake</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={async () => {
+                if (!webImageUri) return;
+                await runScanFromUri(webImageUri);
+              }}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.primaryButtonText}>Scan Medication</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+    }
+    
+    // Show camera capture interface
+    if (webCameraStream) {
+      // Live camera view
+      return (
+        <View style={styles.container}>
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+          
+          <View style={styles.topControls}>
+            <TouchableOpacity
+              style={styles.controlButton}
+              onPress={toggleWebFlash}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.controlButtonText}>
+                Flash: {webFlash === 'off' ? 'Off' : 'On'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.controlButton}
+              onPress={toggleWebCameraFacing}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.controlButtonText}>
+                {webFacing === 'environment' ? 'Back' : 'Front'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {webZoom > 1 && (
+            <View style={styles.zoomIndicator}>
+              <Text style={styles.zoomText}>{webZoom.toFixed(1)}x</Text>
+            </View>
+          )}
+
+          <View style={styles.zoomControls}>
+            <TouchableOpacity
+              style={styles.zoomButton}
+              onPress={() => adjustWebZoom('in')}
+              activeOpacity={0.7}
+              disabled={webZoom >= 3}
+            >
+              <Text
+                style={[
+                  styles.zoomButtonText,
+                  webZoom >= 3 && styles.zoomButtonDisabled,
+                ]}
+              >
+                +
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.zoomButton}
+              onPress={() => adjustWebZoom('out')}
+              activeOpacity={0.7}
+              disabled={webZoom <= 1}
+            >
+              <Text
+                style={[
+                  styles.zoomButtonText,
+                  webZoom <= 1 && styles.zoomButtonDisabled,
+                ]}
+              >
+                -
+              </Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.captureBar}>
+            <View style={styles.captureContent}>
+              <Text style={styles.captureText}>
+                Position medication label within frame
+              </Text>
+              <TouchableOpacity
+                style={styles.shutter}
+                onPress={takeWebPhoto}
+                activeOpacity={0.8}
+              >
+                <View style={styles.shutterInner} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      );
+    }
+    
+    // Show "start camera" button
+    return (
+      <View style={[styles.container, styles.center]}>
+        <Text style={styles.permissionTitle}>Camera Access</Text>
+        <Text style={styles.permissionText}>
+          MedGuide needs camera access to scan medication labels and
+          prescriptions accurately.
+        </Text>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={startWebCamera}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.primaryButtonText}>Open Camera</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+  
   if (!permission) {
     return (
       <View style={[styles.container, styles.center]}>

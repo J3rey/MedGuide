@@ -1,6 +1,6 @@
-import * as FileSystem from 'expo-file-system/legacy';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+import { uriToBase64 } from '../utils/uriToBase64';
 
 // Get backend URL from config with platform-specific defaults
 const getBackendUrl = () => {
@@ -8,11 +8,15 @@ const getBackendUrl = () => {
     return Constants.expoConfig.extra.backendUrl;
   }
 
-  // Default URLs for different platforms
+  // Default URLs for different platforms (development fallbacks)
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:3000'; // Android emulator
   }
-  return 'http://localhost:3000'; // iOS simulator, web
+  if (Platform.OS === 'ios') {
+    return 'http://localhost:3000'; // iOS simulator
+  }
+  // For web, we need the production URL - localhost won't work
+  return 'https://medguide-p132.onrender.com';
 };
 
 const API_URL = getBackendUrl();
@@ -22,9 +26,7 @@ export async function extractTextFromImage(uri: string): Promise<string> {
     console.log('[OCR] Processing image:', uri);
 
     // Read the image file as base64
-    const base64 = await FileSystem.readAsStringAsync(uri, {
-      encoding: 'base64',
-    });
+    const base64 = await uriToBase64(uri);
 
     console.log('[OCR] Image read, base64 length:', base64.length);
     console.log('[OCR] Sending to backend API...');
