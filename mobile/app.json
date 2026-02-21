@@ -15,6 +15,11 @@
       "package": "com.medguide.app"
     },
 
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+
     "plugins": [
       [
         "expo-camera",
@@ -34,7 +39,7 @@
     "extra": {
       "supabaseUrl": "https://kzqqeodwdpqlsgvydqyb.supabase.co",
       "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6cXFlb2R3ZHBxbHNndnlkcXliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2ODQ5MTQsImV4cCI6MjA3ODI2MDkxNH0.tDYMxOsIlIso-478XVgbP91zt13O3M_j9Xc7PGyzEX4",
-      "backendUrl": "http://192.168.1.68:3000"
+      "backendUrl": "https://medguide-p132.onrender.com"
     }
   }
 }
