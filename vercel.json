@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd mobile && npm install && npm run build:web",
+  "outputDirectory": "mobile/dist",
+  "framework": null,
+  "installCommand": "npm install",
+  "devCommand": "cd mobile && npm run web"
+}
