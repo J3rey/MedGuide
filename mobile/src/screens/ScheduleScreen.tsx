@@ -344,7 +344,6 @@ export default function ScheduleScreen(): React.JSX.Element {
       >
         <View style={[styles.header, { paddingHorizontal: containerPadding }]}>
           <View style={styles.headerLeft}>
-            <Text style={styles.bellIcon}>🔔</Text>
             <Text style={styles.title}>{t('schedule.title')}</Text>
           </View>
           <TouchableOpacity
@@ -377,7 +376,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                 value={newAlarmMed}
                 onChangeText={setNewAlarmMed}
                 placeholder="Enter medication name"
-                placeholderTextColor={theme.darkColors.mutedForeground}
+                placeholderTextColor={theme.colors.mutedForeground}
               />
             </View>
 
@@ -434,7 +433,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                 onPress={cancelEdit}
                 style={[styles.button, styles.cancelButton]}
               >
-                <Text style={styles.buttonText}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -452,7 +451,6 @@ export default function ScheduleScreen(): React.JSX.Element {
         >
           {loading ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyIcon}>⏳</Text>
               <Text style={styles.emptyText}>Loading alarms...</Text>
             </View>
           ) : (
@@ -518,7 +516,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                       value={alarm.enabled}
                       onValueChange={() => toggleAlarm(alarm)}
                       trackColor={{
-                        false: theme.darkColors.border,
+                        false: theme.colors.border,
                         true: '#3b82f6',
                       }}
                       thumbColor="#ffffff"
@@ -532,7 +530,6 @@ export default function ScheduleScreen(): React.JSX.Element {
 
         {!loading && alarms.length === 0 && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>⏰</Text>
             <Text style={styles.emptyText}>No alarms set</Text>
             <Text style={styles.emptySubtext}>Tap the + button to add one</Text>
           </View>
@@ -572,7 +569,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                   is24Hour={true}
                   display="spinner"
                   onChange={onTimeChange}
-                  textColor={theme.darkColors.foreground}
+                  textColor={theme.colors.foreground}
                 />
               </View>
             </TouchableOpacity>
@@ -593,7 +590,7 @@ export default function ScheduleScreen(): React.JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.darkColors.background,
+    backgroundColor: theme.colors.background,
   },
   scrollView: {
     flex: 1,
@@ -603,7 +600,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.xl,
-    paddingVertical: theme.spacing.base,
+    paddingVertical: theme.spacing.lg,
     marginBottom: theme.spacing.base,
   },
   headerLeft: {
@@ -611,25 +608,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.sm,
   },
-  bellIcon: {
-    fontSize: 32,
-  },
   title: {
-    fontSize: theme.typography.fontSize.xl,
+    fontSize: theme.typography.fontSize['2xl'],
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
   },
   addButton: {
-    backgroundColor: '#3b82f6',
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    backgroundColor: theme.colors.primary,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
+    ...theme.shadows.interactive,
   },
   addButtonText: {
-    fontSize: 32,
-    color: theme.darkColors.foreground,
+    fontSize: 28,
+    color: theme.colors.primaryForeground,
     fontWeight: theme.typography.fontWeight.bold,
   },
   responsiveContainer: {
@@ -637,69 +632,80 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   addAlarmCard: {
-    backgroundColor: theme.darkColors.card,
+    backgroundColor: theme.colors.card,
     borderRadius: theme.radius.xl,
     padding: theme.spacing.xl,
     marginHorizontal: theme.spacing.xl,
     marginBottom: theme.spacing.base,
     borderWidth: 1,
-    borderColor: theme.darkColors.border,
+    borderColor: theme.colors.border,
   },
   addAlarmTitle: {
-    fontSize: theme.typography.fontSize.lg,
+    fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.darkColors.foreground,
-    marginBottom: theme.spacing.md,
+    color: theme.colors.foreground,
+    marginBottom: theme.spacing.lg,
   },
   inputGroup: {
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
   },
   label: {
     fontSize: theme.typography.fontSize.sm,
-    color: theme.darkColors.mutedForeground,
-    marginBottom: theme.spacing.xs,
+    color: theme.colors.foreground,
+    marginBottom: theme.spacing.sm,
+    fontWeight: theme.typography.fontWeight.semibold,
   },
   input: {
-    backgroundColor: theme.darkColors.background,
+    backgroundColor: theme.colors.inputBackground,
     borderWidth: 1,
-    borderColor: theme.darkColors.border,
+    borderColor: theme.colors.border,
     borderRadius: theme.radius.lg,
     paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
     fontSize: theme.typography.fontSize.base,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
   },
   buttonRow: {
     flexDirection: 'row',
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
   },
   button: {
     flex: 1,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.radius.lg,
+    minHeight: 48,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.radius.xl,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   addButtonStyle: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: theme.colors.primary,
+    ...theme.shadows.interactive,
   },
   cancelButton: {
-    backgroundColor: theme.darkColors.accent,
+    backgroundColor: theme.colors.card,
+    borderWidth: 1.5,
+    borderColor: theme.colors.border,
   },
   buttonText: {
-    color: theme.darkColors.foreground,
+    color: theme.colors.primaryForeground,
     fontSize: theme.typography.fontSize.base,
-    fontWeight: theme.typography.fontWeight.medium,
+    fontWeight: theme.typography.fontWeight.bold,
+  },
+  cancelButtonText: {
+    color: theme.colors.foreground,
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semibold,
   },
   alarmsList: {
     paddingHorizontal: theme.spacing.xl,
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
   },
   alarmCard: {
-    backgroundColor: theme.darkColors.card,
+    backgroundColor: theme.colors.card,
     borderRadius: theme.radius.xl,
     padding: theme.spacing.lg,
     borderWidth: 1,
-    borderColor: theme.darkColors.border,
+    borderColor: theme.colors.border,
     marginBottom: theme.spacing.sm,
   },
   alarmContent: {
@@ -712,21 +718,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   alarmTime: {
-    fontSize: theme.typography.fontSize.xl,
+    fontSize: theme.typography.fontSize['2xl'],
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
     marginBottom: theme.spacing.xs,
   },
   alarmMedication: {
-    fontSize: theme.typography.fontSize.sm,
-    color: '#60a5fa',
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.primary,
     marginBottom: theme.spacing.sm,
+    fontWeight: theme.typography.fontWeight.semibold,
   },
   disabledText: {
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
   },
   disabledMedication: {
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
   },
   daysContainer: {
     flexDirection: 'row',
@@ -734,24 +741,25 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   dayBadge: {
-    paddingHorizontal: theme.spacing.xs,
-    paddingVertical: 4,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 6,
     borderRadius: theme.radius.md,
   },
   dayBadgeActive: {
-    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    backgroundColor: theme.colors.secondary + '20',
   },
   dayBadgeInactive: {
-    backgroundColor: theme.darkColors.accent,
+    backgroundColor: theme.colors.muted,
   },
   dayText: {
     fontSize: theme.typography.fontSize.xs,
+    fontWeight: theme.typography.fontWeight.medium,
   },
   dayTextActive: {
-    color: '#60a5fa',
+    color: theme.colors.secondary,
   },
   dayTextInactive: {
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
   },
   alarmActions: {
     flexDirection: 'row',
@@ -759,13 +767,13 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   editButton: {
-    padding: theme.spacing.xs,
+    padding: theme.spacing.sm,
   },
   editIcon: {
     fontSize: 20,
   },
   deleteButton: {
-    padding: theme.spacing.xs,
+    padding: theme.spacing.sm,
   },
   deleteIcon: {
     fontSize: 20,
@@ -773,39 +781,41 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     paddingVertical: theme.spacing['5xl'],
-  },
-  emptyIcon: {
-    fontSize: 64,
-    marginBottom: theme.spacing.base,
-    opacity: 0.5,
+    paddingHorizontal: theme.spacing.xl,
   },
   emptyText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.darkColors.mutedForeground,
+    fontSize: theme.typography.fontSize.lg,
+    color: theme.colors.foreground,
+    fontWeight: theme.typography.fontWeight.semibold,
+    textAlign: 'center',
   },
   emptySubtext: {
-    fontSize: theme.typography.fontSize.sm,
-    color: theme.darkColors.mutedForeground,
-    marginTop: theme.spacing.xs,
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.mutedForeground,
+    marginTop: theme.spacing.sm,
+    textAlign: 'center',
+    lineHeight:
+      theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
   },
   pickerButton: {
-    backgroundColor: theme.darkColors.background,
+    backgroundColor: theme.colors.inputBackground,
     borderWidth: 1,
-    borderColor: theme.darkColors.border,
+    borderColor: theme.colors.border,
     borderRadius: theme.radius.lg,
     paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   pickerButtonText: {
     fontSize: theme.typography.fontSize.base,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
+    fontWeight: theme.typography.fontWeight.medium,
   },
   pickerArrow: {
     fontSize: theme.typography.fontSize.sm,
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
   },
   daysSelector: {
     flexDirection: 'row',
@@ -813,32 +823,33 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
   },
   dayButton: {
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     borderRadius: theme.radius.md,
-    backgroundColor: theme.darkColors.accent,
+    backgroundColor: theme.colors.card,
     borderWidth: 1,
-    borderColor: theme.darkColors.border,
+    borderColor: theme.colors.border,
   },
   dayButtonActive: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6',
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
   },
   dayButtonText: {
-    fontSize: theme.typography.fontSize.xs,
-    color: theme.darkColors.mutedForeground,
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.foreground,
+    fontWeight: theme.typography.fontWeight.medium,
   },
   dayButtonTextActive: {
-    color: '#ffffff',
-    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.primaryForeground,
+    fontWeight: theme.typography.fontWeight.bold,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'flex-end',
   },
   timePickerContainer: {
-    backgroundColor: theme.darkColors.card,
+    backgroundColor: theme.colors.card,
     borderTopLeftRadius: theme.radius.xl,
     borderTopRightRadius: theme.radius.xl,
     paddingBottom: theme.spacing.xl,
@@ -848,12 +859,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: theme.spacing.base,
     borderBottomWidth: 1,
-    borderBottomColor: theme.darkColors.border,
+    borderBottomColor: theme.colors.border,
   },
   timePickerButton: {
     fontSize: theme.typography.fontSize.base,
-    color: '#3b82f6',
+    color: theme.colors.primary,
     padding: theme.spacing.sm,
+    fontWeight: theme.typography.fontWeight.semibold,
   },
   timePickerDone: {
     fontWeight: theme.typography.fontWeight.bold,

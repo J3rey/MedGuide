@@ -164,7 +164,6 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
                 ]}
               >
                 <View style={styles.headerLeft}>
-                  <Text style={styles.settingsIcon}>⚙️</Text>
                   <Text style={styles.settingsTitle}>Settings</Text>
                 </View>
               </View>
@@ -176,9 +175,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
               ]}
             >
               <TouchableOpacity style={styles.settingsOption} onPress={onBack}>
-                <Text style={styles.settingsOptionText}>
-                  🌐 Change Language
-                </Text>
+                <Text style={styles.settingsOptionText}>Change Language</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -216,13 +213,13 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.darkColors.background,
+    backgroundColor: theme.colors.background,
   },
   settingsScreen: {
     flex: 1,
   },
   settingsHeader: {
-    paddingVertical: theme.spacing.base,
+    paddingVertical: theme.spacing.lg,
     marginBottom: theme.spacing.base,
   },
   headerContent: {
@@ -235,26 +232,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.sm,
   },
-  settingsIcon: {
-    fontSize: 32,
-  },
   settingsTitle: {
-    fontSize: theme.typography.fontSize.xl,
+    fontSize: theme.typography.fontSize['2xl'],
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
   },
   settingsContent: {
     flex: 1,
   },
   settingsOption: {
     padding: theme.spacing.lg,
-    backgroundColor: theme.darkColors.card,
+    backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
     marginBottom: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   settingsOptionText: {
     fontSize: theme.typography.fontSize.base,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
+    fontWeight: theme.typography.fontWeight.medium,
   },
   content: {
     flex: 1,

@@ -41,77 +41,77 @@ type ColorPalette = {
 };
 
 export const colors: ColorPalette = {
-  background: '#ffffff',
-  foreground: '#030213',
-  card: '#ffffff',
-  cardForeground: '#030213',
-  popover: '#ffffff',
-  popoverForeground: '#030213',
-  primary: '#030213',
-  primaryForeground: '#ffffff',
-  secondary: '#f3f3f5',
-  secondaryForeground: '#030213',
-  muted: '#ececf0',
-  mutedForeground: '#717182',
-  accent: '#e9ebef',
-  accentForeground: '#030213',
-  destructive: '#d4183d',
-  destructiveForeground: '#ffffff',
-  border: 'rgba(0, 0, 0, 0.1)',
+  background: '#FAFBFD',
+  foreground: '#1A1D2E',
+  card: '#FFFFFF',
+  cardForeground: '#1A1D2E',
+  popover: '#FFFFFF',
+  popoverForeground: '#1A1D2E',
+  primary: '#3344FF',
+  primaryForeground: '#FFFFFF',
+  secondary: '#FFB845',
+  secondaryForeground: '#1A1D2E',
+  muted: '#F3F4F6',
+  mutedForeground: '#6B7280',
+  accent: '#FFB845',
+  accentForeground: '#1A1D2E',
+  destructive: '#EF4444',
+  destructiveForeground: '#FFFFFF',
+  border: '#E5E7EB',
   input: 'transparent',
-  inputBackground: '#f3f3f5',
-  switchBackground: '#cbced4',
-  ring: 'rgba(0, 0, 0, 0.3)',
-  chart1: '#ff8c42',
-  chart2: '#5eb3d6',
-  chart3: '#2d4a6d',
-  chart4: '#f4e04d',
-  chart5: '#f08a5d',
-  sidebar: '#fafafa',
-  sidebarForeground: '#030213',
-  sidebarPrimary: '#030213',
-  sidebarPrimaryForeground: '#fafafa',
-  sidebarAccent: '#f7f7f7',
-  sidebarAccentForeground: '#1a1a1a',
-  sidebarBorder: '#e5e5e5',
-  sidebarRing: 'rgba(0, 0, 0, 0.3)',
+  inputBackground: '#F9FAFB',
+  switchBackground: '#D1D5DB',
+  ring: '#3344FF',
+  chart1: '#3344FF',
+  chart2: '#FFB845',
+  chart3: '#10B981',
+  chart4: '#8B5CF6',
+  chart5: '#EC4899',
+  sidebar: '#FFFFFF',
+  sidebarForeground: '#1A1D2E',
+  sidebarPrimary: '#3344FF',
+  sidebarPrimaryForeground: '#FFFFFF',
+  sidebarAccent: '#F9FAFB',
+  sidebarAccentForeground: '#1A1D2E',
+  sidebarBorder: '#E5E7EB',
+  sidebarRing: '#3344FF',
 };
 
 export const darkColors: ColorPalette = {
-  background: '#030213',
-  foreground: '#fafafa',
-  card: '#030213',
-  cardForeground: '#fafafa',
-  popover: '#030213',
-  popoverForeground: '#fafafa',
-  primary: '#fafafa',
-  primaryForeground: '#1a1a1a',
-  secondary: '#2a2a2a',
-  secondaryForeground: '#fafafa',
-  muted: '#2a2a2a',
-  mutedForeground: '#a0a0a0',
-  accent: '#2a2a2a',
-  accentForeground: '#fafafa',
-  destructive: '#7f1d1d',
-  destructiveForeground: '#fca5a5',
-  border: '#2a2a2a',
-  input: '#2a2a2a',
-  inputBackground: '#2a2a2a',
-  switchBackground: '#cbced4',
-  ring: '#666666',
-  chart1: '#60a5fa',
-  chart2: '#86efac',
-  chart3: '#f08a5d',
-  chart4: '#c084fc',
-  chart5: '#fb923c',
-  sidebar: '#1a1a1a',
-  sidebarForeground: '#fafafa',
-  sidebarPrimary: '#60a5fa',
-  sidebarPrimaryForeground: '#fafafa',
-  sidebarAccent: '#2a2a2a',
-  sidebarAccentForeground: '#fafafa',
-  sidebarBorder: '#2a2a2a',
-  sidebarRing: '#666666',
+  background: '#0F1117',
+  foreground: '#FFFFFF',
+  card: '#1A1D2E',
+  cardForeground: '#FFFFFF',
+  popover: '#1A1D2E',
+  popoverForeground: '#FFFFFF',
+  primary: '#3344FF',
+  primaryForeground: '#FFFFFF',
+  secondary: '#FFB845',
+  secondaryForeground: '#1A1D2E',
+  muted: '#1F2937',
+  mutedForeground: '#9CA3AF',
+  accent: '#FFB845',
+  accentForeground: '#FFFFFF',
+  destructive: '#DC2626',
+  destructiveForeground: '#FEE2E2',
+  border: '#374151',
+  input: '#1F2937',
+  inputBackground: '#1F2937',
+  switchBackground: '#4B5563',
+  ring: '#3344FF',
+  chart1: '#3344FF',
+  chart2: '#FFB845',
+  chart3: '#10B981',
+  chart4: '#8B5CF6',
+  chart5: '#EC4899',
+  sidebar: '#1A1D2E',
+  sidebarForeground: '#FFFFFF',
+  sidebarPrimary: '#3344FF',
+  sidebarPrimaryForeground: '#FFFFFF',
+  sidebarAccent: '#1F2937',
+  sidebarAccentForeground: '#FFFFFF',
+  sidebarBorder: '#374151',
+  sidebarRing: '#3344FF',
 };
 
 type Typography = {
@@ -140,14 +140,14 @@ type Typography = {
 
 export const typography: Typography = {
   fontSize: {
-    xs: 12,
-    sm: 14,
-    base: 16,
-    lg: 18,
+    xs: 11,
+    sm: 13,
+    base: 15,
+    lg: 17,
     xl: 20,
     '2xl': 24,
-    '3xl': 30,
-    '4xl': 36,
+    '3xl': 28,
+    '4xl': 34,
   },
   fontWeight: {
     normal: '400',
@@ -156,9 +156,9 @@ export const typography: Typography = {
     bold: '700',
   },
   lineHeight: {
-    tight: 1.25,
+    tight: 1.2,
     normal: 1.5,
-    relaxed: 1.75,
+    relaxed: 1.7,
   },
 };
 
@@ -193,6 +193,7 @@ type Radius = {
   md: number;
   lg: number;
   xl: number;
+  chatBubble: number;
   full: number;
 };
 
@@ -201,6 +202,7 @@ export const radius: Radius = {
   md: 8,
   lg: 10,
   xl: 14,
+  chatBubble: 18,
   full: 9999,
 };
 
@@ -213,40 +215,32 @@ type Shadow = {
 };
 
 type Shadows = {
-  sm: Shadow;
-  base: Shadow;
-  md: Shadow;
-  lg: Shadow;
+  none: Shadow;
+  surface: Shadow;
+  interactive: Shadow;
 };
 
 export const shadows: Shadows = {
-  sm: {
+  none: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+  },
+  surface: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.04,
     shadowRadius: 2,
     elevation: 1,
   },
-  base: {
-    shadowColor: '#000',
+  interactive: {
+    shadowColor: '#3344FF',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
     elevation: 2,
-  },
-  md: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  lg: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 8,
   },
 };
 

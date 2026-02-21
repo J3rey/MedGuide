@@ -84,7 +84,7 @@ export default function ManualSearchScreen() {
         <TextInput
           style={styles.searchInput}
           placeholder="Type drug name..."
-          placeholderTextColor={theme.darkColors.mutedForeground}
+          placeholderTextColor={theme.colors.mutedForeground}
           value={searchQuery}
           onChangeText={setSearchQuery}
           autoCapitalize="words"
@@ -95,7 +95,7 @@ export default function ManualSearchScreen() {
           <ActivityIndicator
             style={styles.loadingIndicator}
             size="small"
-            color={theme.darkColors.primary}
+            color={theme.colors.primary}
           />
         )}
       </View>
@@ -216,7 +216,7 @@ export default function ManualSearchScreen() {
             onPress={handleAskChatbot}
           >
             <Text style={styles.chatButtonText}>
-              💬 Ask Chatbot About This Drug
+              Ask Chatbot About This Drug
             </Text>
           </TouchableOpacity>
         </View>
@@ -228,26 +228,26 @@ export default function ManualSearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.darkColors.background,
+    backgroundColor: theme.colors.background,
   },
   header: {
     paddingTop: 60,
     paddingHorizontal: theme.spacing.base,
     paddingBottom: theme.spacing.base,
     borderBottomWidth: 1,
-    borderBottomColor: theme.darkColors.border,
+    borderBottomColor: theme.colors.border,
   },
   backButton: {
     marginBottom: theme.spacing.sm,
   },
   backButtonText: {
     fontSize: theme.typography.fontSize.base,
-    color: theme.darkColors.primary,
+    color: theme.colors.primary,
   },
   title: {
     fontSize: theme.typography.fontSize['2xl'],
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -258,13 +258,13 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 50,
-    backgroundColor: theme.darkColors.card,
+    backgroundColor: theme.colors.card,
     borderRadius: theme.radius.md,
     paddingHorizontal: theme.spacing.base,
     fontSize: theme.typography.fontSize.base,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
     borderWidth: 1,
-    borderColor: theme.darkColors.border,
+    borderColor: theme.colors.border,
   },
   loadingIndicator: {
     marginLeft: theme.spacing.sm,
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   },
   helperTextContent: {
     fontSize: theme.typography.fontSize.xs,
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
     fontStyle: 'italic',
   },
   suggestionsContainer: {
@@ -286,25 +286,25 @@ const styles = StyleSheet.create({
   suggestionsTitle: {
     fontSize: theme.typography.fontSize.sm,
     fontWeight: theme.typography.fontWeight.semibold,
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
     marginBottom: theme.spacing.sm,
   },
   suggestionItem: {
-    backgroundColor: theme.darkColors.card,
+    backgroundColor: theme.colors.card,
     padding: theme.spacing.base,
     borderRadius: theme.radius.md,
     marginBottom: theme.spacing.sm,
     borderWidth: 1,
-    borderColor: theme.darkColors.border,
+    borderColor: theme.colors.border,
   },
   suggestionName: {
     fontSize: theme.typography.fontSize.base,
     fontWeight: theme.typography.fontWeight.semibold,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
   },
   suggestionSubtext: {
     fontSize: theme.typography.fontSize.xs,
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
     marginTop: 4,
   },
   noResultsContainer: {
@@ -315,13 +315,13 @@ const styles = StyleSheet.create({
   },
   noResultsText: {
     fontSize: theme.typography.fontSize.base,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
     textAlign: 'center',
     marginBottom: theme.spacing.sm,
   },
   noResultsSubtext: {
     fontSize: theme.typography.fontSize.sm,
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
     textAlign: 'center',
   },
   selectedDrugContainer: {
@@ -332,21 +332,21 @@ const styles = StyleSheet.create({
   selectedDrugTitle: {
     fontSize: theme.typography.fontSize.sm,
     fontWeight: theme.typography.fontWeight.semibold,
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
     marginBottom: theme.spacing.sm,
   },
   drugCard: {
-    backgroundColor: theme.darkColors.card,
+    backgroundColor: theme.colors.card,
     borderRadius: theme.radius.md,
     padding: theme.spacing.base,
     marginBottom: theme.spacing.base,
     borderWidth: 1,
-    borderColor: theme.darkColors.border,
+    borderColor: theme.colors.border,
   },
   drugName: {
     fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
     marginBottom: theme.spacing.base,
   },
   drugSection: {
@@ -355,24 +355,27 @@ const styles = StyleSheet.create({
   drugSectionTitle: {
     fontSize: theme.typography.fontSize.sm,
     fontWeight: theme.typography.fontWeight.semibold,
-    color: theme.darkColors.primary,
+    color: theme.colors.primary,
     marginBottom: 4,
   },
   drugSectionText: {
     fontSize: theme.typography.fontSize.sm,
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
     lineHeight: 20,
   },
   chatButton: {
-    backgroundColor: theme.darkColors.primary,
+    backgroundColor: theme.colors.primary,
+    minHeight: 48,
     paddingVertical: theme.spacing.base,
     paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.xl,
     alignItems: 'center',
+    justifyContent: 'center',
+    ...theme.shadows.interactive,
   },
   chatButtonText: {
     fontSize: theme.typography.fontSize.base,
-    fontWeight: theme.typography.fontWeight.semibold,
-    color: '#ffffff',
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.primaryForeground,
   },
 });

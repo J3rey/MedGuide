@@ -208,7 +208,7 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
           value={inputMessage}
           onChangeText={setInputMessage}
           placeholder={t('chat.placeholder')}
-          placeholderTextColor={theme.darkColors.mutedForeground}
+          placeholderTextColor={theme.colors.mutedForeground}
           multiline
           maxLength={500}
         />
@@ -231,13 +231,13 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.darkColors.background,
+    backgroundColor: theme.colors.background,
   },
   header: {
     paddingVertical: theme.spacing.base,
     paddingHorizontal: theme.spacing.xl,
     borderBottomWidth: 1,
-    borderBottomColor: theme.darkColors.border,
+    borderBottomColor: theme.colors.border,
   },
   headerContent: {
     flexDirection: 'row',
@@ -246,11 +246,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: theme.typography.fontSize.lg,
     fontWeight: theme.typography.fontWeight.bold,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
   },
   headerSubtitle: {
     fontSize: theme.typography.fontSize.sm,
-    color: theme.darkColors.mutedForeground,
+    color: theme.colors.mutedForeground,
   },
   messagesContainer: {
     flex: 1,
@@ -274,26 +274,30 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   messageBubble: {
-    maxWidth: '80%',
-    borderRadius: theme.radius.xl,
+    maxWidth: '75%',
+    borderRadius: theme.radius.chatBubble,
     paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
   },
   userMessage: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: theme.colors.card,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   botMessage: {
-    backgroundColor: theme.darkColors.card,
+    backgroundColor: '#F0F2FF',
+    borderWidth: 1,
+    borderColor: '#E0E5FF',
   },
   messageText: {
     fontSize: theme.typography.fontSize.base,
     lineHeight: 20,
   },
   userMessageText: {
-    color: '#ffffff',
+    color: theme.colors.foreground,
   },
   botMessageText: {
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -301,20 +305,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.xl,
     paddingVertical: theme.spacing.base,
     borderTopWidth: 1,
-    borderTopColor: theme.darkColors.border,
-    backgroundColor: theme.darkColors.background,
+    borderTopColor: theme.colors.border,
+    backgroundColor: theme.colors.background,
     gap: theme.spacing.sm,
   },
   input: {
     flex: 1,
-    backgroundColor: theme.darkColors.card,
+    backgroundColor: theme.colors.card,
     borderWidth: 1,
-    borderColor: theme.darkColors.border,
+    borderColor: theme.colors.border,
     borderRadius: theme.radius.lg,
     paddingHorizontal: theme.spacing.base,
     paddingVertical: theme.spacing.sm,
     fontSize: theme.typography.fontSize.base,
-    color: theme.darkColors.foreground,
+    color: theme.colors.foreground,
     maxHeight: 100,
   },
   sendButton: {
