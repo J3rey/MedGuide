@@ -1,5 +1,5 @@
 // App.tsx
-import 'intl-pluralrules'; // Polyfill for React Native Intl API support
+import 'intl-pluralrules'; // Polyfill for i18next plural rules
 import React from 'react';
 import './src/i18n/index'; // MUST be here
 

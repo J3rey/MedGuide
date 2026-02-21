@@ -4,27 +4,20 @@ export default {
     slug: 'medguide',
     version: '1.0.0',
     orientation: 'portrait',
-    icon: './assets/icon.png',
     userInterfaceStyle: 'light',
     splash: {
-      image: './assets/splash.png',
       resizeMode: 'contain',
       backgroundColor: '#ffffff',
     },
-    assetBundlePatterns: ['**/*'],
     ios: {
       supportsTablet: true,
       bundleIdentifier: 'com.medguide.app',
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#ffffff',
       },
       package: 'com.medguide.app',
-    },
-    web: {
-      favicon: './assets/favicon.png',
     },
     plugins: [
       [
@@ -37,15 +30,17 @@ export default {
       [
         'expo-notifications',
         {
-          icon: './assets/icon.png',
           color: '#3B82F6',
-          sounds: ['./assets/notification.wav'],
         },
       ],
     ],
     extra: {
+      eas: {
+        projectId: '39383a77-2c35-4319-8692-41d25a0cbe44',
+      },
       backendUrl:
-        process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3000', // For physical device, set to your computer's IP
+        process.env.EXPO_PUBLIC_BACKEND_URL ||
+        'https://medguide-p132.onrender.com',
       supabaseUrl:
         process.env.SUPABASE_URL || 'https://kzqqeodwdpqlsgvydqyb.supabase.co',
       supabaseAnonKey:
