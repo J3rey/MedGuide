@@ -27,27 +27,63 @@ function unique(arr: string[]): string[] {
 function likelyDrugName(token: string): boolean {
   // Filter out very short tokens (less likely to be drug names)
   if (token.length < 3) return false;
-  
+
   // Filter out common words that often appear in medication packaging
   const commonWords = new Set([
-    'the', 'and', 'for', 'with', 'use', 'mg', 'mcg', 'ml',
-    'tablet', 'tablets', 'capsule', 'capsules', 'oral', 'daily',
-    'take', 'not', 'instructions', 'warnings', 'caution', 'keep',
-    'out', 'reach', 'children', 'store', 'room', 'temperature',
-    'expiry', 'date', 'batch', 'lot', 'manufactured', 'mfg',
-    'exp', 'net', 'wt', 'weight', 'contents', 'contains',
-    'active', 'inactive', 'ingredients', 'directions', 'dosage',
+    'the',
+    'and',
+    'for',
+    'with',
+    'use',
+    'mg',
+    'mcg',
+    'ml',
+    'tablet',
+    'tablets',
+    'capsule',
+    'capsules',
+    'oral',
+    'daily',
+    'take',
+    'not',
+    'instructions',
+    'warnings',
+    'caution',
+    'keep',
+    'out',
+    'reach',
+    'children',
+    'store',
+    'room',
+    'temperature',
+    'expiry',
+    'date',
+    'batch',
+    'lot',
+    'manufactured',
+    'mfg',
+    'exp',
+    'net',
+    'wt',
+    'weight',
+    'contents',
+    'contains',
+    'active',
+    'inactive',
+    'ingredients',
+    'directions',
+    'dosage',
   ]);
-  
+
   if (commonWords.has(token)) return false;
-  
+
   // Filter out tokens that are just numbers or look like dates
   if (/^\d+$/.test(token)) return false;
-  if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}$/.test(token)) return false;
-  
+  if (/^\d{1,2}[/-]\d{1,2}[/-]\d{2,4}$/.test(token)) return false;
+
   // Drug names typically have at least one vowel
   if (!/[aeiouy]/i.test(token)) return false;
-  
+
   return true;
 }
 
@@ -57,38 +93,38 @@ function likelyDrugName(token: string): boolean {
  */
 function scoreCandidateQuality(candidate: string): number {
   let score = 0;
-  
+
   // Longer candidates (up to a point) are often more specific drug names
   const words = candidate.split(' ');
   if (words.length === 1 && candidate.length >= 6) score += 2;
   if (words.length === 2) score += 3;
   if (words.length === 3) score += 2;
-  
+
   // Candidates with common drug suffixes/patterns
   const drugPatterns = [
-    /ol$/i,      // -ol (e.g., paracetamol, atenolol)
-    /ine$/i,     // -ine (e.g., morphine, codeine)
-    /cin$/i,     // -cin (e.g., penicillin)
-    /mycin$/i,   // -mycin (antibiotics)
-    /cillin$/i,  // -cillin (e.g., amoxicillin)
+    /ol$/i, // -ol (e.g., paracetamol, atenolol)
+    /ine$/i, // -ine (e.g., morphine, codeine)
+    /cin$/i, // -cin (e.g., penicillin)
+    /mycin$/i, // -mycin (antibiotics)
+    /cillin$/i, // -cillin (e.g., amoxicillin)
     /prazole$/i, // -prazole (e.g., omeprazole)
-    /statin$/i,  // -statin (e.g., atorvastatin)
-    /pril$/i,    // -pril (e.g., lisinopril)
-    /zosin$/i,   // -zosin (e.g., doxazosin)
-    /azole$/i,   // -azole (e.g., fluconazole)
+    /statin$/i, // -statin (e.g., atorvastatin)
+    /pril$/i, // -pril (e.g., lisinopril)
+    /zosin$/i, // -zosin (e.g., doxazosin)
+    /azole$/i, // -azole (e.g., fluconazole)
   ];
-  
+
   for (const pattern of drugPatterns) {
     if (pattern.test(candidate)) {
       score += 4;
       break;
     }
   }
-  
+
   // Check if all words pass drug name filter
   const allWordsValid = words.every(likelyDrugName);
   if (allWordsValid) score += 1;
-  
+
   return score;
 }
 
@@ -100,7 +136,7 @@ export function buildCandidates(ocrText: string): string[] {
 
   // tokens from all text using OCR-aware normalization
   const allTokens = ocrNormalize(ocrText).split(' ').filter(Boolean);
-  
+
   // Filter tokens to focus on potential drug names
   const drugLikeTokens = allTokens.filter(likelyDrugName);
 
@@ -143,7 +179,7 @@ export function buildCandidates(ocrText: string): string[] {
 
   // Get top candidates and expand with OCR variations for the best ones
   const topCandidates = scoredCandidates.slice(0, 25).map((c) => c.text);
-  
+
   // For the top 10 candidates, add OCR variations to catch common errors
   const withVariations: string[] = [...topCandidates];
   for (let i = 0; i < Math.min(10, topCandidates.length); i++) {

@@ -6,13 +6,8 @@ import { ocrSimilarity } from '../utils/fuzzyMatch';
 
 interface DrugMatch {
   drug: Drug;
-  frequency: number;  // How many candidates matched this drug
-  bestScore: number;  // Best similarity score from any candidate
-}
-
-function dedupeById(drugs: Drug[]): Drug[] {
-  const seen = new Set<number>();
-  return drugs.filter((d) => (seen.has(d.id) ? false : (seen.add(d.id), true)));
+  frequency: number; // How many candidates matched this drug
+  bestScore: number; // Best similarity score from any candidate
 }
 
 /**
@@ -31,13 +26,13 @@ function scoreDrugMatches(
         match.drug.drug_name,
         ocrText.toLowerCase()
       );
-      
+
       // Combined score: frequency + best candidate match + direct match
       const score =
         match.frequency * 10 + // Frequency is most important
-        match.bestScore * 5 +   // Best candidate match
-        directScore * 3;        // Direct similarity with OCR text
-      
+        match.bestScore * 5 + // Best candidate match
+        directScore * 3; // Direct similarity with OCR text
+
       return { drug: match.drug, score };
     })
     .sort((a, b) => b.score - a.score);
@@ -57,8 +52,10 @@ export async function findDrugMatchesFromImage(uri: string): Promise<{
   }
 
   const candidates = buildCandidates(ocrText);
-  console.log(`[Match] Generated ${candidates.length} candidates from OCR text`);
-  
+  console.log(
+    `[Match] Generated ${candidates.length} candidates from OCR text`
+  );
+
   if (candidates.length === 0) {
     console.log('[Match] No valid candidates found');
     return { ocrText, candidates: [], matches: [] };
@@ -72,20 +69,22 @@ export async function findDrugMatchesFromImage(uri: string): Promise<{
   for (const candidate of candidates) {
     // keep queries short to avoid garbage
     if (candidate.length < 3) continue;
-    
+
     try {
       const results = await searchDrugs(candidate);
       queriesCompleted++;
-      
+
       if (results.length > 0) {
-        console.log(`[Match] Candidate "${candidate}" found ${results.length} results`);
+        console.log(
+          `[Match] Candidate "${candidate}" found ${results.length} results`
+        );
       }
-      
+
       // Update frequency and scores for each matched drug
       for (const drug of results) {
         const existing = drugMatchMap.get(drug.id);
         const similarity = ocrSimilarity(candidate, drug.drug_name);
-        
+
         if (existing) {
           existing.frequency++;
           existing.bestScore = Math.max(existing.bestScore, similarity);
@@ -103,11 +102,13 @@ export async function findDrugMatchesFromImage(uri: string): Promise<{
     }
   }
 
-  console.log(`[Match] Completed ${queriesCompleted} queries, found ${drugMatchMap.size} unique drugs`);
+  console.log(
+    `[Match] Completed ${queriesCompleted} queries, found ${drugMatchMap.size} unique drugs`
+  );
 
   // Score and sort matches
   const matches = scoreDrugMatches(drugMatchMap, ocrText).slice(0, 15);
-  
+
   console.log(`[Match] Returning top ${matches.length} matches`);
   return { ocrText, candidates, matches };
 }

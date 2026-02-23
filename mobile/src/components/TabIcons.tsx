@@ -9,20 +9,18 @@ interface IconProps {
 
 // Calendar/Schedule Icon - professional medical appointment style
 export const ScheduleIcon = ({ active, animatedValue }: IconProps) => {
-  const scale = animatedValue?.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.1],
-  }) || 1;
+  const scale =
+    animatedValue?.interpolate({
+      inputRange: [0, 1],
+      outputRange: [1, 1.1],
+    }) || 1;
 
   return (
     <Animated.View style={[styles.iconContainer, { transform: [{ scale }] }]}>
       <View style={styles.scheduleOuter}>
         {/* Calendar header */}
         <View
-          style={[
-            styles.scheduleHeader,
-            active && styles.scheduleHeaderActive,
-          ]}
+          style={[styles.scheduleHeader, active && styles.scheduleHeaderActive]}
         />
         {/* Calendar grid dots */}
         <View style={styles.scheduleGrid}>
@@ -44,10 +42,11 @@ export const ScheduleIcon = ({ active, animatedValue }: IconProps) => {
 
 // Camera Icon - professional pill/medication scanner style
 export const CameraIcon = ({ active, animatedValue }: IconProps) => {
-  const scale = animatedValue?.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.1],
-  }) || 1;
+  const scale =
+    animatedValue?.interpolate({
+      inputRange: [0, 1],
+      outputRange: [1, 1.1],
+    }) || 1;
 
   return (
     <Animated.View style={[styles.iconContainer, { transform: [{ scale }] }]}>
@@ -57,10 +56,7 @@ export const CameraIcon = ({ active, animatedValue }: IconProps) => {
           {/* Lens */}
           <View style={[styles.cameraLens, active && styles.cameraLensActive]}>
             <View
-              style={[
-                styles.cameraInner,
-                active && styles.cameraInnerActive,
-              ]}
+              style={[styles.cameraInner, active && styles.cameraInnerActive]}
             />
           </View>
         </View>
@@ -76,10 +72,11 @@ export const CameraIcon = ({ active, animatedValue }: IconProps) => {
 
 // Chat Icon - professional medical consultation style
 export const ChatIcon = ({ active, animatedValue }: IconProps) => {
-  const scale = animatedValue?.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.1],
-  }) || 1;
+  const scale =
+    animatedValue?.interpolate({
+      inputRange: [0, 1],
+      outputRange: [1, 1.1],
+    }) || 1;
 
   return (
     <Animated.View style={[styles.iconContainer, { transform: [{ scale }] }]}>
@@ -108,15 +105,14 @@ export const ChatIcon = ({ active, animatedValue }: IconProps) => {
 
 // Settings Icon - professional gear/cog style
 export const SettingsIcon = ({ active, animatedValue }: IconProps) => {
-  const rotate = animatedValue?.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '45deg'],
-  }) || '0deg';
+  const rotate =
+    animatedValue?.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '45deg'],
+    }) || '0deg';
 
   return (
-    <Animated.View
-      style={[styles.iconContainer, { transform: [{ rotate }] }]}
-    >
+    <Animated.View style={[styles.iconContainer, { transform: [{ rotate }] }]}>
       <View style={styles.settingsOuter}>
         {/* Gear center */}
         <View

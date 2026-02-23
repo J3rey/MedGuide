@@ -2,19 +2,13 @@ import React, { useEffect, useRef } from 'react';
 import {
   View,
   TouchableOpacity,
-  Text,
   StyleSheet,
   Platform,
   Animated,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
-import {
-  ScheduleIcon,
-  CameraIcon,
-  ChatIcon,
-  SettingsIcon,
-} from './TabIcons';
+import { ScheduleIcon, CameraIcon, ChatIcon, SettingsIcon } from './TabIcons';
 
 type Tab = 'schedule' | 'camera' | 'chat' | 'settings';
 
@@ -26,12 +20,15 @@ interface DarkBottomNavigationProps {
 interface TabItemProps {
   id: Tab;
   label: string;
-  Icon: React.ComponentType<{ active: boolean; animatedValue?: Animated.Value }>;
+  Icon: React.ComponentType<{
+    active: boolean;
+    animatedValue?: Animated.Value;
+  }>;
   isActive: boolean;
   onPress: () => void;
 }
 
-function TabItem({ id, label, Icon, isActive, onPress }: TabItemProps) {
+function TabItem({ label, Icon, isActive, onPress }: TabItemProps) {
   const scaleAnim = useRef(new Animated.Value(isActive ? 1 : 0)).current;
   const bounceAnim = useRef(new Animated.Value(0)).current;
 

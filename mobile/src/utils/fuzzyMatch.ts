@@ -1,5 +1,5 @@
 /**
- * Fuzzy matching utilities for improving OCR text matching   
+ * Fuzzy matching utilities for improving OCR text matching
  * Helps handle typos, OCR errors, and similar text variations
  */
 
@@ -10,7 +10,7 @@
 export function levenshteinDistance(str1: string, str2: string): number {
   const s1 = str1.toLowerCase();
   const s2 = str2.toLowerCase();
-  
+
   const len1 = s1.length;
   const len2 = s2.length;
 
@@ -30,9 +30,9 @@ export function levenshteinDistance(str1: string, str2: string): number {
         dp[i][j] = dp[i - 1][j - 1];
       } else {
         dp[i][j] = Math.min(
-          dp[i - 1][j] + 1,     // deletion
-          dp[i][j - 1] + 1,     // insertion
-          dp[i - 1][j - 1] + 1  // substitution
+          dp[i - 1][j] + 1, // deletion
+          dp[i][j - 1] + 1, // insertion
+          dp[i - 1][j - 1] + 1 // substitution
         );
       }
     }
@@ -47,12 +47,12 @@ export function levenshteinDistance(str1: string, str2: string): number {
  */
 export function similarityScore(str1: string, str2: string): number {
   if (!str1 || !str2) return 0;
-  
+
   const distance = levenshteinDistance(str1, str2);
   const maxLen = Math.max(str1.length, str2.length);
-  
+
   if (maxLen === 0) return 1;
-  
+
   return 1 - distance / maxLen;
 }
 
@@ -62,23 +62,23 @@ export function similarityScore(str1: string, str2: string): number {
  */
 const OCR_SUBSTITUTIONS: Record<string, string[]> = {
   '0': ['o', 'O'],
-  'o': ['0', 'O'],
-  'O': ['0', 'o'],
+  o: ['0', 'O'],
+  O: ['0', 'o'],
   '1': ['i', 'I', 'l', '|'],
-  'i': ['1', 'I', 'l', '|'],
-  'I': ['1', 'i', 'l', '|'],
-  'l': ['1', 'i', 'I', '|'],
+  i: ['1', 'I', 'l', '|'],
+  I: ['1', 'i', 'l', '|'],
+  l: ['1', 'i', 'I', '|'],
   '5': ['s', 'S'],
-  's': ['5', 'S'],
-  'S': ['5', 's'],
+  s: ['5', 'S'],
+  S: ['5', 's'],
   '8': ['B'],
-  'B': ['8'],
-  'z': ['2'],
+  B: ['8'],
+  z: ['2'],
   '2': ['z'],
-  'g': ['q', '9'],
-  'q': ['g'],
+  g: ['q', '9'],
+  q: ['g'],
   '6': ['b'],
-  'b': ['6'],
+  b: ['6'],
 };
 
 /**
@@ -87,13 +87,13 @@ const OCR_SUBSTITUTIONS: Record<string, string[]> = {
  */
 export function ocrNormalize(text: string): string {
   let normalized = text.toLowerCase().trim();
-  
+
   // Remove common OCR artifacts
   normalized = normalized
-    .replace(/[^\w\s]/g, ' ')  // Replace special characters with spaces
-    .replace(/\s+/g, ' ')       // Normalize whitespace
+    .replace(/[^\w\s]/g, ' ') // Replace special characters with spaces
+    .replace(/\s+/g, ' ') // Normalize whitespace
     .trim();
-  
+
   return normalized;
 }
 
@@ -104,31 +104,32 @@ export function ocrNormalize(text: string): string {
 export function ocrSimilarity(str1: string, str2: string): number {
   const norm1 = ocrNormalize(str1);
   const norm2 = ocrNormalize(str2);
-  
+
   // Base similarity
   let score = similarityScore(norm1, norm2);
-  
+
   // Boost score if they're very close with possible OCR substitutions
   if (score > 0.7) {
     // Check if difference could be explained by OCR confusions
     const len = Math.min(norm1.length, norm2.length);
     let confusionMatches = 0;
-    
+
     for (let i = 0; i < len; i++) {
       const c1 = norm1[i];
       const c2 = norm2[i];
-      
+
       if (c1 === c2) {
         confusionMatches++;
       } else if (OCR_SUBSTITUTIONS[c1]?.includes(c2)) {
         confusionMatches += 0.9; // Almost as good as exact match
       }
     }
-    
-    const confusionScore = confusionMatches / Math.max(norm1.length, norm2.length);
+
+    const confusionScore =
+      confusionMatches / Math.max(norm1.length, norm2.length);
     score = Math.max(score, confusionScore);
   }
-  
+
   return score;
 }
 
@@ -151,7 +152,7 @@ export function findBestMatches(
     }))
     .filter((match) => match.score >= threshold)
     .sort((a, b) => b.score - a.score);
-  
+
   return matches;
 }
 
@@ -179,19 +180,20 @@ export function fuzzyMatches(
 export function getOcrVariations(word: string): string[] {
   const variations = new Set<string>([word]);
   const normalized = ocrNormalize(word);
-  
+
   // Generate variations by substituting OCR-confusable characters
   for (let i = 0; i < normalized.length; i++) {
     const char = normalized[i];
     const substitutions = OCR_SUBSTITUTIONS[char];
-    
+
     if (substitutions) {
       for (const sub of substitutions) {
-        const variation = normalized.substring(0, i) + sub + normalized.substring(i + 1);
+        const variation =
+          normalized.substring(0, i) + sub + normalized.substring(i + 1);
         variations.add(variation);
       }
     }
   }
-  
+
   return Array.from(variations);
 }
