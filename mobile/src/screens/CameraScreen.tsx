@@ -760,16 +760,6 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 
       <SafeAreaView style={styles.captureBar} edges={['bottom']}>
         <View style={styles.captureContent}>
-          <TouchableOpacity
-            style={styles.galleryButton}
-            onPress={pickFromGallery}
-            activeOpacity={0.8}
-            accessibilityLabel={t('camera.accessibility.chooseGallery')}
-            accessibilityRole="button"
-          >
-            <Text style={styles.galleryButtonText}>📁</Text>
-          </TouchableOpacity>
-
           <View style={styles.centerColumn}>
             <Text style={styles.captureText}>{t('camera.positionLabel')}</Text>
             <TouchableOpacity
@@ -788,7 +778,15 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.placeholder} />
+          <TouchableOpacity
+            style={styles.galleryButton}
+            onPress={pickFromGallery}
+            activeOpacity={0.8}
+            accessibilityLabel={t('camera.accessibility.chooseGallery')}
+            accessibilityRole="button"
+          >
+            <Text style={styles.galleryButtonText}>📁</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     </View>
@@ -928,10 +926,10 @@ const styles = StyleSheet.create({
   captureContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    position: 'relative',
   },
   centerColumn: {
-    flex: 1,
     alignItems: 'center',
     gap: theme.spacing.base,
   },
@@ -960,6 +958,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   galleryButton: {
+    position: 'absolute',
+    left: 0,
     width: 48,
     height: 48,
     borderRadius: 24,
@@ -971,9 +971,6 @@ const styles = StyleSheet.create({
   },
   galleryButtonText: {
     fontSize: 24,
-  },
-  placeholder: {
-    width: 48,
   },
 
   preview: { flex: 1, resizeMode: 'contain', backgroundColor: '#000' },
