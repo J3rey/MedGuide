@@ -238,6 +238,16 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
    */
   const startWebCamera = useCallback(async () => {
     try {
+      // Check if getUserMedia is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera API not supported in this browser. Please use a modern browser like Chrome, Firefox, or Safari.');
+      }
+
+      // Check if the page is secure (HTTPS or localhost)
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        throw new Error('Camera access requires HTTPS. Please access this site via https://');
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: webFacing,
@@ -285,11 +295,17 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
-      Alert.alert(
-        t('camera.errors.cameraErrorTitle'),
-        t('camera.errors.cameraErrorMessage'),
-        [{ text: 'OK' }]
-      );
+      if (Platform.OS === 'web') {
+        // Web-friendly error display
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        alert(`${t('camera.errors.cameraErrorTitle')}\n\n${t('camera.errors.cameraErrorMessage')}\n\nDetails: ${errorMessage}`);
+      } else {
+        Alert.alert(
+          t('camera.errors.cameraErrorTitle'),
+          t('camera.errors.cameraErrorMessage'),
+          [{ text: 'OK' }]
+        );
+      }
     }
   }, [webFacing, webZoom, t]);
 
@@ -381,11 +397,16 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       }
     } catch (error) {
       console.error('Error switching camera:', error);
-      Alert.alert(
-        t('camera.errors.cameraErrorTitle'),
-        t('camera.errors.switchErrorMessage'),
-        [{ text: 'OK' }]
-      );
+      if (Platform.OS === 'web') {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        alert(`${t('camera.errors.cameraErrorTitle')}\n\n${t('camera.errors.switchErrorMessage')}\n\nDetails: ${errorMessage}`);
+      } else {
+        Alert.alert(
+          t('camera.errors.cameraErrorTitle'),
+          t('camera.errors.switchErrorMessage'),
+          [{ text: 'OK' }]
+        );
+      }
     } finally {
       setIsSwitchingCamera(false);
     }
