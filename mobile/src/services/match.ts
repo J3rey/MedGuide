@@ -1,3 +1,5 @@
+import { ocrNormalize, getOcrVariations } from '../utils/fuzzyMatch';
+
 function normalize(s: string): string {
   return s
     .toLowerCase()
@@ -18,33 +20,137 @@ function unique(arr: string[]): string[] {
   return out;
 }
 
+/**
+ * Check if a token looks like it could be a drug name
+ * Filters out common OCR noise and non-drug words
+ */
+function likelyDrugName(token: string): boolean {
+  // Filter out very short tokens (less likely to be drug names)
+  if (token.length < 3) return false;
+  
+  // Filter out common words that often appear in medication packaging
+  const commonWords = new Set([
+    'the', 'and', 'for', 'with', 'use', 'mg', 'mcg', 'ml',
+    'tablet', 'tablets', 'capsule', 'capsules', 'oral', 'daily',
+    'take', 'not', 'instructions', 'warnings', 'caution', 'keep',
+    'out', 'reach', 'children', 'store', 'room', 'temperature',
+    'expiry', 'date', 'batch', 'lot', 'manufactured', 'mfg',
+    'exp', 'net', 'wt', 'weight', 'contents', 'contains',
+    'active', 'inactive', 'ingredients', 'directions', 'dosage',
+  ]);
+  
+  if (commonWords.has(token)) return false;
+  
+  // Filter out tokens that are just numbers or look like dates
+  if (/^\d+$/.test(token)) return false;
+  if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}$/.test(token)) return false;
+  
+  // Drug names typically have at least one vowel
+  if (!/[aeiouy]/i.test(token)) return false;
+  
+  return true;
+}
+
+/**
+ * Score a candidate by its likelihood of being a drug name
+ * Higher scores = more likely to be a drug name
+ */
+function scoreCandidateQuality(candidate: string): number {
+  let score = 0;
+  
+  // Longer candidates (up to a point) are often more specific drug names
+  const words = candidate.split(' ');
+  if (words.length === 1 && candidate.length >= 6) score += 2;
+  if (words.length === 2) score += 3;
+  if (words.length === 3) score += 2;
+  
+  // Candidates with common drug suffixes/patterns
+  const drugPatterns = [
+    /ol$/i,      // -ol (e.g., paracetamol, atenolol)
+    /ine$/i,     // -ine (e.g., morphine, codeine)
+    /cin$/i,     // -cin (e.g., penicillin)
+    /mycin$/i,   // -mycin (antibiotics)
+    /cillin$/i,  // -cillin (e.g., amoxicillin)
+    /prazole$/i, // -prazole (e.g., omeprazole)
+    /statin$/i,  // -statin (e.g., atorvastatin)
+    /pril$/i,    // -pril (e.g., lisinopril)
+    /zosin$/i,   // -zosin (e.g., doxazosin)
+    /azole$/i,   // -azole (e.g., fluconazole)
+  ];
+  
+  for (const pattern of drugPatterns) {
+    if (pattern.test(candidate)) {
+      score += 4;
+      break;
+    }
+  }
+  
+  // Check if all words pass drug name filter
+  const allWordsValid = words.every(likelyDrugName);
+  if (allWordsValid) score += 1;
+  
+  return score;
+}
+
 export function buildCandidates(ocrText: string): string[] {
   const lines = ocrText
     .split('\n')
     .map((l) => normalize(l))
     .filter(Boolean);
 
-  // tokens from all text
-  const allTokens = normalize(ocrText).split(' ').filter(Boolean);
+  // tokens from all text using OCR-aware normalization
+  const allTokens = ocrNormalize(ocrText).split(' ').filter(Boolean);
+  
+  // Filter tokens to focus on potential drug names
+  const drugLikeTokens = allTokens.filter(likelyDrugName);
 
   // n-grams (2-4 words) catch multi-word drug names
   const ngrams: string[] = [];
   const maxN = 4;
-  for (let i = 0; i < allTokens.length; i++) {
+  for (let i = 0; i < drugLikeTokens.length; i++) {
     for (let n = 2; n <= maxN; n++) {
-      const slice = allTokens.slice(i, i + n);
-      if (slice.length === n) ngrams.push(slice.join(' '));
+      const slice = drugLikeTokens.slice(i, i + n);
+      if (slice.length === n) {
+        ngrams.push(slice.join(' '));
+      }
     }
   }
 
-  // include single tokens too (catch "paracetamol")
-  const singles = allTokens;
+  // Include lines that look like drug names
+  const drugLikeLines = lines.filter((line) => {
+    const words = line.split(' ');
+    return words.length <= 3 && words.some(likelyDrugName);
+  });
 
-  // prioritize longer phrases first (often more specific)
-  const candidates = unique([...lines, ...ngrams, ...singles])
-    .filter((c) => c.length >= 2)
-    .sort((a, b) => b.length - a.length);
+  // Combine all candidates
+  const allCandidates = unique([
+    ...drugLikeLines,
+    ...ngrams,
+    ...drugLikeTokens,
+  ]).filter((c) => c.length >= 3);
 
-  // Keep it sane (avoid sending 500 candidates)
-  return candidates.slice(0, 40);
+  // Score and sort candidates by quality
+  const scoredCandidates = allCandidates
+    .map((candidate) => ({
+      text: candidate,
+      score: scoreCandidateQuality(candidate),
+    }))
+    .sort((a, b) => {
+      // Sort by score first, then by length (longer = more specific)
+      if (b.score !== a.score) return b.score - a.score;
+      return b.text.length - a.text.length;
+    });
+
+  // Get top candidates and expand with OCR variations for the best ones
+  const topCandidates = scoredCandidates.slice(0, 25).map((c) => c.text);
+  
+  // For the top 10 candidates, add OCR variations to catch common errors
+  const withVariations: string[] = [...topCandidates];
+  for (let i = 0; i < Math.min(10, topCandidates.length); i++) {
+    const variations = getOcrVariations(topCandidates[i]);
+    withVariations.push(...variations);
+  }
+
+  // Deduplicate and return top candidates
+  return unique(withVariations).slice(0, 50);
 }

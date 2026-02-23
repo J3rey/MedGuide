@@ -35,31 +35,53 @@ router.get(
         return;
       }
 
-      // First, try to find exact or prefix matches (prioritized)
+      const query = q.trim();
+      if (query.length < 2) {
+        res.json([]);
+        return;
+      }
+
+      // Use fuzzy search with trigram similarity (handles typos and OCR errors)
+      const { data: fuzzyMatches, error: fuzzyError } = await supabase.rpc(
+        'search_drugs_fuzzy',
+        {
+          search_term: query,
+          threshold: 0.2, // Lower threshold for more lenient matching (OCR often has errors)
+        }
+      );
+
+      if (fuzzyError) {
+        console.error('Fuzzy search error:', fuzzyError);
+        // Fallback to ILIKE search if fuzzy search fails
+        const { data: fallbackMatches, error: fallbackError } = await supabase
+          .from('drugs')
+          .select('*')
+          .or(`drug_name.ilike.%${query}%`)
+          .limit(15);
+
+        if (fallbackError) throw fallbackError;
+        res.json(fallbackMatches || []);
+        return;
+      }
+
+      // Also get exact/prefix matches and combine with fuzzy results
       const { data: exactMatches, error: exactError } = await supabase
         .from('drugs')
         .select('*')
-        .or(`drug_name.ilike.${q}%`)
+        .or(`drug_name.ilike.${query}%`)
         .limit(5);
 
-      if (exactError) throw exactError;
+      if (exactError) {
+        // Ignore exact match errors, just use fuzzy results
+        res.json((fuzzyMatches || []).slice(0, 15));
+        return;
+      }
 
-      // Then, find partial matches anywhere in the name
-      const { data: partialMatches, error: partialError } = await supabase
-        .from('drugs')
-        .select('*')
-        .or(
-          `drug_name.ilike.%${q}%,counseling.ilike.%${q}%,indications.ilike.%${q}%`
-        )
-        .limit(15);
-
-      if (partialError) throw partialError;
-
-      // Combine results, avoiding duplicates
+      // Combine and deduplicate: prioritize exact matches, then fuzzy matches
       const exactIds = new Set((exactMatches || []).map((d) => d.id));
       const combined = [
         ...(exactMatches || []),
-        ...(partialMatches || []).filter((d) => !exactIds.has(d.id)),
+        ...(fuzzyMatches || []).filter((d) => !exactIds.has(d.id)),
       ].slice(0, 15);
 
       res.json(combined);
