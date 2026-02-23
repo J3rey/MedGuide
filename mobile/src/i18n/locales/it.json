@@ -36,10 +36,52 @@
     "sun": "Dom"
   },
   "camera": {
-    "title": "Scansiona Prescrizione",
+    "title": "Scansiona Farmaco",
     "subtitle": "Scatta una foto della tua prescrizione",
     "takePicture": "Scatta Foto",
-    "scanPrescription": "Scansiona Prescrizione"
+    "scanPrescription": "Scansiona Prescrizione",
+    "scanMedication": "Scansiona Farmaco",
+    "retake": "Riscatta",
+    "flashOff": "Flash: Spento",
+    "flashOn": "Flash: Acceso",
+    "flashAuto": "Flash: Auto",
+    "cameraBack": "Posteriore",
+    "cameraFront": "Anteriore",
+    "openCamera": "Apri Fotocamera",
+    "fromGallery": "Scegli dalla Galleria",
+    "positionLabel": "Posiziona l'etichetta del farmaco all'interno della cornice",
+    "switching": "Cambio fotocamera...",
+    "processing": "Elaborazione immagine...",
+    "permissions": {
+      "title": "Accesso alla Fotocamera",
+      "required": "Accesso alla Fotocamera Richiesto",
+      "message": "MedGuide necessita dell'accesso alla fotocamera per scansionare accuratamente etichette di farmaci e prescrizioni.",
+      "grant": "Concedi Permesso",
+      "denied": "Si prega di abilitare l'accesso alla fotocamera nelle impostazioni del dispositivo.",
+      "checking": "Verifica dei permessi della fotocamera..."
+    },
+    "errors": {
+      "captureFailedTitle": "Scatto Fallito",
+      "captureFailedMessage": "Impossibile scattare la foto. Riprova.",
+      "cameraErrorTitle": "Errore Fotocamera",
+      "cameraErrorMessage": "Impossibile accedere alla fotocamera. Controlla i permessi.",
+      "switchErrorMessage": "Impossibile cambiare fotocamera. Riprova.",
+      "processingErrorTitle": "Errore",
+      "processingErrorMessage": "Elaborazione immagine fallita. Riprova.",
+      "galleryErrorTitle": "Errore Galleria",
+      "galleryErrorMessage": "Impossibile accedere alla galleria. Riprova."
+    },
+    "accessibility": {
+      "shutter": "Scatta foto",
+      "retake": "Riscatta foto",
+      "scan": "Scansiona farmaco",
+      "toggleFlash": "Attiva/disattiva flash",
+      "toggleCamera": "Cambia fotocamera",
+      "zoomIn": "Ingrandisci",
+      "zoomOut": "Riduci",
+      "openCamera": "Apri fotocamera",
+      "chooseGallery": "Scegli dalla galleria"
+    }
   },
   "chat": {
     "title": "Assistente Medico",

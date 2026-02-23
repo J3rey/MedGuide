@@ -36,10 +36,52 @@
     "sun": "Sun"
   },
   "camera": {
-    "title": "Scan Prescription",
+    "title": "Scan Medication",
     "subtitle": "Take a photo of your prescription",
     "takePicture": "Take Picture",
-    "scanPrescription": "Scan Prescription"
+    "scanPrescription": "Scan Prescription",
+    "scanMedication": "Scan Medication",
+    "retake": "Retake",
+    "flashOff": "Flash: Off",
+    "flashOn": "Flash: On",
+    "flashAuto": "Flash: Auto",
+    "cameraBack": "Back",
+    "cameraFront": "Front",
+    "openCamera": "Open Camera",
+    "fromGallery": "Choose from Gallery",
+    "positionLabel": "Position medication label within frame",
+    "switching": "Switching camera...",
+    "processing": "Processing image...",
+    "permissions": {
+      "title": "Camera Access",
+      "required": "Camera Access Required",
+      "message": "MedGuide needs camera access to scan medication labels and prescriptions accurately.",
+      "grant": "Grant Permission",
+      "denied": "Please enable camera access in your device settings.",
+      "checking": "Checking camera permissions..."
+    },
+    "errors": {
+      "captureFailedTitle": "Capture Failed",
+      "captureFailedMessage": "Unable to take photo. Please try again.",
+      "cameraErrorTitle": "Camera Error",
+      "cameraErrorMessage": "Unable to access camera. Please check permissions.",
+      "switchErrorMessage": "Unable to switch camera. Please try again.",
+      "processingErrorTitle": "Error",
+      "processingErrorMessage": "Failed to process image. Please try again.",
+      "galleryErrorTitle": "Gallery Error",
+      "galleryErrorMessage": "Unable to access gallery. Please try again."
+    },
+    "accessibility": {
+      "shutter": "Take photo",
+      "retake": "Retake photo",
+      "scan": "Scan medication",
+      "toggleFlash": "Toggle flash",
+      "toggleCamera": "Switch camera",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "openCamera": "Open camera",
+      "chooseGallery": "Choose from gallery"
+    }
   },
   "chat": {
     "title": "Medical Assistant",

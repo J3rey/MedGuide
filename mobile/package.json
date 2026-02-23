@@ -35,6 +35,8 @@
     "expo-camera": "~17.0.0",
     "expo-device": "~8.0.0",
     "expo-file-system": "~19.0.0",
+    "expo-haptics": "~14.0.0",
+    "expo-image-picker": "~17.0.0",
     "expo-notifications": "~0.32.0",
     "intl-pluralrules": "^2.0.1",
     "react": "19.1.0",

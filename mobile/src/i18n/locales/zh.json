@@ -36,10 +36,52 @@
     "sun": "周日"
   },
   "camera": {
-    "title": "扫描处方",
+    "title": "扫描药物",
     "subtitle": "拍摄您的处方照片",
     "takePicture": "拍照",
-    "scanPrescription": "扫描处方"
+    "scanPrescription": "扫描处方",
+    "scanMedication": "扫描药物",
+    "retake": "重拍",
+    "flashOff": "闪光灯：关闭",
+    "flashOn": "闪光灯：开启",
+    "flashAuto": "闪光灯：自动",
+    "cameraBack": "后置",
+    "cameraFront": "前置",
+    "openCamera": "打开相机",
+    "fromGallery": "从相册选择",
+    "positionLabel": "将药物标签放在框架内",
+    "switching": "切换相机中...",
+    "processing": "处理图像中...",
+    "permissions": {
+      "title": "相机访问",
+      "required": "需要相机访问权限",
+      "message": "MedGuide需要相机访问权限以准确扫描药物标签和处方。",
+      "grant": "授予权限",
+      "denied": "请在设备设置中启用相机访问权限。",
+      "checking": "检查相机权限中..."
+    },
+    "errors": {
+      "captureFailedTitle": "拍摄失败",
+      "captureFailedMessage": "无法拍照。请重试。",
+      "cameraErrorTitle": "相机错误",
+      "cameraErrorMessage": "无法访问相机。请检查权限。",
+      "switchErrorMessage": "无法切换相机。请重试。",
+      "processingErrorTitle": "错误",
+      "processingErrorMessage": "图像处理失败。请重试。",
+      "galleryErrorTitle": "相册错误",
+      "galleryErrorMessage": "无法访问相册。请重试。"
+    },
+    "accessibility": {
+      "shutter": "拍照",
+      "retake": "重拍",
+      "scan": "扫描药物",
+      "toggleFlash": "切换闪光灯",
+      "toggleCamera": "切换相机",
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
+      "openCamera": "打开相机",
+      "chooseGallery": "从相册选择"
+    }
   },
   "chat": {
     "title": "医疗助手",

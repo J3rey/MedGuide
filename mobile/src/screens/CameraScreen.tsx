@@ -7,11 +7,19 @@ import {
   StyleSheet,
   Alert,
   Platform,
+  ActivityIndicator,
+  AppState,
+  type AppStateStatus,
 } from 'react-native';
 import { CameraView, useCameraPermissions, FlashMode } from 'expo-camera';
+import * as ImagePicker from 'expo-image-picker';
+import * as Haptics from 'expo-haptics';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import { CameraScreenProps } from '../types/navigation';
 import { uriToBase64 } from '../utils/uriToBase64';
+import { CAMERA_CONSTANTS } from '../utils/cameraConstants';
 
 type CameraFacing = 'front' | 'back';
 
@@ -26,46 +34,102 @@ interface VideoTrackCapabilities {
 }
 
 export default function CameraScreen({ navigation }: CameraScreenProps) {
+  const { t } = useTranslation();
   const cameraRef = useRef<CameraView | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
+  const webImageUrlRef = useRef<string | null>(null);
+  const videoReadyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Camera state
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [facing, setFacing] = useState<CameraFacing>('back');
   const [flash, setFlash] = useState<FlashMode>('off');
-  const [zoom, setZoom] = useState<number>(0); // 0 = no zoom (closest to standard)
+  const [zoom, setZoom] = useState<number>(CAMERA_CONSTANTS.MOBILE_ZOOM_MIN);
   const [isCapturing, setIsCapturing] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isSwitchingCamera, setIsSwitchingCamera] = useState<boolean>(false);
 
   // Web-only state
   const [webImageUri, setWebImageUri] = useState<string | null>(null);
-  const [webCameraStream, setWebCameraStream] = useState<MediaStream | null>(
-    null
-  );
-  const [webFacing, setWebFacing] = useState<'user' | 'environment'>(
-    'environment'
-  );
-  const [webZoom, setWebZoom] = useState<number>(1);
+  const [webCameraStream, setWebCameraStream] = useState<MediaStream | null>(null);
+  const [webFacing, setWebFacing] = useState<'user' | 'environment'>('environment');
+  const [webZoom, setWebZoom] = useState<number>(CAMERA_CONSTANTS.WEB_ZOOM_MIN);
   const [webFlash, setWebFlash] = useState<'off' | 'on'>('off');
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Cleanup camera stream on unmount
+  // Cleanup camera stream and URLs on unmount
   useEffect(() => {
     return () => {
       if (webCameraStream) {
         webCameraStream.getTracks().forEach((track) => track.stop());
       }
+      if (webImageUrlRef.current) {
+        URL.revokeObjectURL(webImageUrlRef.current);
+      }
+      if (videoReadyTimeoutRef.current) {
+        clearTimeout(videoReadyTimeoutRef.current);
+      }
     };
   }, [webCameraStream]);
 
+  // Pause camera when app backgrounds (mobile only)
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+
+    const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'background' && webCameraStream) {
+        webCameraStream.getTracks().forEach((track) => (track.enabled = false));
+      } else if (nextAppState === 'active' && webCameraStream) {
+        webCameraStream.getTracks().forEach((track) => (track.enabled = true));
+      }
+    });
+
+    return () => subscription.remove();
+  }, [webCameraStream]);
+
+  // Web keyboard shortcuts
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isProcessing || isSwitchingCamera) return;
+
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        if (webCameraStream && !webImageUri) {
+          takeWebPhoto();
+        }
+      } else if (e.key === 'Escape') {
+        if (webImageUri) {
+          handleWebRetake();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [webCameraStream, webImageUri, isProcessing, isSwitchingCamera]);
+
   /**
-   * Hooks (callbacks) MUST be declared before any conditional returns.
+   * Mobile camera handlers
    */
+  const toggleCameraFacing = useCallback(async () => {
+    if (isSwitchingCamera) return;
 
-  const toggleCameraFacing = useCallback(() => {
-    setFacing((current) => (current === 'back' ? 'front' : 'back'));
-  }, []);
+    try {
+      setIsSwitchingCamera(true);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setFacing((current) => (current === 'back' ? 'front' : 'back'));
+      
+      // Small delay for better UX
+      await new Promise((resolve) => setTimeout(resolve, CAMERA_CONSTANTS.CAMERA_SWITCH_DELAY));
+    } finally {
+      setIsSwitchingCamera(false);
+    }
+  }, [isSwitchingCamera]);
 
-  const toggleFlash = useCallback(() => {
+  const toggleFlash = useCallback(async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setFlash((current) => {
       if (current === 'off') return 'on';
       if (current === 'on') return 'auto';
@@ -75,9 +139,9 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 
   const adjustZoom = useCallback((direction: 'in' | 'out') => {
     setZoom((current) => {
-      const step = 0.1;
-      if (direction === 'in') return Math.min(1, current + step);
-      return Math.max(0, current - step);
+      if (direction === 'in')
+        return Math.min(CAMERA_CONSTANTS.MOBILE_ZOOM_MAX, current + CAMERA_CONSTANTS.MOBILE_ZOOM_STEP);
+      return Math.max(CAMERA_CONSTANTS.MOBILE_ZOOM_MIN, current - CAMERA_CONSTANTS.MOBILE_ZOOM_STEP);
     });
   }, []);
 
@@ -86,76 +150,110 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 
     try {
       setIsCapturing(true);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
       const cam = cameraRef.current;
       if (!cam) throw new Error('Camera not ready');
 
       const photo = await cam.takePictureAsync({
-        quality: 0.85,
+        quality: CAMERA_CONSTANTS.PHOTO_QUALITY,
         skipProcessing: false,
       });
 
       if (!photo?.uri) throw new Error('Failed to capture photo');
       setPhotoUri(photo.uri);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
       console.error('Photo capture error:', error);
-      Alert.alert('Capture Failed', 'Unable to take photo. Please try again.', [
-        { text: 'OK' },
-      ]);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(
+        t('camera.errors.captureFailedTitle'),
+        t('camera.errors.captureFailedMessage'),
+        [{ text: 'OK' }]
+      );
     } finally {
       setIsCapturing(false);
     }
-  }, [isCapturing]);
+  }, [isCapturing, t]);
 
-  const retake = useCallback(() => {
+  const retake = useCallback(async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setPhotoUri(null);
   }, []);
+
+  const pickFromGallery = useCallback(async () => {
+    try {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: CAMERA_CONSTANTS.PHOTO_QUALITY,
+        allowsEditing: false,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setPhotoUri(result.assets[0].uri);
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+    } catch (error) {
+      console.error('Gallery picker error:', error);
+      Alert.alert(
+        t('camera.errors.galleryErrorTitle'),
+        t('camera.errors.galleryErrorMessage'),
+        [{ text: 'OK' }]
+      );
+    }
+  }, [t]);
 
   const runScanFromUri = useCallback(
     async (uri: string) => {
       try {
-        // Convert to base64 using platform-specific method
-        const base64 = await uriToBase64(uri);
-        console.log(
-          '[CameraScreen] Image converted to base64, length:',
-          base64.length
-        );
+        setIsProcessing(true);
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
         // Navigate to ScanResults with the URI
         navigation.navigate('ScanResults', { uri });
       } catch (error) {
         console.error('[CameraScreen] Error processing image:', error);
-        Alert.alert('Error', 'Failed to process image. Please try again.', [
-          { text: 'OK' },
-        ]);
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        Alert.alert(
+          t('camera.errors.processingErrorTitle'),
+          t('camera.errors.processingErrorMessage'),
+          [{ text: 'OK' }]
+        );
+      } finally {
+        setIsProcessing(false);
       }
     },
-    [navigation]
+    [navigation, t]
   );
 
   const scan = useCallback(() => {
-    if (!photoUri) return;
+    if (!photoUri || isProcessing) return;
     runScanFromUri(photoUri);
-  }, [photoUri, runScanFromUri]);
+  }, [photoUri, isProcessing, runScanFromUri]);
 
-  // Web camera handlers
+  /**
+   * Web camera handlers
+   */
   const startWebCamera = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: webFacing,
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
         },
       });
       setWebCameraStream(stream);
 
       // Apply zoom if supported
       const videoTrack = stream.getVideoTracks()[0];
-      const capabilities =
-        videoTrack.getCapabilities() as VideoTrackCapabilities;
+      const capabilities = videoTrack.getCapabilities() as VideoTrackCapabilities;
       if (capabilities.zoom && webZoom > 1) {
         try {
           await videoTrack.applyConstraints({
-            // @ts-ignore - zoom is not in TypeScript types yet
+            // @ts-expect-error - zoom is not in TypeScript types yet
             advanced: [{ zoom: webZoom }],
           });
         } catch (e) {
@@ -163,21 +261,37 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
         }
       }
 
-      // Wait for video element to be available
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+      // Wait for video element to be ready using proper event
+      if (videoRef.current) {
+        const video = videoRef.current;
+        
+        // Clear any existing timeout
+        if (videoReadyTimeoutRef.current) {
+          clearTimeout(videoReadyTimeoutRef.current);
         }
-      }, 100);
+
+        const setupVideo = () => {
+          video.srcObject = stream;
+        };
+
+        if (video.readyState >= 2) {
+          setupVideo();
+        } else {
+          video.addEventListener('loadedmetadata', setupVideo, { once: true });
+          
+          // Fallback timeout
+          videoReadyTimeoutRef.current = setTimeout(setupVideo, CAMERA_CONSTANTS.VIDEO_ELEMENT_READY_DELAY);
+        }
+      }
     } catch (error) {
       console.error('Error accessing camera:', error);
       Alert.alert(
-        'Camera Error',
-        'Unable to access camera. Please check permissions.',
+        t('camera.errors.cameraErrorTitle'),
+        t('camera.errors.cameraErrorMessage'),
         [{ text: 'OK' }]
       );
     }
-  }, [webFacing, webZoom]);
+  }, [webFacing, webZoom, t]);
 
   const stopWebCamera = useCallback(() => {
     if (webCameraStream) {
@@ -203,54 +317,85 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     canvas.toBlob(
       (blob) => {
         if (blob) {
+          // Revoke old URL if exists
+          if (webImageUrlRef.current) {
+            URL.revokeObjectURL(webImageUrlRef.current);
+          }
+
           const url = URL.createObjectURL(blob);
+          webImageUrlRef.current = url;
           setWebImageUri(url);
           stopWebCamera();
         }
       },
       'image/jpeg',
-      0.85
+      CAMERA_CONSTANTS.WEB_JPEG_QUALITY
     );
   }, [stopWebCamera]);
 
+  const handleWebRetake = useCallback(() => {
+    // Revoke old URL
+    if (webImageUrlRef.current) {
+      URL.revokeObjectURL(webImageUrlRef.current);
+      webImageUrlRef.current = null;
+    }
+    setWebImageUri(null);
+  }, []);
+
   const toggleWebCameraFacing = useCallback(async () => {
-    // Stop current camera stream
-    stopWebCamera();
-    
-    // Switch facing mode
-    const newFacing = webFacing === 'environment' ? 'user' : 'environment';
-    setWebFacing(newFacing);
-    
-    // Restart camera with new facing mode
+    if (isSwitchingCamera) return;
+
     try {
+      setIsSwitchingCamera(true);
+      stopWebCamera();
+
+      const newFacing = webFacing === 'environment' ? 'user' : 'environment';
+      setWebFacing(newFacing);
+
+      // Small delay for better UX
+      await new Promise((resolve) => setTimeout(resolve, CAMERA_CONSTANTS.CAMERA_SWITCH_DELAY));
+
+      // Restart camera with new facing mode
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: newFacing,
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
         },
       });
       setWebCameraStream(stream);
 
-      // Wait for video element to be available
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+      // Setup video element
+      if (videoRef.current) {
+        const video = videoRef.current;
+        const setupVideo = () => {
+          video.srcObject = stream;
+        };
+
+        if (video.readyState >= 2) {
+          setupVideo();
+        } else {
+          video.addEventListener('loadedmetadata', setupVideo, { once: true });
+          setTimeout(setupVideo, CAMERA_CONSTANTS.VIDEO_ELEMENT_READY_DELAY);
         }
-      }, 100);
+      }
     } catch (error) {
       console.error('Error switching camera:', error);
       Alert.alert(
-        'Camera Error',
-        'Unable to switch camera. Please try again.',
+        t('camera.errors.cameraErrorTitle'),
+        t('camera.errors.switchErrorMessage'),
         [{ text: 'OK' }]
       );
+    } finally {
+      setIsSwitchingCamera(false);
     }
-  }, [stopWebCamera, webFacing]);
+  }, [stopWebCamera, webFacing, isSwitchingCamera, t]);
 
   const adjustWebZoom = useCallback((direction: 'in' | 'out') => {
     setWebZoom((current) => {
-      const step = 0.5;
-      if (direction === 'in') return Math.min(3, current + step);
-      return Math.max(1, current - step);
+      if (direction === 'in')
+        return Math.min(CAMERA_CONSTANTS.WEB_ZOOM_MAX, current + CAMERA_CONSTANTS.WEB_ZOOM_STEP);
+      return Math.max(CAMERA_CONSTANTS.WEB_ZOOM_MIN, current - CAMERA_CONSTANTS.WEB_ZOOM_STEP);
     });
   }, []);
 
@@ -260,13 +405,12 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     // Try to enable torch mode if available
     if (webCameraStream) {
       const videoTrack = webCameraStream.getVideoTracks()[0];
-      const capabilities =
-        videoTrack.getCapabilities() as VideoTrackCapabilities;
+      const capabilities = videoTrack.getCapabilities() as VideoTrackCapabilities;
 
       if (capabilities.torch) {
         try {
           await videoTrack.applyConstraints({
-            // @ts-ignore - torch is not in TypeScript types yet
+            // @ts-expect-error - torch is not in TypeScript types yet
             advanced: [{ torch: webFlash === 'off' }],
           });
         } catch (e) {
@@ -280,16 +424,17 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   useEffect(() => {
     if (webCameraStream && Platform.OS === 'web' && webZoom > 1) {
       const videoTrack = webCameraStream.getVideoTracks()[0];
-      const capabilities =
-        videoTrack.getCapabilities() as VideoTrackCapabilities;
-      
+      const capabilities = videoTrack.getCapabilities() as VideoTrackCapabilities;
+
       if (capabilities.zoom) {
-        videoTrack.applyConstraints({
-          // @ts-ignore - zoom is not in TypeScript types yet
-          advanced: [{ zoom: webZoom }],
-        }).catch(() => {
-          console.log('Zoom adjustment failed');
-        });
+        videoTrack
+          .applyConstraints({
+            // @ts-expect-error - zoom is not in TypeScript types yet
+            advanced: [{ zoom: webZoom }],
+          })
+          .catch(() => {
+            console.log('Zoom adjustment failed');
+          });
       }
     }
   }, [webCameraStream, webZoom]);
@@ -303,46 +448,63 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     if (webImageUri) {
       // Show preview after capture
       return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
           <Image source={{ uri: webImageUri }} style={styles.preview} />
           <View style={styles.previewActions}>
             <TouchableOpacity
               style={styles.secondaryButton}
-              onPress={() => setWebImageUri(null)}
+              onPress={handleWebRetake}
               activeOpacity={0.8}
+              accessibilityLabel={t('camera.accessibility.retake')}
+              accessibilityRole="button"
             >
-              <Text style={styles.secondaryButtonText}>Retake</Text>
+              <Text style={styles.secondaryButtonText}>{t('camera.retake')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.primaryButton}
+              style={[styles.primaryButton, isProcessing && styles.buttonDisabled]}
               onPress={async () => {
-                if (!webImageUri) return;
+                if (!webImageUri || isProcessing) return;
                 await runScanFromUri(webImageUri);
               }}
+              disabled={isProcessing}
               activeOpacity={0.8}
+              accessibilityLabel={t('camera.accessibility.scan')}
+              accessibilityRole="button"
             >
-              <Text style={styles.primaryButtonText}>Scan Medication</Text>
+              {isProcessing ? (
+                <ActivityIndicator color={theme.colors.primaryForeground} />
+              ) : (
+                <Text style={styles.primaryButtonText}>{t('camera.scanMedication')}</Text>
+              )}
             </TouchableOpacity>
           </View>
-        </View>
+        </SafeAreaView>
       );
     }
 
     // Show camera capture interface
     if (webCameraStream) {
-      // Live camera view
       return (
-        <View style={styles.container}>
-          <video ref={videoRef} autoPlay playsInline style={styles.video} />
+        <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+          <video ref={videoRef} autoPlay playsInline style={styles.video as any} />
+
+          {isSwitchingCamera && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color={theme.colors.primary} />
+              <Text style={styles.loadingText}>{t('camera.switching')}</Text>
+            </View>
+          )}
 
           <View style={styles.topControls}>
             <TouchableOpacity
               style={styles.controlButton}
               onPress={toggleWebFlash}
               activeOpacity={0.7}
+              accessibilityLabel={t('camera.accessibility.toggleFlash')}
+              accessibilityRole="button"
             >
               <Text style={styles.controlButtonText}>
-                Flash: {webFlash === 'off' ? 'Off' : 'On'}
+                {webFlash === 'off' ? t('camera.flashOff') : t('camera.flashOn')}
               </Text>
             </TouchableOpacity>
 
@@ -350,9 +512,12 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
               style={styles.controlButton}
               onPress={toggleWebCameraFacing}
               activeOpacity={0.7}
+              disabled={isSwitchingCamera}
+              accessibilityLabel={t('camera.accessibility.toggleCamera')}
+              accessibilityRole="button"
             >
               <Text style={styles.controlButtonText}>
-                {webFacing === 'environment' ? 'Back' : 'Front'}
+                {webFacing === 'environment' ? t('camera.cameraBack') : t('camera.cameraFront')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -368,12 +533,14 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
               style={styles.zoomButton}
               onPress={() => adjustWebZoom('in')}
               activeOpacity={0.7}
-              disabled={webZoom >= 3}
+              disabled={webZoom >= CAMERA_CONSTANTS.WEB_ZOOM_MAX}
+              accessibilityLabel={t('camera.accessibility.zoomIn')}
+              accessibilityRole="button"
             >
               <Text
                 style={[
                   styles.zoomButtonText,
-                  webZoom >= 3 && styles.zoomButtonDisabled,
+                  webZoom >= CAMERA_CONSTANTS.WEB_ZOOM_MAX && styles.zoomButtonDisabled,
                 ]}
               >
                 +
@@ -383,12 +550,14 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
               style={styles.zoomButton}
               onPress={() => adjustWebZoom('out')}
               activeOpacity={0.7}
-              disabled={webZoom <= 1}
+              disabled={webZoom <= CAMERA_CONSTANTS.WEB_ZOOM_MIN}
+              accessibilityLabel={t('camera.accessibility.zoomOut')}
+              accessibilityRole="button"
             >
               <Text
                 style={[
                   styles.zoomButtonText,
-                  webZoom <= 1 && styles.zoomButtonDisabled,
+                  webZoom <= CAMERA_CONSTANTS.WEB_ZOOM_MIN && styles.zoomButtonDisabled,
                 ]}
               >
                 -
@@ -398,94 +567,101 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 
           <View style={styles.captureBar}>
             <View style={styles.captureContent}>
-              <Text style={styles.captureText}>
-                Position medication label within frame
-              </Text>
+              <Text style={styles.captureText}>{t('camera.positionLabel')}</Text>
               <TouchableOpacity
                 style={styles.shutter}
                 onPress={takeWebPhoto}
                 activeOpacity={0.8}
+                accessibilityLabel={t('camera.accessibility.shutter')}
+                accessibilityRole="button"
               >
                 <View style={styles.shutterInner} />
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </SafeAreaView>
       );
     }
 
     // Show "start camera" button
     return (
-      <View style={[styles.container, styles.center]}>
-        <Text style={styles.permissionTitle}>Camera Access</Text>
-        <Text style={styles.permissionText}>
-          MedGuide needs camera access to scan medication labels and
-          prescriptions accurately.
-        </Text>
+      <SafeAreaView style={[styles.container, styles.center]} edges={['top', 'bottom']}>
+        <Text style={styles.permissionTitle}>{t('camera.permissions.title')}</Text>
+        <Text style={styles.permissionText}>{t('camera.permissions.message')}</Text>
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={startWebCamera}
           activeOpacity={0.8}
+          accessibilityLabel={t('camera.accessibility.openCamera')}
+          accessibilityRole="button"
         >
-          <Text style={styles.primaryButtonText}>Open Camera</Text>
+          <Text style={styles.primaryButtonText}>{t('camera.openCamera')}</Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     );
   }
 
+  // Mobile platform below
   if (!permission) {
     return (
-      <View style={[styles.container, styles.center]}>
-        <Text style={styles.loadingText}>Checking camera permissions...</Text>
-      </View>
+      <SafeAreaView style={[styles.container, styles.center]} edges={['top', 'bottom']}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={styles.loadingText}>{t('camera.permissions.checking')}</Text>
+      </SafeAreaView>
     );
   }
 
   if (!permission.granted) {
     return (
-      <View style={[styles.container, styles.center]}>
-        <Text style={styles.permissionTitle}>Camera Access Required</Text>
-        <Text style={styles.permissionText}>
-          MedGuide needs camera access to scan medication labels and
-          prescriptions accurately.
-        </Text>
+      <SafeAreaView style={[styles.container, styles.center]} edges={['top', 'bottom']}>
+        <Text style={styles.permissionTitle}>{t('camera.permissions.required')}</Text>
+        <Text style={styles.permissionText}>{t('camera.permissions.message')}</Text>
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={requestPermission}
           activeOpacity={0.8}
+          accessibilityLabel={t('camera.permissions.grant')}
+          accessibilityRole="button"
         >
-          <Text style={styles.primaryButtonText}>Grant Permission</Text>
+          <Text style={styles.primaryButtonText}>{t('camera.permissions.grant')}</Text>
         </TouchableOpacity>
         {permission.canAskAgain === false && (
-          <Text style={styles.permissionDeniedText}>
-            Please enable camera access in your device settings.
-          </Text>
+          <Text style={styles.permissionDeniedText}>{t('camera.permissions.denied')}</Text>
         )}
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (photoUri) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <Image source={{ uri: photoUri }} style={styles.preview} />
         <View style={styles.previewActions}>
           <TouchableOpacity
             style={styles.secondaryButton}
             onPress={retake}
             activeOpacity={0.8}
+            accessibilityLabel={t('camera.accessibility.retake')}
+            accessibilityRole="button"
           >
-            <Text style={styles.secondaryButtonText}>Retake</Text>
+            <Text style={styles.secondaryButtonText}>{t('camera.retake')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.primaryButton}
+            style={[styles.primaryButton, isProcessing && styles.buttonDisabled]}
             onPress={scan}
+            disabled={isProcessing}
             activeOpacity={0.8}
+            accessibilityLabel={t('camera.accessibility.scan')}
+            accessibilityRole="button"
           >
-            <Text style={styles.primaryButtonText}>Scan Medication</Text>
+            {isProcessing ? (
+              <ActivityIndicator color={theme.colors.primaryForeground} />
+            ) : (
+              <Text style={styles.primaryButtonText}>{t('camera.scanMedication')}</Text>
+            )}
           </TouchableOpacity>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -501,18 +677,27 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
         mode="picture"
       />
 
-      <View style={styles.topControls}>
+      {isSwitchingCamera && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.loadingText}>{t('camera.switching')}</Text>
+        </View>
+      )}
+
+      <SafeAreaView style={styles.topControls} edges={['top']}>
         <TouchableOpacity
           style={styles.controlButton}
           onPress={toggleFlash}
           activeOpacity={0.7}
+          accessibilityLabel={t('camera.accessibility.toggleFlash')}
+          accessibilityRole="button"
         >
           <Text style={styles.controlButtonText}>
             {flash === 'off'
-              ? 'Flash: Off'
+              ? t('camera.flashOff')
               : flash === 'on'
-                ? 'Flash: On'
-                : 'Flash: Auto'}
+                ? t('camera.flashOn')
+                : t('camera.flashAuto')}
           </Text>
         </TouchableOpacity>
 
@@ -520,12 +705,15 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
           style={styles.controlButton}
           onPress={toggleCameraFacing}
           activeOpacity={0.7}
+          disabled={isSwitchingCamera}
+          accessibilityLabel={t('camera.accessibility.toggleCamera')}
+          accessibilityRole="button"
         >
           <Text style={styles.controlButtonText}>
-            {facing === 'back' ? 'Back' : 'Front'}
+            {facing === 'back' ? t('camera.cameraBack') : t('camera.cameraFront')}
           </Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
 
       {zoom > 0 && (
         <View style={styles.zoomIndicator}>
@@ -536,51 +724,73 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       <View style={styles.zoomControls}>
         <TouchableOpacity
           style={styles.zoomButton}
-          onPress={() => adjustZoom('out')}
-          activeOpacity={0.7}
-          disabled={zoom <= 0}
-        >
-          <Text
-            style={[
-              styles.zoomButtonText,
-              zoom <= 0 && styles.zoomButtonDisabled,
-            ]}
-          >
-            -
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.zoomButton}
           onPress={() => adjustZoom('in')}
           activeOpacity={0.7}
-          disabled={zoom >= 1}
+          disabled={zoom >= CAMERA_CONSTANTS.MOBILE_ZOOM_MAX}
+          accessibilityLabel={t('camera.accessibility.zoomIn')}
+          accessibilityRole="button"
         >
           <Text
             style={[
               styles.zoomButtonText,
-              zoom >= 1 && styles.zoomButtonDisabled,
+              zoom >= CAMERA_CONSTANTS.MOBILE_ZOOM_MAX && styles.zoomButtonDisabled,
             ]}
           >
             +
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.zoomButton}
+          onPress={() => adjustZoom('out')}
+          activeOpacity={0.7}
+          disabled={zoom <= CAMERA_CONSTANTS.MOBILE_ZOOM_MIN}
+          accessibilityLabel={t('camera.accessibility.zoomOut')}
+          accessibilityRole="button"
+        >
+          <Text
+            style={[
+              styles.zoomButtonText,
+              zoom <= CAMERA_CONSTANTS.MOBILE_ZOOM_MIN && styles.zoomButtonDisabled,
+            ]}
+          >
+            -
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.captureBar}>
+      <SafeAreaView style={styles.captureBar} edges={['bottom']}>
         <View style={styles.captureContent}>
-          <Text style={styles.captureText}>
-            Position medication label within frame
-          </Text>
           <TouchableOpacity
-            style={[styles.shutter, isCapturing && styles.shutterDisabled]}
-            onPress={takePhoto}
-            disabled={isCapturing}
+            style={styles.galleryButton}
+            onPress={pickFromGallery}
             activeOpacity={0.8}
+            accessibilityLabel={t('camera.accessibility.chooseGallery')}
+            accessibilityRole="button"
           >
-            <View style={styles.shutterInner} />
+            <Text style={styles.galleryButtonText}>📁</Text>
           </TouchableOpacity>
+
+          <View style={styles.centerColumn}>
+            <Text style={styles.captureText}>{t('camera.positionLabel')}</Text>
+            <TouchableOpacity
+              style={[styles.shutter, isCapturing && styles.shutterDisabled]}
+              onPress={takePhoto}
+              disabled={isCapturing}
+              activeOpacity={0.8}
+              accessibilityLabel={t('camera.accessibility.shutter')}
+              accessibilityRole="button"
+            >
+              {isCapturing ? (
+                <ActivityIndicator color={theme.colors.primary} />
+              ) : (
+                <View style={styles.shutterInner} />
+              )}
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.placeholder} />
         </View>
-      </View>
+      </SafeAreaView>
     </View>
   );
 }
@@ -598,6 +808,14 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.mutedForeground,
     textAlign: 'center',
+    marginTop: theme.spacing.base,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
   },
   permissionTitle: {
     fontSize: theme.typography.fontSize['2xl'],
@@ -611,8 +829,7 @@ const styles = StyleSheet.create({
     color: theme.colors.mutedForeground,
     marginBottom: theme.spacing.xl,
     textAlign: 'center',
-    lineHeight:
-      theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
+    lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
     paddingHorizontal: theme.spacing.base,
   },
   permissionDeniedText: {
@@ -638,9 +855,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: theme.spacing['3xl'],
     paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.base,
+    paddingVertical: theme.spacing.base,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   controlButton: {
@@ -661,13 +877,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: theme.spacing.lg,
     top: '50%',
-    marginTop: -60,
+    marginTop: -CAMERA_CONSTANTS.ZOOM_BUTTON_SIZE,
     gap: theme.spacing.sm,
   },
   zoomButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: CAMERA_CONSTANTS.ZOOM_BUTTON_SIZE,
+    height: CAMERA_CONSTANTS.ZOOM_BUTTON_SIZE,
+    borderRadius: CAMERA_CONSTANTS.ZOOM_BUTTON_SIZE / 2,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)',
@@ -709,7 +925,16 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
-  captureContent: { alignItems: 'center', gap: theme.spacing.base },
+  captureContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  centerColumn: {
+    flex: 1,
+    alignItems: 'center',
+    gap: theme.spacing.base,
+  },
   captureText: {
     fontSize: theme.typography.fontSize.sm,
     color: '#FFFFFF',
@@ -717,9 +942,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   shutter: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: CAMERA_CONSTANTS.SHUTTER_SIZE,
+    height: CAMERA_CONSTANTS.SHUTTER_SIZE,
+    borderRadius: CAMERA_CONSTANTS.SHUTTER_SIZE / 2,
     backgroundColor: theme.colors.card,
     borderWidth: 4,
     borderColor: theme.colors.primary,
@@ -731,8 +956,24 @@ const styles = StyleSheet.create({
   shutterInner: {
     width: '100%',
     height: '100%',
-    borderRadius: 30,
+    borderRadius: (CAMERA_CONSTANTS.SHUTTER_SIZE - 12) / 2,
     backgroundColor: theme.colors.primary,
+  },
+  galleryButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  galleryButtonText: {
+    fontSize: 24,
+  },
+  placeholder: {
+    width: 48,
   },
 
   preview: { flex: 1, resizeMode: 'contain', backgroundColor: '#000' },
@@ -775,5 +1016,8 @@ const styles = StyleSheet.create({
     color: theme.colors.primaryForeground,
     fontSize: theme.typography.fontSize.base,
     fontWeight: theme.typography.fontWeight.bold,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
 });

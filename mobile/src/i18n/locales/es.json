@@ -36,10 +36,52 @@
     "sun": "Dom"
   },
   "camera": {
-    "title": "Escanear Receta",
+    "title": "Escanear Medicamento",
     "subtitle": "Tome una foto de su receta",
     "takePicture": "Tomar Foto",
-    "scanPrescription": "Escanear Receta"
+    "scanPrescription": "Escanear Receta",
+    "scanMedication": "Escanear Medicamento",
+    "retake": "Repetir",
+    "flashOff": "Flash: Apagado",
+    "flashOn": "Flash: Encendido",
+    "flashAuto": "Flash: Auto",
+    "cameraBack": "Trasera",
+    "cameraFront": "Frontal",
+    "openCamera": "Abrir Cámara",
+    "fromGallery": "Elegir de Galería",
+    "positionLabel": "Coloque la etiqueta del medicamento dentro del marco",
+    "switching": "Cambiando cámara...",
+    "processing": "Procesando imagen...",
+    "permissions": {
+      "title": "Acceso a la Cámara",
+      "required": "Se Requiere Acceso a la Cámara",
+      "message": "MedGuide necesita acceso a la cámara para escanear etiquetas de medicamentos y recetas con precisión.",
+      "grant": "Otorgar Permiso",
+      "denied": "Por favor habilite el acceso a la cámara en la configuración de su dispositivo.",
+      "checking": "Verificando permisos de cámara..."
+    },
+    "errors": {
+      "captureFailedTitle": "Captura Fallida",
+      "captureFailedMessage": "No se pudo tomar la foto. Por favor intente nuevamente.",
+      "cameraErrorTitle": "Error de Cámara",
+      "cameraErrorMessage": "No se puede acceder a la cámara. Por favor verifique los permisos.",
+      "switchErrorMessage": "No se puede cambiar de cámara. Por favor intente nuevamente.",
+      "processingErrorTitle": "Error",
+      "processingErrorMessage": "Error al procesar la imagen. Por favor intente nuevamente.",
+      "galleryErrorTitle": "Error de Galería",
+      "galleryErrorMessage": "No se puede acceder a la galería. Por favor intente nuevamente."
+    },
+    "accessibility": {
+      "shutter": "Tomar foto",
+      "retake": "Repetir foto",
+      "scan": "Escanear medicamento",
+      "toggleFlash": "Alternar flash",
+      "toggleCamera": "Cambiar cámara",
+      "zoomIn": "Acercar",
+      "zoomOut": "Alejar",
+      "openCamera": "Abrir cámara",
+      "chooseGallery": "Elegir de galería"
+    }
   },
   "chat": {
     "title": "Asistente Médico",

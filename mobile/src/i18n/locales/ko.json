@@ -36,10 +36,52 @@
     "sun": "일"
   },
   "camera": {
-    "title": "처방전 스캔",
-    "subtitle": "처방전 사진을 촬영하세요",
+    "title": "약물 스캔",
+    "subtitle": "처방전 사진을 찍으세요",
     "takePicture": "사진 찍기",
-    "scanPrescription": "처방전 스캔"
+    "scanPrescription": "처방전 스캔",
+    "scanMedication": "약물 스캔",
+    "retake": "다시 찍기",
+    "flashOff": "플래시: 끔",
+    "flashOn": "플래시: 켬",
+    "flashAuto": "플래시: 자동",
+    "cameraBack": "후면",
+    "cameraFront": "전면",
+    "openCamera": "카메라 열기",
+    "fromGallery": "갤러리에서 선택",
+    "positionLabel": "약물 라벨을 프레임 안에 위치시키세요",
+    "switching": "카메라 전환 중...",
+    "processing": "이미지 처리 중...",
+    "permissions": {
+      "title": "카메라 접근",
+      "required": "카메라 접근 권한 필요",
+      "message": "MedGuide는 약물 라벨과 처방전을 정확하게 스캔하기 위해 카메라 접근 권한이 필요합니다.",
+      "grant": "권한 부여",
+      "denied": "기기 설정에서 카메라 접근을 활성화하세요.",
+      "checking": "카메라 권한 확인 중..."
+    },
+    "errors": {
+      "captureFailedTitle": "촬영 실패",
+      "captureFailedMessage": "사진을 찍을 수 없습니다. 다시 시도하세요.",
+      "cameraErrorTitle": "카메라 오류",
+      "cameraErrorMessage": "카메라에 접근할 수 없습니다. 권한을 확인하세요.",
+      "switchErrorMessage": "카메라를 전환할 수 없습니다. 다시 시도하세요.",
+      "processingErrorTitle": "오류",
+      "processingErrorMessage": "이미지 처리에 실패했습니다. 다시 시도하세요.",
+      "galleryErrorTitle": "갤러리 오류",
+      "galleryErrorMessage": "갤러리에 접근할 수 없습니다. 다시 시도하세요."
+    },
+    "accessibility": {
+      "shutter": "사진 찍기",
+      "retake": "다시 찍기",
+      "scan": "약물 스캔",
+      "toggleFlash": "플래시 전환",
+      "toggleCamera": "카메라 전환",
+      "zoomIn": "확대",
+      "zoomOut": "축소",
+      "openCamera": "카메라 열기",
+      "chooseGallery": "갤러리에서 선택"
+    }
   },
   "chat": {
     "title": "의료 도우미",
