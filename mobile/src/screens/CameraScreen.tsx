@@ -60,6 +60,10 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   const [webZoom, setWebZoom] = useState<number>(CAMERA_CONSTANTS.WEB_ZOOM_MIN);
   const [webFlash, setWebFlash] = useState<'off' | 'on'>('off');
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  
+  // Debug state (web only)
+  const [debugInfo, setDebugInfo] = useState<string>('');
+  const [showDebug, setShowDebug] = useState<boolean>(Platform.OS === 'web');
 
   // Cleanup camera stream and URLs on unmount
   useEffect(() => {
@@ -259,6 +263,17 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
    */
   const startWebCamera = useCallback(async () => {
     try {
+      // Collect diagnostic info
+      const diagnostics = [
+        `Protocol: ${location.protocol}`,
+        `Hostname: ${location.hostname}`,
+        `User Agent: ${navigator.userAgent.substring(0, 50)}...`,
+        `Has mediaDevices: ${!!navigator.mediaDevices}`,
+        `Has getUserMedia: ${!!navigator.mediaDevices?.getUserMedia}`,
+      ];
+      setDebugInfo(diagnostics.join('\n'));
+      console.log('Camera diagnostics:', diagnostics);
+
       // Check if getUserMedia is supported
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error(
@@ -276,6 +291,8 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
           'Camera access requires HTTPS. Please access this site via https://'
         );
       }
+      
+      console.log('Requesting camera access...');
 
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -284,6 +301,8 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
           height: { ideal: 1080 },
         },
       });
+      console.log('Camera stream obtained successfully');
+      setDebugInfo(prev => prev + '\n✅ Camera stream obtained');
       setWebCameraStream(stream);
 
       // Apply zoom if supported
@@ -328,12 +347,22 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      const errorName = error instanceof Error ? error.name : 'Error';
+
+      const errorDetails = [
+        `Error: ${errorName}`,
+        `Message: ${errorMessage}`,
+        `Browser: ${navigator.userAgent.split(' ').slice(-2).join(' ')}`,
+      ].join('\n');
+
+      setDebugInfo((prev) => prev + '\n\n❌ ERROR:\n' + errorDetails);
+
       if (Platform.OS === 'web') {
         // Web-friendly error display
-        const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error';
         alert(
-          `${t('camera.errors.cameraErrorTitle')}\n\n${t('camera.errors.cameraErrorMessage')}\n\nDetails: ${errorMessage}`
+          `${t('camera.errors.cameraErrorTitle')}\n\n${t('camera.errors.cameraErrorMessage')}\n\nDetails: ${errorName}: ${errorMessage}\n\nCheck the debug panel for more info.`
         );
       } else {
         Alert.alert(
@@ -592,6 +621,19 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
               </Text>
             </TouchableOpacity>
 
+            {/* Debug toggle button */}
+            <TouchableOpacity
+              style={[styles.controlButton, styles.debugControlButton]}
+              onPress={() => setShowDebug(!showDebug)}
+              activeOpacity={0.7}
+              accessibilityLabel="Toggle Debug Info"
+              accessibilityRole="button"
+            >
+              <Text style={styles.controlButtonText}>
+                {showDebug ? '🐛 Hide' : '🐛'}
+              </Text>
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.controlButton}
               onPress={toggleWebCameraFacing}
@@ -607,6 +649,13 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
               </Text>
             </TouchableOpacity>
           </View>
+
+          {/* Debug panel overlay */}
+          {showDebug && debugInfo && (
+            <View style={styles.debugOverlay}>
+              <Text style={styles.debugText}>{debugInfo}</Text>
+            </View>
+          )}
 
           {webZoom > 1 && (
             <View style={styles.zoomIndicator}>
@@ -694,6 +743,36 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
         >
           <Text style={styles.primaryButtonText}>{t('camera.openCamera')}</Text>
         </TouchableOpacity>
+
+        {/* Debug Panel */}
+        {showDebug && debugInfo && (
+          <View style={styles.debugPanel}>
+            <TouchableOpacity
+              onPress={() => setShowDebug(false)}
+              style={styles.debugToggle}
+            >
+              <Text style={styles.debugToggleText}>Hide Debug Info</Text>
+            </TouchableOpacity>
+            <Text style={styles.debugText}>{debugInfo}</Text>
+          </View>
+        )}
+        {showDebug && !debugInfo && (
+          <TouchableOpacity
+            onPress={() => {
+              const diagnostics = [
+                `Protocol: ${location.protocol}`,
+                `Hostname: ${location.hostname}`,
+                `User Agent: ${navigator.userAgent}`,
+                `Has mediaDevices: ${!!navigator.mediaDevices}`,
+                `Has getUserMedia: ${!!navigator.mediaDevices?.getUserMedia}`,
+              ];
+              setDebugInfo(diagnostics.join('\n'));
+            }}
+            style={styles.debugButton}
+          >
+            <Text style={styles.debugButtonText}>Show Debug Info</Text>
+          </TouchableOpacity>
+        )}
       </SafeAreaView>
     );
   }
@@ -1144,5 +1223,60 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     opacity: 0.6,
+  },
+
+  // Debug panel styles
+  debugPanel: {
+    marginTop: theme.spacing.xl,
+    padding: theme.spacing.base,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    maxWidth: 600,
+    width: '90%',
+  },
+  debugText: {
+    fontSize: theme.typography.fontSize.xs,
+    color: '#FFFFFF',
+    fontFamily: Platform.OS === 'web' ? 'monospace' : 'Courier',
+    lineHeight: 18,
+  },
+  debugToggle: {
+    alignSelf: 'flex-end',
+    marginBottom: theme.spacing.sm,
+  },
+  debugToggleText: {
+    fontSize: theme.typography.fontSize.xs,
+    color: theme.colors.primary,
+    fontWeight: theme.typography.fontWeight.semibold,
+  },
+  debugButton: {
+    marginTop: theme.spacing.base,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.base,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  debugButtonText: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.mutedForeground,
+  },
+  debugControlButton: {
+    minWidth: 44,
+  },
+  debugOverlay: {
+    position: 'absolute',
+    top: 100,
+    left: theme.spacing.base,
+    right: theme.spacing.base,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    padding: theme.spacing.base,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    maxHeight: 300,
   },
 });
