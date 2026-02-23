@@ -142,15 +142,15 @@ export function buildCandidates(ocrText: string): string[] {
     });
 
   // Get top candidates and expand with OCR variations for the best ones
-  const topCandidates = scoredCandidates.slice(0, 25).map((c) => c.text);
+  const topCandidates = scoredCandidates.slice(0, 15).map((c) => c.text);
   
-  // For the top 10 candidates, add OCR variations to catch common errors
+  // For the top 5 candidates, add OCR variations to catch common errors
   const withVariations: string[] = [...topCandidates];
-  for (let i = 0; i < Math.min(10, topCandidates.length); i++) {
+  for (let i = 0; i < Math.min(5, topCandidates.length); i++) {
     const variations = getOcrVariations(topCandidates[i]);
     withVariations.push(...variations);
   }
 
-  // Deduplicate and return top candidates
-  return unique(withVariations).slice(0, 50);
+  // Deduplicate and return top candidates (limited for performance)
+  return unique(withVariations).slice(0, 20);
 }

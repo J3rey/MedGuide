@@ -1,24 +1,16 @@
 import { Drug } from '../types/drug';
 import { extractTextFromImage } from './ocr';
 import { buildCandidates } from './match';
-import { searchDrugs } from './drugSearch';
+import { batchSearchDrugs } from './drugSearch';
 import { ocrSimilarity } from '../utils/fuzzyMatch';
 
 interface DrugMatch {
   drug: Drug;
-  frequency: number;  // How many candidates matched this drug
   bestScore: number;  // Best similarity score from any candidate
 }
 
-function dedupeById(drugs: Drug[]): Drug[] {
-  const seen = new Set<number>();
-  return drugs.filter((d) => (seen.has(d.id) ? false : (seen.add(d.id), true)));
-}
-
 /**
- * Score and prioritize drug matches based on:
- * 1. Frequency (how many different candidates found this drug)
- * 2. Similarity score (best match score)
+ * Score and prioritize drug matches based on similarity
  */
 function scoreDrugMatches(
   drugMatches: Map<number, DrugMatch>,
@@ -32,11 +24,8 @@ function scoreDrugMatches(
         ocrText.toLowerCase()
       );
       
-      // Combined score: frequency + best candidate match + direct match
-      const score =
-        match.frequency * 10 + // Frequency is most important
-        match.bestScore * 5 +   // Best candidate match
-        directScore * 3;        // Direct similarity with OCR text
+      // Combined score: best candidate match + direct match
+      const score = match.bestScore * 5 + directScore * 3;
       
       return { drug: match.drug, score };
     })
@@ -50,6 +39,8 @@ export async function findDrugMatchesFromImage(uri: string): Promise<{
   candidates: string[];
   matches: Drug[];
 }> {
+  const startTime = Date.now();
+  
   const ocrText = await extractTextFromImage(uri);
   if (!ocrText || ocrText.trim().length === 0) {
     console.log('[Match] No OCR text extracted');
@@ -57,57 +48,59 @@ export async function findDrugMatchesFromImage(uri: string): Promise<{
   }
 
   const candidates = buildCandidates(ocrText);
-  console.log(`[Match] Generated ${candidates.length} candidates from OCR text`);
+  console.log(`[Match] Generated ${candidates.length} candidates from OCR text in ${Date.now() - startTime}ms`);
   
   if (candidates.length === 0) {
     console.log('[Match] No valid candidates found');
     return { ocrText, candidates: [], matches: [] };
   }
 
-  // Track drug matches with frequency and scores
-  const drugMatchMap = new Map<number, DrugMatch>();
-
-  // Query DB using candidates, track frequency and scores
-  let queriesCompleted = 0;
-  for (const candidate of candidates) {
-    // keep queries short to avoid garbage
-    if (candidate.length < 3) continue;
-    
-    try {
-      const results = await searchDrugs(candidate);
-      queriesCompleted++;
-      
-      if (results.length > 0) {
-        console.log(`[Match] Candidate "${candidate}" found ${results.length} results`);
-      }
-      
-      // Update frequency and scores for each matched drug
-      for (const drug of results) {
-        const existing = drugMatchMap.get(drug.id);
-        const similarity = ocrSimilarity(candidate, drug.drug_name);
-        
-        if (existing) {
-          existing.frequency++;
-          existing.bestScore = Math.max(existing.bestScore, similarity);
-        } else {
-          drugMatchMap.set(drug.id, {
-            drug,
-            frequency: 1,
-            bestScore: similarity,
-          });
-        }
-      }
-    } catch (error) {
-      console.error(`[Match] Error searching for "${candidate}":`, error);
-      // ignore per-candidate failures
-    }
+  // Filter candidates (minimum length check)
+  const validCandidates = candidates.filter((c) => c.length >= 3);
+  
+  if (validCandidates.length === 0) {
+    console.log('[Match] No valid candidates after filtering');
+    return { ocrText, candidates, matches: [] };
   }
 
-  console.log(`[Match] Completed ${queriesCompleted} queries, found ${drugMatchMap.size} unique drugs`);
+  console.log(`[Match] Searching ${validCandidates.length} candidates using batch API...`);
+  const searchStart = Date.now();
+
+  // Use batch search - single API call for all candidates!
+  let results: Drug[] = [];
+  try {
+    results = await batchSearchDrugs(validCandidates);
+    console.log(`[Match] Batch search completed in ${Date.now() - searchStart}ms, found ${results.length} drugs`);
+  } catch (error) {
+    console.error('[Match] Batch search error:', error);
+    return { ocrText, candidates, matches: [] };
+  }
+
+  // Score each drug match based on similarity to candidates and OCR text
+  const drugMatchMap = new Map<number, DrugMatch>();
+
+  for (const drug of results) {
+    let bestScore = 0;
+    
+    // Find best similarity score across all candidates
+    for (const candidate of validCandidates) {
+      const similarity = ocrSimilarity(candidate, drug.drug_name);
+      if (similarity > bestScore) {
+        bestScore = similarity;
+      }
+    }
+    
+    drugMatchMap.set(drug.id, {
+      drug,
+      bestScore,
+    });
+  }
 
   // Score and sort matches
   const matches = scoreDrugMatches(drugMatchMap, ocrText).slice(0, 15);
   
-  console.log(`[Match] Returning top ${matches.length} matches`);
+  const totalTime = Date.now() - startTime;
+  console.log(`[Match] Completed in ${totalTime}ms, returning ${matches.length} matches`);
+  
   return { ocrText, candidates, matches };
 }

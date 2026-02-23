@@ -95,6 +95,78 @@ router.get(
   }
 );
 
+// Batch search drugs - accepts multiple search terms at once
+router.post(
+  '/drugs/batch-search',
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { queries } = req.body;
+
+      if (!queries || !Array.isArray(queries)) {
+        res.status(400).json({ error: 'Body must contain "queries" array' });
+        return;
+      }
+
+      // Limit to prevent abuse
+      if (queries.length > 50) {
+        res.status(400).json({ error: 'Maximum 50 queries allowed' });
+        return;
+      }
+
+      // Filter valid queries
+      const validQueries = queries
+        .filter((q) => typeof q === 'string' && q.trim().length >= 3)
+        .slice(0, 50);
+
+      if (validQueries.length === 0) {
+        res.json([]);
+        return;
+      }
+
+      // Collect all unique drug matches
+      const drugMap = new Map<number, any>();
+
+      // Search for each query using fuzzy matching
+      for (const query of validQueries) {
+        const trimmedQuery = query.trim();
+        
+        try {
+          // Use fuzzy search
+          const { data: fuzzyMatches } = await supabase.rpc(
+            'search_drugs_fuzzy',
+            {
+              search_term: trimmedQuery,
+              threshold: 0.2,
+            }
+          );
+
+          // Add to results map (deduplicate by drug ID)
+          if (fuzzyMatches && Array.isArray(fuzzyMatches)) {
+            for (const drug of fuzzyMatches) {
+              if (!drugMap.has(drug.id)) {
+                drugMap.set(drug.id, drug);
+              }
+            }
+          }
+        } catch (queryError) {
+          // Continue with other queries if one fails
+          console.error(`Batch search error for "${trimmedQuery}":`, queryError);
+        }
+      }
+
+      // Return all unique drugs found
+      const results = Array.from(drugMap.values()).slice(0, 30);
+      res.json(results);
+    } catch (error) {
+      console.error(
+        'Error in batch search:',
+        error instanceof Error ? error.message : error
+      );
+      res.status(500).json({ error: 'Failed to batch search drugs' });
+    }
+  }
+);
+
 // Get drug by ID
 router.get('/drugs/:id', async (req: Request, res: Response): Promise<void> => {
   try {

@@ -39,3 +39,33 @@ export async function searchDrugs(query: string): Promise<Drug[]> {
     return [];
   }
 }
+
+/**
+ * Batch search drugs - sends multiple queries in a single API call
+ * Much faster than making individual requests for each candidate
+ */
+export async function batchSearchDrugs(queries: string[]): Promise<Drug[]> {
+  try {
+    if (queries.length === 0) return [];
+    
+    const url = `${API_BASE}/drugs/batch-search`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ queries }),
+    });
+
+    if (!res.ok) {
+      console.error(`Batch drug search failed: ${res.status}`);
+      return [];
+    }
+
+    const data = await res.json();
+    return data as Drug[];
+  } catch (error) {
+    console.error('Batch drug search error:', error);
+    return [];
+  }
+}
