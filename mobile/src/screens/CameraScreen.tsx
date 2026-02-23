@@ -60,7 +60,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   const [webZoom, setWebZoom] = useState<number>(CAMERA_CONSTANTS.WEB_ZOOM_MIN);
   const [webFlash, setWebFlash] = useState<'off' | 'on'>('off');
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  
+
   // Debug state (web only)
   const [debugInfo, setDebugInfo] = useState<string>('');
   const [showDebug, setShowDebug] = useState<boolean>(Platform.OS === 'web');
@@ -291,7 +291,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
           'Camera access requires HTTPS. Please access this site via https://'
         );
       }
-      
+
       console.log('Requesting camera access...');
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -302,7 +302,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
         },
       });
       console.log('Camera stream obtained successfully');
-      setDebugInfo(prev => prev + '\n✅ Camera stream obtained');
+      setDebugInfo((prev) => prev + '\n✅ Camera stream obtained');
       setWebCameraStream(stream);
 
       // Apply zoom if supported
