@@ -760,6 +760,16 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 
       <SafeAreaView style={styles.captureBar} edges={['bottom']}>
         <View style={styles.captureContent}>
+          <TouchableOpacity
+            style={styles.galleryButton}
+            onPress={pickFromGallery}
+            activeOpacity={0.8}
+            accessibilityLabel={t('camera.accessibility.chooseGallery')}
+            accessibilityRole="button"
+          >
+            <Text style={styles.galleryButtonText}>📁</Text>
+          </TouchableOpacity>
+
           <View style={styles.centerColumn}>
             <Text style={styles.captureText}>{t('camera.positionLabel')}</Text>
             <TouchableOpacity
@@ -778,15 +788,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            style={styles.galleryButton}
-            onPress={pickFromGallery}
-            activeOpacity={0.8}
-            accessibilityLabel={t('camera.accessibility.chooseGallery')}
-            accessibilityRole="button"
-          >
-            <Text style={styles.galleryButtonText}>📁</Text>
-          </TouchableOpacity>
+          <View style={styles.galleryButtonSpacer} />
         </View>
       </SafeAreaView>
     </View>
@@ -924,12 +926,13 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
   captureContent: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
-    position: 'relative',
-    width: '100%',
+    justifyContent: 'space-between',
+    paddingHorizontal: theme.spacing.base,
   },
   centerColumn: {
+    flex: 1,
     alignItems: 'center',
     gap: theme.spacing.md,
   },
@@ -959,8 +962,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   galleryButton: {
-    position: 'absolute',
-    left: 0,
     width: 48,
     height: 48,
     borderRadius: 24,
@@ -969,6 +970,9 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  galleryButtonSpacer: {
+    width: 48,
   },
   galleryButtonText: {
     fontSize: 24,
