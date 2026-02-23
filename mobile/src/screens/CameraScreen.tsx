@@ -924,20 +924,21 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
   captureContent: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
     position: 'relative',
+    width: '100%',
   },
   centerColumn: {
     alignItems: 'center',
-    gap: theme.spacing.base,
+    gap: theme.spacing.md,
   },
   captureText: {
-    fontSize: theme.typography.fontSize.sm,
+    fontSize: theme.typography.fontSize.base,
     color: '#FFFFFF',
-    fontWeight: theme.typography.fontWeight.medium,
+    fontWeight: theme.typography.fontWeight.semibold,
     textAlign: 'center',
+    letterSpacing: 0.5,
   },
   shutter: {
     width: CAMERA_CONSTANTS.SHUTTER_SIZE,
