@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   TouchableOpacity,
   Text,
   StyleSheet,
   Platform,
+  Animated,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
+import {
+  ScheduleIcon,
+  CameraIcon,
+  ChatIcon,
+  SettingsIcon,
+} from './TabIcons';
 
 type Tab = 'schedule' | 'camera' | 'chat' | 'settings';
 
@@ -16,30 +23,87 @@ interface DarkBottomNavigationProps {
   onTabChange: (tab: Tab) => void;
 }
 
-// Simple icon components using unicode symbols (non-emoji)
-const ScheduleIcon = ({ active }: { active: boolean }) => (
-  <View style={styles.iconShape}>
-    <View style={[styles.iconCircle, active && styles.iconCircleActive]} />
-  </View>
-);
+interface TabItemProps {
+  id: Tab;
+  label: string;
+  Icon: React.ComponentType<{ active: boolean; animatedValue?: Animated.Value }>;
+  isActive: boolean;
+  onPress: () => void;
+}
 
-const CameraIcon = ({ active }: { active: boolean }) => (
-  <View style={styles.iconShape}>
-    <View style={[styles.iconSquare, active && styles.iconSquareActive]} />
-  </View>
-);
+function TabItem({ id, label, Icon, isActive, onPress }: TabItemProps) {
+  const scaleAnim = useRef(new Animated.Value(isActive ? 1 : 0)).current;
+  const bounceAnim = useRef(new Animated.Value(0)).current;
 
-const ChatIcon = ({ active }: { active: boolean }) => (
-  <View style={styles.iconShape}>
-    <View style={[styles.iconBubble, active && styles.iconBubbleActive]} />
-  </View>
-);
+  useEffect(() => {
+    Animated.spring(scaleAnim, {
+      toValue: isActive ? 1 : 0,
+      friction: 5,
+      tension: 100,
+      useNativeDriver: true,
+    }).start();
+  }, [isActive, scaleAnim]);
 
-const SettingsIcon = ({ active }: { active: boolean }) => (
-  <View style={styles.iconShape}>
-    <View style={[styles.iconGear, active && styles.iconGearActive]} />
-  </View>
-);
+  const handlePress = () => {
+    // Bounce animation on press
+    Animated.sequence([
+      Animated.timing(bounceAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.spring(bounceAnim, {
+        toValue: 0,
+        friction: 3,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    onPress();
+  };
+
+  const bounceScale = bounceAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0.85],
+  });
+
+  return (
+    <TouchableOpacity
+      style={styles.tab}
+      onPress={handlePress}
+      activeOpacity={0.7}
+      accessibilityRole="tab"
+      accessibilityState={{ selected: isActive }}
+      accessibilityLabel={label}
+    >
+      <Animated.View
+        style={[
+          isActive ? styles.activeIconContainer : styles.iconContainer,
+          { transform: [{ scale: bounceScale }] },
+        ]}
+      >
+        <Icon active={isActive} animatedValue={scaleAnim} />
+      </Animated.View>
+      <Animated.Text
+        style={[
+          styles.label,
+          isActive && styles.activeLabel,
+          {
+            opacity: scaleAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0.6, 1],
+            }),
+          },
+        ]}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        {label}
+      </Animated.Text>
+    </TouchableOpacity>
+  );
+}
 
 export default function DarkBottomNavigation({
   activeTab,
@@ -65,32 +129,16 @@ export default function DarkBottomNavigation({
   return (
     <View style={styles.container}>
       <View style={styles.tabBar}>
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <TouchableOpacity
-              key={tab.id}
-              style={[styles.tab]}
-              onPress={() => onTabChange(tab.id)}
-              activeOpacity={0.7}
-            >
-              <View
-                style={
-                  isActive ? styles.activeIconContainer : styles.iconContainer
-                }
-              >
-                <tab.Icon active={isActive} />
-              </View>
-              <Text
-                style={[styles.label, isActive && styles.activeLabel]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+        {tabs.map((tab) => (
+          <TabItem
+            key={tab.id}
+            id={tab.id}
+            label={tab.label}
+            Icon={tab.Icon}
+            isActive={activeTab === tab.id}
+            onPress={() => onTabChange(tab.id)}
+          />
+        ))}
       </View>
     </View>
   );
@@ -135,54 +183,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  iconShape: {
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  iconCircle: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 2,
-    borderColor: theme.colors.mutedForeground,
-  },
-  iconCircleActive: {
-    borderColor: theme.colors.primaryForeground,
-  },
-  iconSquare: {
-    width: 18,
-    height: 18,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: theme.colors.mutedForeground,
-  },
-  iconSquareActive: {
-    borderColor: theme.colors.primaryForeground,
-  },
-  iconBubble: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: theme.colors.mutedForeground,
-  },
-  iconBubbleActive: {
-    borderColor: theme.colors.primaryForeground,
-  },
-  iconGear: {
-    width: 18,
-    height: 18,
-    borderRadius: 3,
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: theme.colors.mutedForeground,
-  },
-  iconGearActive: {
-    borderColor: theme.colors.primaryForeground,
   },
   label: {
     fontSize: theme.typography.fontSize.xs,
