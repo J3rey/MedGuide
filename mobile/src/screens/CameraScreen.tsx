@@ -213,12 +213,38 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     );
   }, [stopWebCamera]);
 
-  const toggleWebCameraFacing = useCallback(() => {
+  const toggleWebCameraFacing = useCallback(async () => {
+    // Stop current camera stream
     stopWebCamera();
-    setWebFacing((current) =>
-      current === 'environment' ? 'user' : 'environment'
-    );
-  }, [stopWebCamera]);
+    
+    // Switch facing mode
+    const newFacing = webFacing === 'environment' ? 'user' : 'environment';
+    setWebFacing(newFacing);
+    
+    // Restart camera with new facing mode
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: newFacing,
+        },
+      });
+      setWebCameraStream(stream);
+
+      // Wait for video element to be available
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Error switching camera:', error);
+      Alert.alert(
+        'Camera Error',
+        'Unable to switch camera. Please try again.',
+        [{ text: 'OK' }]
+      );
+    }
+  }, [stopWebCamera, webFacing]);
 
   const adjustWebZoom = useCallback((direction: 'in' | 'out') => {
     setWebZoom((current) => {
@@ -250,12 +276,23 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     }
   }, [webCameraStream, webFlash]);
 
-  // Restart camera when facing or zoom changes
+  // Apply zoom changes when zoom level changes
   useEffect(() => {
-    if (webCameraStream && Platform.OS === 'web') {
-      startWebCamera();
+    if (webCameraStream && Platform.OS === 'web' && webZoom > 1) {
+      const videoTrack = webCameraStream.getVideoTracks()[0];
+      const capabilities =
+        videoTrack.getCapabilities() as VideoTrackCapabilities;
+      
+      if (capabilities.zoom) {
+        videoTrack.applyConstraints({
+          // @ts-ignore - zoom is not in TypeScript types yet
+          advanced: [{ zoom: webZoom }],
+        }).catch(() => {
+          console.log('Zoom adjustment failed');
+        });
+      }
     }
-  }, [webFacing, webZoom]);
+  }, [webCameraStream, webZoom]);
 
   /**
    * Conditional rendering AFTER hooks
@@ -456,6 +493,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     <View style={styles.container}>
       <CameraView
         ref={cameraRef}
+        key={facing}
         style={styles.camera}
         facing={facing}
         flash={flash}
