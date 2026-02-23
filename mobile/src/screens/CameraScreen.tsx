@@ -18,7 +18,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import { CameraScreenProps } from '../types/navigation';
-import { uriToBase64 } from '../utils/uriToBase64';
 import { CAMERA_CONSTANTS } from '../utils/cameraConstants';
 
 type CameraFacing = 'front' | 'back';
@@ -38,7 +37,9 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   const cameraRef = useRef<CameraView | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const webImageUrlRef = useRef<string | null>(null);
-  const videoReadyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const videoReadyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   // Camera state
   const [photoUri, setPhotoUri] = useState<string | null>(null);
@@ -124,6 +125,36 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [webCameraStream, webImageUri, isProcessing, isSwitchingCamera]);
+
+  // Ensure video element plays when stream is available (web only)
+  useEffect(() => {
+    if (Platform.OS !== 'web' || !webCameraStream || !videoRef.current) return;
+
+    const video = videoRef.current;
+
+    const ensureVideoPlaying = async () => {
+      if (video.srcObject !== webCameraStream) {
+        video.srcObject = webCameraStream;
+      }
+
+      if (video.paused) {
+        try {
+          await video.play();
+          console.log('Video ensured playing via useEffect');
+        } catch (err) {
+          console.error('Failed to play video in useEffect:', err);
+        }
+      }
+    };
+
+    // Try immediately
+    ensureVideoPlaying();
+
+    // Also try after a short delay
+    const timeout = setTimeout(ensureVideoPlaying, 500);
+
+    return () => clearTimeout(timeout);
+  }, [webCameraStream]);
 
   /**
    * Mobile camera handlers
@@ -302,7 +333,20 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
         },
       });
       console.log('Camera stream obtained successfully');
-      setDebugInfo((prev) => prev + '\n✅ Camera stream obtained');
+      const videoTracks = stream.getVideoTracks();
+      console.log(
+        'Video tracks:',
+        videoTracks.length,
+        videoTracks[0]?.label,
+        'enabled:',
+        videoTracks[0]?.enabled
+      );
+      setDebugInfo(
+        (prev) =>
+          prev +
+          '\n✅ Camera stream obtained\n✅ Video tracks: ' +
+          videoTracks.length
+      );
       setWebCameraStream(stream);
 
       // Apply zoom if supported
@@ -329,8 +373,22 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
           clearTimeout(videoReadyTimeoutRef.current);
         }
 
-        const setupVideo = () => {
+        const setupVideo = async () => {
           video.srcObject = stream;
+          // Explicitly play video (required for iOS Safari)
+          try {
+            await video.play();
+            console.log('Video playing successfully');
+            setDebugInfo((prev) => prev + '\n✅ Video element playing');
+          } catch (playError) {
+            console.error('Video play error:', playError);
+            setDebugInfo(
+              (prev) =>
+                prev +
+                '\n⚠️ Video play warning: ' +
+                (playError instanceof Error ? playError.message : 'unknown')
+            );
+          }
         };
 
         if (video.readyState >= 2) {
@@ -451,8 +509,15 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       // Setup video element
       if (videoRef.current) {
         const video = videoRef.current;
-        const setupVideo = () => {
+        const setupVideo = async () => {
           video.srcObject = stream;
+          // Explicitly play video (required for iOS Safari)
+          try {
+            await video.play();
+            console.log('Video playing after camera switch');
+          } catch (playError) {
+            console.error('Video play error after switch:', playError);
+          }
         };
 
         if (video.readyState >= 2) {
@@ -596,7 +661,8 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             ref={videoRef}
             autoPlay
             playsInline
-            style={styles.video as any}
+            muted
+            style={styles.video as React.CSSProperties}
           />
 
           {isSwitchingCamera && (
@@ -1047,6 +1113,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     objectFit: 'cover',
+    backgroundColor: '#000',
   },
 
   topControls: {
