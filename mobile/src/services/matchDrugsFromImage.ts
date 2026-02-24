@@ -68,7 +68,12 @@ export async function findDrugMatchesFromImage(uri: string): Promise<{
   let queriesCompleted = 0;
   for (const candidate of candidates) {
     // keep queries short to avoid garbage
-    if (candidate.length < 3) continue;
+    if (candidate.length < 4 || candidate.length > 25) continue;
+
+    // Add small delay between searches to avoid rate limiting (50ms)
+    if (queriesCompleted > 0) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
 
     try {
       const results = await searchDrugs(candidate);
@@ -98,7 +103,11 @@ export async function findDrugMatchesFromImage(uri: string): Promise<{
       }
     } catch (error) {
       console.error(`[Match] Error searching for "${candidate}":`, error);
-      // ignore per-candidate failures
+      // If it's a rate limit error, propagate it
+      if (error instanceof Error && error.message.includes('Too many requests')) {
+        throw error;
+      }
+      // ignore other per-candidate failures
     }
   }
 
