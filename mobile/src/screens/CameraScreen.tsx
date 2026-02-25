@@ -259,7 +259,10 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   const runScanFromUri = useCallback(
     async (uri: string) => {
       try {
-        console.log('[CameraScreen] Starting scan with URI:', uri.substring(0, 50));
+        console.log(
+          '[CameraScreen] Starting scan with URI:',
+          uri.substring(0, 50)
+        );
         setIsProcessing(true);
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
@@ -497,10 +500,10 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             const url = URL.createObjectURL(blob);
             webImageUrlRef.current = url;
             console.log('Setting webImageUri to:', url.substring(0, 50));
-            
+
             // Stop camera before showing preview
             stopWebCamera();
-            
+
             // Set the image URI
             setWebImageUri(url);
             setIsCapturing(false);

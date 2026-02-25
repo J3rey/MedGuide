@@ -30,12 +30,18 @@ export default function ScanResultsScreen({
 
     (async () => {
       try {
-        console.log('[ScanResults] Starting scan with URI:', uri.substring(0, 50));
+        console.log(
+          '[ScanResults] Starting scan with URI:',
+          uri.substring(0, 50)
+        );
         setLoading(true);
         setError(null);
 
         const res = await findDrugMatchesFromImage(uri);
-        console.log('[ScanResults] Scan complete, matches:', res.matches.length);
+        console.log(
+          '[ScanResults] Scan complete, matches:',
+          res.matches.length
+        );
 
         if (!mounted) return;
 
