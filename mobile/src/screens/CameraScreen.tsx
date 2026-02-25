@@ -124,7 +124,14 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 
   // Ensure video element plays when stream is available (web only)
   useEffect(() => {
-    if (Platform.OS !== 'web' || !webCameraStream || !videoRef.current || isCapturing || webImageUri) return;
+    if (
+      Platform.OS !== 'web' ||
+      !webCameraStream ||
+      !videoRef.current ||
+      isCapturing ||
+      webImageUri
+    )
+      return;
 
     const video = videoRef.current;
     let isMounted = true;
