@@ -5,12 +5,20 @@ export async function uriToBase64(uri: string): Promise<string> {
   // If it's already a data URL, just extract the base64 part
   if (uri.startsWith('data:')) {
     console.log(
-      '[uriToBase64] URI is already a data URL, extracting base64 portion'
+      '[uriToBase64] URI is already a data URL, length:',
+      uri.length
     );
-    const base64 = uri.split(',')[1];
-    if (!base64) {
-      throw new Error('Invalid data URL format');
+    const parts = uri.split(',');
+    if (parts.length < 2) {
+      console.error('[uriToBase64] Invalid data URL - no comma separator found');
+      throw new Error('Invalid data URL format - missing comma separator');
     }
+    const base64 = parts[1];
+    if (!base64 || base64.length === 0) {
+      console.error('[uriToBase64] Invalid data URL - empty base64 portion');
+      throw new Error('Invalid data URL format - empty base64 data');
+    }
+    console.log('[uriToBase64] Extracted base64, length:', base64.length);
     return base64;
   }
 

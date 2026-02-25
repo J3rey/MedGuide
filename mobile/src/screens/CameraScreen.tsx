@@ -711,8 +711,19 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
                 isProcessing && styles.buttonDisabled,
               ]}
               onPress={async () => {
-                if (!webImageUri || isProcessing) return;
+                console.log('[CameraScreen] Scan button pressed');
+                console.log('[CameraScreen] webImageUri exists:', !!webImageUri);
+                console.log('[CameraScreen] isProcessing:', isProcessing);
+                console.log('[CameraScreen] webImageUri preview:', webImageUri?.substring(0, 100));
+                
+                if (!webImageUri || isProcessing) {
+                  console.log('[CameraScreen] Scan blocked - no URI or already processing');
+                  return;
+                }
+                
+                console.log('[CameraScreen] Starting scan...');
                 await runScanFromUri(webImageUri);
+                console.log('[CameraScreen] Scan function completed');
               }}
               disabled={isProcessing}
               activeOpacity={0.8}
