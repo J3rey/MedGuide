@@ -522,12 +522,14 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             webImageUrlRef.current = url;
             console.log('Setting webImageUri to:', url.substring(0, 50));
 
-            // Stop camera before showing preview
-            stopWebCamera();
-
-            // Set the image URI
+            // Set the image URI first (prevents useEffect from trying to play)
             setWebImageUri(url);
-            setIsCapturing(false);
+
+            // Then stop camera stream after a brief delay
+            setTimeout(() => {
+              stopWebCamera();
+              setIsCapturing(false);
+            }, 100);
           } else {
             console.error('Failed to create image blob or blob is empty');
             alert('Failed to capture photo. Please try again.');
