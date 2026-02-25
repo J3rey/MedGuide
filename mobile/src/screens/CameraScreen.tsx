@@ -259,11 +259,14 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   const runScanFromUri = useCallback(
     async (uri: string) => {
       try {
+        console.log('[CameraScreen] Starting scan with URI:', uri.substring(0, 50));
         setIsProcessing(true);
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
         // Navigate to ScanResults with the URI
+        console.log('[CameraScreen] Navigating to ScanResults...');
         navigation.navigate('ScanResults', { uri });
+        console.log('[CameraScreen] Navigation complete');
       } catch (error) {
         console.error('[CameraScreen] Error processing image:', error);
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -273,7 +276,8 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
           [{ text: 'OK' }]
         );
       } finally {
-        setIsProcessing(false);
+        // Don't set isProcessing to false immediately - let the nav complete
+        setTimeout(() => setIsProcessing(false), 500);
       }
     },
     [navigation, t]
@@ -389,16 +393,26 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   }, [webCameraStream]);
 
   const takeWebPhoto = useCallback(() => {
-    if (!videoRef.current) {
-      console.error('Video ref not available');
+    if (!videoRef.current || isCapturing) {
+      console.error('Video ref not available or already capturing');
       return;
     }
 
     const video = videoRef.current;
 
+    console.log('Starting photo capture...');
+    console.log('Video state:', {
+      readyState: video.readyState,
+      paused: video.paused,
+      ended: video.ended,
+      videoWidth: video.videoWidth,
+      videoHeight: video.videoHeight,
+      currentTime: video.currentTime,
+    });
+
     // Validate video is ready and has valid dimensions
     if (video.readyState < 2) {
-      console.error('Video not ready');
+      console.error('Video not ready, readyState:', video.readyState);
       alert('Camera not ready. Please wait a moment and try again.');
       return;
     }
@@ -421,41 +435,90 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       return;
     }
 
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    setIsCapturing(true);
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      console.error('Failed to get canvas context');
-      return;
-    }
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
 
-    // Draw the current video frame to canvas
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Failed to get canvas context');
+        setIsCapturing(false);
+        return;
+      }
 
-    // Convert to blob URL
-    canvas.toBlob(
-      (blob) => {
-        if (blob && blob.size > 0) {
-          // Revoke old URL if exists
-          if (webImageUrlRef.current) {
-            URL.revokeObjectURL(webImageUrlRef.current);
-          }
+      // Draw the current video frame to canvas
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-          const url = URL.createObjectURL(blob);
-          webImageUrlRef.current = url;
-          setWebImageUri(url);
-          stopWebCamera();
-        } else {
-          console.error('Failed to create image blob or blob is empty');
-          alert('Failed to capture photo. Please try again.');
+      // Validate that we actually captured some pixel data (not all black)
+      const imageData = ctx.getImageData(
+        0,
+        0,
+        Math.min(100, canvas.width),
+        Math.min(100, canvas.height)
+      );
+      let hasNonBlackPixels = false;
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        // Check if any RGB values are non-zero
+        if (
+          imageData.data[i] > 10 ||
+          imageData.data[i + 1] > 10 ||
+          imageData.data[i + 2] > 10
+        ) {
+          hasNonBlackPixels = true;
+          break;
         }
-      },
-      'image/jpeg',
-      CAMERA_CONSTANTS.WEB_JPEG_QUALITY
-    );
-  }, [stopWebCamera]);
+      }
+
+      if (!hasNonBlackPixels) {
+        console.error('Captured image appears to be completely black');
+        alert(
+          'Camera capture failed - image is black. Please ensure camera permissions are granted and try again.'
+        );
+        setIsCapturing(false);
+        return;
+      }
+
+      console.log('Canvas drawn successfully, converting to blob...');
+
+      // Convert to blob URL
+      canvas.toBlob(
+        (blob) => {
+          if (blob && blob.size > 0) {
+            console.log('Blob created successfully, size:', blob.size);
+
+            // Revoke old URL if exists
+            if (webImageUrlRef.current) {
+              URL.revokeObjectURL(webImageUrlRef.current);
+            }
+
+            const url = URL.createObjectURL(blob);
+            webImageUrlRef.current = url;
+            console.log('Setting webImageUri to:', url.substring(0, 50));
+            
+            // Stop camera before showing preview
+            stopWebCamera();
+            
+            // Set the image URI
+            setWebImageUri(url);
+            setIsCapturing(false);
+          } else {
+            console.error('Failed to create image blob or blob is empty');
+            alert('Failed to capture photo. Please try again.');
+            setIsCapturing(false);
+          }
+        },
+        'image/jpeg',
+        CAMERA_CONSTANTS.WEB_JPEG_QUALITY
+      );
+    } catch (error) {
+      console.error('Error during photo capture:', error);
+      alert('Failed to capture photo. Please try again.');
+      setIsCapturing(false);
+    }
+  }, [stopWebCamera, isCapturing]);
 
   const handleWebRetake = useCallback(() => {
     // Revoke old URL
@@ -660,10 +723,12 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             style={styles.video as React.CSSProperties}
           />
 
-          {isSwitchingCamera && (
+          {(isSwitchingCamera || isCapturing) && (
             <View style={styles.loadingOverlay}>
               <ActivityIndicator size="large" color={theme.colors.primary} />
-              <Text style={styles.loadingText}>{t('camera.switching')}</Text>
+              <Text style={styles.loadingText}>
+                {isSwitchingCamera ? t('camera.switching') : 'Capturing...'}
+              </Text>
             </View>
           )}
 
@@ -749,13 +814,18 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
                 {t('camera.positionLabel')}
               </Text>
               <TouchableOpacity
-                style={styles.shutter}
+                style={[styles.shutter, isCapturing && styles.shutterDisabled]}
                 onPress={takeWebPhoto}
+                disabled={isCapturing}
                 activeOpacity={0.8}
                 accessibilityLabel={t('camera.accessibility.shutter')}
                 accessibilityRole="button"
               >
-                <View style={styles.shutterInner} />
+                {isCapturing ? (
+                  <ActivityIndicator color={theme.colors.primary} />
+                ) : (
+                  <View style={styles.shutterInner} />
+                )}
               </TouchableOpacity>
             </View>
           </View>
