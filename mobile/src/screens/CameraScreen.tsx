@@ -36,7 +36,6 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   const { t } = useTranslation();
   const cameraRef = useRef<CameraView | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
-  const webImageUrlRef = useRef<string | null>(null);
   const videoReadyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null
   );
