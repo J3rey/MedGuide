@@ -4,13 +4,12 @@ import * as FileSystem from 'expo-file-system/legacy';
 export async function uriToBase64(uri: string): Promise<string> {
   // If it's already a data URL, just extract the base64 part
   if (uri.startsWith('data:')) {
-    console.log(
-      '[uriToBase64] URI is already a data URL, length:',
-      uri.length
-    );
+    console.log('[uriToBase64] URI is already a data URL, length:', uri.length);
     const parts = uri.split(',');
     if (parts.length < 2) {
-      console.error('[uriToBase64] Invalid data URL - no comma separator found');
+      console.error(
+        '[uriToBase64] Invalid data URL - no comma separator found'
+      );
       throw new Error('Invalid data URL format - missing comma separator');
     }
     const base64 = parts[1];
@@ -27,10 +26,17 @@ export async function uriToBase64(uri: string): Promise<string> {
     try {
       const res = await fetch(uri);
       if (!res.ok) {
-        throw new Error(`Failed to fetch blob: ${res.status} ${res.statusText}`);
+        throw new Error(
+          `Failed to fetch blob: ${res.status} ${res.statusText}`
+        );
       }
       const blob = await res.blob();
-      console.log('[uriToBase64] Blob fetched, size:', blob.size, 'type:', blob.type);
+      console.log(
+        '[uriToBase64] Blob fetched, size:',
+        blob.size,
+        'type:',
+        blob.type
+      );
 
       return await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -41,7 +47,10 @@ export async function uriToBase64(uri: string): Promise<string> {
             reject(new Error('Failed to extract base64 from data URL'));
             return;
           }
-          console.log('[uriToBase64] Successfully converted to base64, length:', base64.length);
+          console.log(
+            '[uriToBase64] Successfully converted to base64, length:',
+            base64.length
+          );
           resolve(base64);
         };
         reader.onerror = () =>

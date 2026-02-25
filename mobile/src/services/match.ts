@@ -27,7 +27,7 @@ function unique(arr: string[]): string[] {
 function likelyDrugName(token: string): boolean {
   // Filter out very short tokens (less likely to be drug names)
   if (token.length < 4) return false;
-  
+
   // Filter out very long tokens that are likely garbage OCR
   if (token.length > 25) return false;
 

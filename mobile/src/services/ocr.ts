@@ -45,14 +45,20 @@ export async function extractTextFromImage(uri: string): Promise<string> {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error('[OCR] API error:', errorData);
-      
+
       // Handle rate limit errors
       if (response.status === 429) {
-        throw new Error(errorData.message || 'Too many requests. Please wait a moment and try again.');
+        throw new Error(
+          errorData.message ||
+            'Too many requests. Please wait a moment and try again.'
+        );
       }
-      
+
       // Handle other errors
-      const errorMsg = errorData.message || errorData.error || `OCR API error: ${response.status}`;
+      const errorMsg =
+        errorData.message ||
+        errorData.error ||
+        `OCR API error: ${response.status}`;
       throw new Error(errorMsg);
     }
 

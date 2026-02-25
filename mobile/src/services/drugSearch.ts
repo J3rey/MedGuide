@@ -31,7 +31,9 @@ export async function searchDrugs(query: string): Promise<Drug[]> {
       // Handle rate limiting
       if (res.status === 429) {
         console.error('Drug search rate limited');
-        throw new Error('Too many requests. Please wait a moment and try again.');
+        throw new Error(
+          'Too many requests. Please wait a moment and try again.'
+        );
       }
       console.error(`Drug search failed: ${res.status}`);
       return [];
