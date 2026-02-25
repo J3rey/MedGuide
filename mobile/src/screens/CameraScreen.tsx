@@ -71,6 +71,12 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       if (videoReadyTimeoutRef.current) {
         clearTimeout(videoReadyTimeoutRef.current);
       }
+      // Clean up blob URL on unmount
+      if (webImageUrlRef.current) {
+        console.log('Cleaning up blob URL on unmount:', webImageUrlRef.current);
+        URL.revokeObjectURL(webImageUrlRef.current);
+        webImageUrlRef.current = null;
+      }
     };
   }, [webCameraStream]);
 
@@ -502,29 +508,38 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
         return;
       }
 
-      console.log('Canvas drawn successfully, converting to data URL...');
+      console.log('Canvas drawn successfully, converting to image...');
 
-      // Convert canvas to data URL (more compatible with React Native Web than blob URLs)
-      try {
-        const dataUrl = canvas.toDataURL(
-          'image/jpeg',
-          CAMERA_CONSTANTS.WEB_JPEG_QUALITY
-        );
-        console.log('Data URL created, length:', dataUrl.length);
+      // Convert canvas to blob and create a managed URL
+      // This is more reliable than data URLs for large images in React Native Web
+      canvas.toBlob(
+        (blob) => {
+          if (!blob || blob.size === 0) {
+            console.error('Failed to create image blob or blob is empty');
+            alert('Failed to capture photo. Please try again.');
+            setIsCapturing(false);
+            return;
+          }
 
-        // Set the image URI first (prevents useEffect from trying to play)
-        setWebImageUri(dataUrl);
+          console.log('Blob created, size:', blob.size, 'type:', blob.type);
 
-        // Then stop camera stream after a brief delay
-        setTimeout(() => {
-          stopWebCamera();
-          setIsCapturing(false);
-        }, 100);
-      } catch (dataUrlError) {
-        console.error('Failed to create data URL:', dataUrlError);
-        alert('Failed to capture photo. Please try again.');
-        setIsCapturing(false);
-      }
+          // Create blob URL and store reference
+          const blobUrl = URL.createObjectURL(blob);
+          webImageUrlRef.current = blobUrl;
+          console.log('Created blob URL that will persist:', blobUrl);
+
+          // Set the image URI (this triggers the preview render)
+          setWebImageUri(blobUrl);
+
+          // Then stop camera stream after a brief delay
+          setTimeout(() => {
+            stopWebCamera();
+            setIsCapturing(false);
+          }, 100);
+        },
+        'image/jpeg',
+        CAMERA_CONSTANTS.WEB_JPEG_QUALITY
+      );
     } catch (error) {
       console.error('Error during photo capture:', error);
       alert('Failed to capture photo. Please try again.');
@@ -533,8 +548,13 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   }, [stopWebCamera, isCapturing]);
 
   const handleWebRetake = useCallback(() => {
-    console.log('Retaking photo, clearing image URI');
-    // Using data URLs now, no need to revoke
+    console.log('Retaking photo');
+    // Revoke the blob URL to free memory
+    if (webImageUrlRef.current) {
+      console.log('Revoking blob URL:', webImageUrlRef.current);
+      URL.revokeObjectURL(webImageUrlRef.current);
+      webImageUrlRef.current = null;
+    }
     setWebImageUri(null);
   }, []);
 
@@ -666,10 +686,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   // Web platform: show camera capture UI
   if (Platform.OS === 'web') {
     if (webImageUri) {
-      console.log(
-        'Rendering image preview with data URL, length:',
-        webImageUri.length
-      );
+      console.log('Rendering image preview with blob URL:', webImageUri);
       // Show preview after capture
       return (
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -678,8 +695,8 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             style={styles.preview}
             onError={(error) => {
               console.error(
-                'Image load error, URI length:',
-                webImageUri.length,
+                'Image load error for blob URL:',
+                webImageUri,
                 'Error:',
                 error
               );
@@ -687,10 +704,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
               handleWebRetake();
             }}
             onLoad={() => {
-              console.log(
-                'Image loaded successfully, data URL length:',
-                webImageUri.length
-              );
+              console.log('Image loaded successfully from blob URL:', webImageUri);
             }}
           />
           <View style={styles.previewActions}>
