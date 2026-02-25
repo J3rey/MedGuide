@@ -666,7 +666,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   // Web platform: show camera capture UI
   if (Platform.OS === 'web') {
     if (webImageUri) {
-      console.log('Rendering image preview with blob URL:', webImageUri);
+      console.log('Rendering image preview with URI:', webImageUri.substring(0, 50) + '...');
       // Show preview after capture
       return (
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -675,8 +675,8 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             style={styles.preview}
             onError={(error) => {
               console.error(
-                'Image load error for blob URL:',
-                webImageUri,
+                'Image load error:',
+                webImageUri.substring(0, 50) + '...',
                 'Error:',
                 error
               );
@@ -685,8 +685,8 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             }}
             onLoad={() => {
               console.log(
-                'Image loaded successfully from blob URL:',
-                webImageUri
+                'Image loaded successfully, URI length:',
+                webImageUri.length
               );
             }}
           />
