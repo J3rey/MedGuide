@@ -395,7 +395,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     }
 
     const video = videoRef.current;
-    
+
     // Validate video is ready and has valid dimensions
     if (video.readyState < 2) {
       console.error('Video not ready');
@@ -404,8 +404,14 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     }
 
     if (video.videoWidth === 0 || video.videoHeight === 0) {
-      console.error('Video has invalid dimensions:', video.videoWidth, video.videoHeight);
-      alert('Camera not properly initialized. Please close and reopen the camera.');
+      console.error(
+        'Video has invalid dimensions:',
+        video.videoWidth,
+        video.videoHeight
+      );
+      alert(
+        'Camera not properly initialized. Please close and reopen the camera.'
+      );
       return;
     }
 
@@ -591,8 +597,8 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       // Show preview after capture
       return (
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-          <Image 
-            source={{ uri: webImageUri }} 
+          <Image
+            source={{ uri: webImageUri }}
             style={styles.preview}
             onError={(error) => {
               console.error('Image load error:', error);
@@ -832,8 +838,8 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   if (photoUri) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-        <Image 
-          source={{ uri: photoUri }} 
+        <Image
+          source={{ uri: photoUri }}
           style={styles.preview}
           onError={(error) => {
             console.error('Image load error:', error);
