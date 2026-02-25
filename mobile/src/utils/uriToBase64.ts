@@ -2,7 +2,18 @@ import { Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
 
 export async function uriToBase64(uri: string): Promise<string> {
+  // If it's already a data URL, just extract the base64 part
+  if (uri.startsWith('data:')) {
+    console.log('[uriToBase64] URI is already a data URL, extracting base64 portion');
+    const base64 = uri.split(',')[1];
+    if (!base64) {
+      throw new Error('Invalid data URL format');
+    }
+    return base64;
+  }
+
   if (Platform.OS === 'web') {
+    console.log('[uriToBase64] Fetching blob URL or file path:', uri.substring(0, 50));
     const res = await fetch(uri);
     const blob = await res.blob();
 
