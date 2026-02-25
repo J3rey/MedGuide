@@ -389,22 +389,49 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   }, [webCameraStream]);
 
   const takeWebPhoto = useCallback(() => {
-    if (!videoRef.current) return;
+    if (!videoRef.current) {
+      console.error('Video ref not available');
+      return;
+    }
 
     const video = videoRef.current;
+    
+    // Validate video is ready and has valid dimensions
+    if (video.readyState < 2) {
+      console.error('Video not ready');
+      alert('Camera not ready. Please wait a moment and try again.');
+      return;
+    }
+
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+      console.error('Video has invalid dimensions:', video.videoWidth, video.videoHeight);
+      alert('Camera not properly initialized. Please close and reopen the camera.');
+      return;
+    }
+
+    if (video.paused || video.ended) {
+      console.error('Video is paused or ended');
+      alert('Camera feed not active. Please refresh the page.');
+      return;
+    }
+
     const canvas = document.createElement('canvas');
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.error('Failed to get canvas context');
+      return;
+    }
 
-    ctx.drawImage(video, 0, 0);
+    // Draw the current video frame to canvas
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     // Convert to blob URL
     canvas.toBlob(
       (blob) => {
-        if (blob) {
+        if (blob && blob.size > 0) {
           // Revoke old URL if exists
           if (webImageUrlRef.current) {
             URL.revokeObjectURL(webImageUrlRef.current);
@@ -414,6 +441,9 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
           webImageUrlRef.current = url;
           setWebImageUri(url);
           stopWebCamera();
+        } else {
+          console.error('Failed to create image blob or blob is empty');
+          alert('Failed to capture photo. Please try again.');
         }
       },
       'image/jpeg',
@@ -561,7 +591,18 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       // Show preview after capture
       return (
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-          <Image source={{ uri: webImageUri }} style={styles.preview} />
+          <Image 
+            source={{ uri: webImageUri }} 
+            style={styles.preview}
+            onError={(error) => {
+              console.error('Image load error:', error);
+              alert('Failed to display captured image. Please try again.');
+              handleWebRetake();
+            }}
+            onLoad={() => {
+              console.log('Image loaded successfully');
+            }}
+          />
           <View style={styles.previewActions}>
             <TouchableOpacity
               style={styles.secondaryButton}
@@ -791,7 +832,21 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   if (photoUri) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-        <Image source={{ uri: photoUri }} style={styles.preview} />
+        <Image 
+          source={{ uri: photoUri }} 
+          style={styles.preview}
+          onError={(error) => {
+            console.error('Image load error:', error);
+            Alert.alert(
+              'Image Load Error',
+              'Failed to display captured photo. Please try again.',
+              [{ text: 'OK', onPress: retake }]
+            );
+          }}
+          onLoad={() => {
+            console.log('Photo loaded successfully');
+          }}
+        />
         <View style={styles.previewActions}>
           <TouchableOpacity
             style={styles.secondaryButton}
