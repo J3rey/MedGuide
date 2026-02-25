@@ -282,7 +282,11 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
           uri.substring(0, 50)
         );
         setIsProcessing(true);
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        
+        // Haptics only available on native platforms
+        if (Platform.OS !== 'web') {
+          await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        }
 
         // Navigate to ScanResults with the URI
         console.log('[CameraScreen] Navigating to ScanResults...');
@@ -290,7 +294,12 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
         console.log('[CameraScreen] Navigation complete');
       } catch (error) {
         console.error('[CameraScreen] Error processing image:', error);
-        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        
+        // Haptics only available on native platforms
+        if (Platform.OS !== 'web') {
+          await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        }
+        
         Alert.alert(
           t('camera.errors.processingErrorTitle'),
           t('camera.errors.processingErrorMessage'),
