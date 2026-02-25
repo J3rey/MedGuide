@@ -504,10 +504,13 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 
       console.log('Canvas drawn successfully, converting to data URL...');
 
-      // Convert canvas directly to data URL  
+      // Convert canvas directly to data URL
       // React Native Web handles data URLs better than blob URLs
       try {
-        const dataUrl = canvas.toDataURL('image/jpeg', CAMERA_CONSTANTS.WEB_JPEG_QUALITY);
+        const dataUrl = canvas.toDataURL(
+          'image/jpeg',
+          CAMERA_CONSTANTS.WEB_JPEG_QUALITY
+        );
         console.log('Data URL created successfully, length:', dataUrl.length);
 
         // Set the image URI (this triggers the preview render)
