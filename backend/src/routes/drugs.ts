@@ -78,10 +78,14 @@ router.get(
       }
 
       // Combine and deduplicate: prioritize exact matches, then fuzzy matches
-      const exactIds = new Set((exactMatches || []).map((d) => d.id));
+      const exactIds = new Set(
+        (exactMatches || []).map((d: { id: number }) => d.id)
+      );
       const combined = [
         ...(exactMatches || []),
-        ...(fuzzyMatches || []).filter((d) => !exactIds.has(d.id)),
+        ...(fuzzyMatches || []).filter(
+          (d: { id: number }) => !exactIds.has(d.id)
+        ),
       ].slice(0, 15);
 
       res.json(combined);
