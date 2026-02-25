@@ -666,7 +666,10 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   // Web platform: show camera capture UI
   if (Platform.OS === 'web') {
     if (webImageUri) {
-      console.log('Rendering image preview with URI:', webImageUri.substring(0, 50) + '...');
+      console.log(
+        'Rendering image preview with URI:',
+        webImageUri.substring(0, 50) + '...'
+      );
       // Show preview after capture
       return (
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
