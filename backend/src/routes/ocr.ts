@@ -70,8 +70,8 @@ If handwritten, do your best to read medication names only.`;
     });
   } catch (error) {
     console.error('[OCR Extract] Error:', error);
-    const errorObj = error as any;
-    
+    const errorObj = error as { response?: unknown; status?: unknown; message?: string };
+
     // Log full error for debugging
     if (errorObj.response) {
       console.error('[OCR Extract] Gemini API Response:', errorObj.response);
@@ -79,32 +79,39 @@ If handwritten, do your best to read medication names only.`;
     if (errorObj.status) {
       console.error('[OCR Extract] Error status:', errorObj.status);
     }
-    
+
     // Check for Gemini API rate limit errors
     const errorMessage = error instanceof Error ? error.message : '';
     const errorString = JSON.stringify(errorObj);
-    
-    if (errorMessage.includes('quota') || 
-        errorMessage.includes('429') || 
-        errorMessage.includes('Resource has been exhausted') ||
-        errorString.includes('RESOURCE_EXHAUSTED') ||
-        errorObj.status === 429) {
+
+    if (
+      errorMessage.includes('quota') ||
+      errorMessage.includes('429') ||
+      errorMessage.includes('Resource has been exhausted') ||
+      errorString.includes('RESOURCE_EXHAUSTED') ||
+      errorObj.status === 429
+    ) {
       console.error('[OCR Extract] Gemini API quota exceeded');
       return res.status(429).json({
         error: 'Rate limit exceeded',
-        message: 'The AI vision service has reached its limit. Please try again in a few moments.',
+        message:
+          'The AI vision service has reached its limit. Please try again in a few moments.',
       });
     }
-    
+
     // Check for invalid API key
-    if (errorMessage.includes('API key') || errorMessage.includes('invalid') || errorObj.status === 400) {
+    if (
+      errorMessage.includes('API key') ||
+      errorMessage.includes('invalid') ||
+      errorObj.status === 400
+    ) {
       console.error('[OCR Extract] API key issue');
       return res.status(500).json({
         error: 'Configuration error',
         message: 'Server configuration issue. Please contact support.',
       });
     }
-    
+
     res.status(500).json({
       error: 'OCR processing failed',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -177,8 +184,8 @@ If handwritten, do your best to read medication names only.`;
       });
     } catch (error) {
       console.error('[OCR Upload] Error:', error);
-      const errorObj = error as any;
-      
+      const errorObj = error as { response?: unknown; status?: unknown; message?: string };
+
       // Log full error for debugging
       if (errorObj.response) {
         console.error('[OCR Upload] Gemini API Response:', errorObj.response);
@@ -186,32 +193,39 @@ If handwritten, do your best to read medication names only.`;
       if (errorObj.status) {
         console.error('[OCR Upload] Error status:', errorObj.status);
       }
-      
+
       // Check for Gemini API rate limit errors
       const errorMessage = error instanceof Error ? error.message : '';
       const errorString = JSON.stringify(errorObj);
-      
-      if (errorMessage.includes('quota') || 
-          errorMessage.includes('429') || 
-          errorMessage.includes('Resource has been exhausted') ||
-          errorString.includes('RESOURCE_EXHAUSTED') ||
-          errorObj.status === 429) {
+
+      if (
+        errorMessage.includes('quota') ||
+        errorMessage.includes('429') ||
+        errorMessage.includes('Resource has been exhausted') ||
+        errorString.includes('RESOURCE_EXHAUSTED') ||
+        errorObj.status === 429
+      ) {
         console.error('[OCR Upload] Gemini API quota exceeded');
         return res.status(429).json({
           error: 'Rate limit exceeded',
-          message: 'The AI vision service has reached its limit. Please try again in a few moments.',
+          message:
+            'The AI vision service has reached its limit. Please try again in a few moments.',
         });
       }
-      
+
       // Check for invalid API key
-      if (errorMessage.includes('API key') || errorMessage.includes('invalid') || errorObj.status === 400) {
+      if (
+        errorMessage.includes('API key') ||
+        errorMessage.includes('invalid') ||
+        errorObj.status === 400
+      ) {
         console.error('[OCR Upload] API key issue');
         return res.status(500).json({
           error: 'Configuration error',
           message: 'Server configuration issue. Please contact support.',
         });
       }
-      
+
       res.status(500).json({
         error: 'OCR processing failed',
         message: error instanceof Error ? error.message : 'Unknown error',
