@@ -70,7 +70,11 @@ If handwritten, do your best to read medication names only.`;
     });
   } catch (error) {
     console.error('[OCR Extract] Error:', error);
-    const errorObj = error as { response?: unknown; status?: unknown; message?: string };
+    const errorObj = error as {
+      response?: unknown;
+      status?: unknown;
+      message?: string;
+    };
 
     // Log full error for debugging
     if (errorObj.response) {
@@ -184,7 +188,11 @@ If handwritten, do your best to read medication names only.`;
       });
     } catch (error) {
       console.error('[OCR Upload] Error:', error);
-      const errorObj = error as { response?: unknown; status?: unknown; message?: string };
+      const errorObj = error as {
+        response?: unknown;
+        status?: unknown;
+        message?: string;
+      };
 
       // Log full error for debugging
       if (errorObj.response) {
