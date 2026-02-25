@@ -62,20 +62,27 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   const [webFlash, setWebFlash] = useState<'off' | 'on'>('off');
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Cleanup camera stream and URLs on unmount
+  // Cleanup camera stream on unmount (don't revoke blob URLs here)
   useEffect(() => {
     return () => {
       if (webCameraStream) {
         webCameraStream.getTracks().forEach((track) => track.stop());
-      }
-      if (webImageUrlRef.current) {
-        URL.revokeObjectURL(webImageUrlRef.current);
       }
       if (videoReadyTimeoutRef.current) {
         clearTimeout(videoReadyTimeoutRef.current);
       }
     };
   }, [webCameraStream]);
+
+  // Cleanup blob URL only on component unmount
+  useEffect(() => {
+    return () => {
+      if (webImageUrlRef.current) {
+        console.log('Cleaning up blob URL on unmount');
+        URL.revokeObjectURL(webImageUrlRef.current);
+      }
+    };
+  }, []);
 
   // Pause camera when app backgrounds (mobile only)
   useEffect(() => {
@@ -511,16 +518,18 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       canvas.toBlob(
         (blob) => {
           if (blob && blob.size > 0) {
-            console.log('Blob created successfully, size:', blob.size);
+            console.log('Blob created successfully, size:', blob.size, 'type:', blob.type);
 
-            // Revoke old URL if exists
+            // Revoke old URL if exists (before creating new one)
             if (webImageUrlRef.current) {
+              console.log('Revoking old blob URL:', webImageUrlRef.current);
               URL.revokeObjectURL(webImageUrlRef.current);
+              webImageUrlRef.current = null;
             }
 
             const url = URL.createObjectURL(blob);
             webImageUrlRef.current = url;
-            console.log('Setting webImageUri to:', url.substring(0, 50));
+            console.log('Created new blob URL:', url);
 
             // Set the image URI first (prevents useEffect from trying to play)
             setWebImageUri(url);
@@ -547,6 +556,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   }, [stopWebCamera, isCapturing]);
 
   const handleWebRetake = useCallback(() => {
+    console.log('Retaking photo, revoking blob URL');
     // Revoke old URL
     if (webImageUrlRef.current) {
       URL.revokeObjectURL(webImageUrlRef.current);
@@ -683,6 +693,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   // Web platform: show camera capture UI
   if (Platform.OS === 'web') {
     if (webImageUri) {
+      console.log('Rendering image preview with URI:', webImageUri);
       // Show preview after capture
       return (
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -690,12 +701,12 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             source={{ uri: webImageUri }}
             style={styles.preview}
             onError={(error) => {
-              console.error('Image load error:', error);
+              console.error('Image load error for URI:', webImageUri, 'Error:', error);
               alert('Failed to display captured image. Please try again.');
               handleWebRetake();
             }}
             onLoad={() => {
-              console.log('Image loaded successfully');
+              console.log('Image loaded successfully from URI:', webImageUri);
             }}
           />
           <View style={styles.previewActions}>
