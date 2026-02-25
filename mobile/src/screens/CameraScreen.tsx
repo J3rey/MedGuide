@@ -518,7 +518,12 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       canvas.toBlob(
         (blob) => {
           if (blob && blob.size > 0) {
-            console.log('Blob created successfully, size:', blob.size, 'type:', blob.type);
+            console.log(
+              'Blob created successfully, size:',
+              blob.size,
+              'type:',
+              blob.type
+            );
 
             // Revoke old URL if exists (before creating new one)
             if (webImageUrlRef.current) {
@@ -701,7 +706,12 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             source={{ uri: webImageUri }}
             style={styles.preview}
             onError={(error) => {
-              console.error('Image load error for URI:', webImageUri, 'Error:', error);
+              console.error(
+                'Image load error for URI:',
+                webImageUri,
+                'Error:',
+                error
+              );
               alert('Failed to display captured image. Please try again.');
               handleWebRetake();
             }}
