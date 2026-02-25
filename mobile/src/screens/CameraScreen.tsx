@@ -124,20 +124,29 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 
   // Ensure video element plays when stream is available (web only)
   useEffect(() => {
-    if (Platform.OS !== 'web' || !webCameraStream || !videoRef.current) return;
+    if (Platform.OS !== 'web' || !webCameraStream || !videoRef.current || isCapturing || webImageUri) return;
 
     const video = videoRef.current;
+    let isMounted = true;
 
     const ensureVideoPlaying = async () => {
+      if (!isMounted || isCapturing || webImageUri) return;
+
       if (video.srcObject !== webCameraStream) {
         video.srcObject = webCameraStream;
       }
 
-      if (video.paused) {
+      if (video.paused && isMounted && !isCapturing && !webImageUri) {
         try {
-          await video.play();
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            await playPromise;
+          }
         } catch (err) {
-          console.error('Failed to play video in useEffect:', err);
+          // Ignore AbortError - it happens when we're transitioning away
+          if (err instanceof Error && err.name !== 'AbortError') {
+            console.error('Failed to play video:', err);
+          }
         }
       }
     };
@@ -146,10 +155,15 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     ensureVideoPlaying();
 
     // Also try after a short delay
-    const timeout = setTimeout(ensureVideoPlaying, 500);
+    const timeout = setTimeout(() => {
+      if (isMounted) ensureVideoPlaying();
+    }, 500);
 
-    return () => clearTimeout(timeout);
-  }, [webCameraStream]);
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+    };
+  }, [webCameraStream, isCapturing, webImageUri]);
 
   /**
    * Mobile camera handlers
