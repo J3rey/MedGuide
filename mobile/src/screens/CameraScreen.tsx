@@ -704,7 +704,10 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
               handleWebRetake();
             }}
             onLoad={() => {
-              console.log('Image loaded successfully from blob URL:', webImageUri);
+              console.log(
+                'Image loaded successfully from blob URL:',
+                webImageUri
+              );
             }}
           />
           <View style={styles.previewActions}>
