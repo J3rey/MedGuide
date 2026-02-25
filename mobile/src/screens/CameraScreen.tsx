@@ -506,7 +506,10 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 
       // Convert canvas to data URL (more compatible with React Native Web than blob URLs)
       try {
-        const dataUrl = canvas.toDataURL('image/jpeg', CAMERA_CONSTANTS.WEB_JPEG_QUALITY);
+        const dataUrl = canvas.toDataURL(
+          'image/jpeg',
+          CAMERA_CONSTANTS.WEB_JPEG_QUALITY
+        );
         console.log('Data URL created, length:', dataUrl.length);
 
         // Set the image URI first (prevents useEffect from trying to play)
@@ -663,7 +666,10 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
   // Web platform: show camera capture UI
   if (Platform.OS === 'web') {
     if (webImageUri) {
-      console.log('Rendering image preview with data URL, length:', webImageUri.length);
+      console.log(
+        'Rendering image preview with data URL, length:',
+        webImageUri.length
+      );
       // Show preview after capture
       return (
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -681,7 +687,10 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
               handleWebRetake();
             }}
             onLoad={() => {
-              console.log('Image loaded successfully, data URL length:', webImageUri.length);
+              console.log(
+                'Image loaded successfully, data URL length:',
+                webImageUri.length
+              );
             }}
           />
           <View style={styles.previewActions}>
