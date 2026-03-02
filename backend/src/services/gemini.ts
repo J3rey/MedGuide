@@ -203,6 +203,10 @@ export const chat = async (
     '에 대해 알려주세요', // Korean
     'cuéntame sobre', // Spanish
     'dimmi di', // Italian
+    'beritahu saya tentang', // Indonesian
+    'beritahu saya', // Indonesian
+    'मुझे बताएं', // Hindi
+    'के बारे में बताएं', // Hindi
   ];
 
   // Check if this is an initial "Tell me about" query
@@ -213,16 +217,33 @@ export const chat = async (
 
   // Define valid keywords in multiple languages
   const validKeywords = [
-    // English
+    // English - expanded to catch more variations
     'counseling',
+    'counsel',
+    'how to take',
+    'dosage',
+    'dose',
     'adverse effects',
+    'adverse affects',
     'side effects',
+    'side affects',
+    'effects',
+    'affects',
     'pregnancy precautions',
     'pregnancy',
+    'pregnant',
+    'safe during pregnancy',
+    'safe for pregnancy',
     'children precautions',
     'children',
+    'kids',
+    'pediatric',
+    'safe for children',
     'breastfeeding precautions',
     'breastfeeding',
+    'nursing',
+    'lactation',
+    'safe for breastfeeding',
 
     // Chinese
     '咨询',
@@ -271,6 +292,40 @@ export const chat = async (
     'bambini',
     "precauzioni durante l'allattamento",
     'allattamento',
+
+    // Indonesian
+    'konseling',
+    'cara mengonsumsi',
+    'cara minum',
+    'efek samping',
+    'efek buruk',
+    'kehamilan',
+    'hamil',
+    'aman untuk kehamilan',
+    'anak-anak',
+    'anak',
+    'aman untuk anak',
+    'menyusui',
+    'ibu menyusui',
+    'aman untuk menyusui',
+
+    // Hindi
+    'परामर्श',
+    'सलाह',
+    'कैसे लें',
+    'खुराक',
+    'दुष्प्रभाव',
+    'साइड इफेक्ट',
+    'प्रभाव',
+    'गर्भावस्था',
+    'गर्भवती',
+    'गर्भावस्था के लिए सुरक्षित',
+    'बच्चे',
+    'बच्चों',
+    'बच्चों के लिए सुरक्षित',
+    'स्तनपान',
+    'दूध पिलाना',
+    'स्तनपान के लिए सुरक्षित',
   ];
 
   // Check if user query contains valid keywords
@@ -286,7 +341,7 @@ export const chat = async (
 
   // If no drugs found
   if (drugs.length === 0) {
-    return "I don't have information about that medication in my database. Please consult a healthcare professional.";
+    return "I don't have information about that medication in my database. Please consult your pharmacist or healthcare provider for accurate information.";
   }
 
   // For initial queries, only show indications
@@ -296,21 +351,25 @@ export const chat = async (
     // Define keyword list for different languages
     const keywordListForPrompt: Record<string, string> = {
       English:
-        'counseling, adverse effects, pregnancy precautions, children precautions, or breastfeeding precautions',
+        'how to take it, side effects, if it\'s safe for pregnancy, for children, or for breastfeeding individuals',
       Chinese:
-        '咨询/用法、不良反应/副作用、妊娠注意事项、儿童注意事项或哺乳注意事项',
+        '如何服用、副作用、怀孕期间是否安全、儿童是否安全或哺乳期间是否安全',
       Korean:
-        '상담/복용법, 부작용, 임신 주의사항, 어린이 주의사항 또는 수유 주의사항',
+        '복용 방법, 부작용, 임신 중 안전성, 어린이 안전성 또는 수유 중 안전성',
       Spanish:
-        'asesoramiento, efectos adversos, precauciones durante el embarazo, precauciones para niños o precauciones durante la lactancia',
+        'cómo tomarlo, efectos secundarios, si es seguro durante el embarazo, para niños o para personas en lactancia',
       Italian:
-        "consulenza, effetti avversi, precauzioni in gravidanza, precauzioni per bambini o precauzioni durante l'allattamento",
+        'come assumerlo, effetti collaterali, se è sicuro in gravidanza, per bambini o per persone che allattano',
+      Indonesian:
+        'cara mengonsumsinya, efek samping, apakah aman untuk kehamilan, untuk anak-anak, atau untuk ibu menyusui',
+      Hindi:
+        'इसे कैसे लें, दुष्प्रभाव, क्या यह गर्भावस्था के लिए सुरक्षित है, बच्चों के लिए, या स्तनपान कराने वालों के लिए',
     };
 
     const keywordList =
       keywordListForPrompt[language] || keywordListForPrompt['English'];
 
-    const prompt = `You are MedGuide Assistant. Provide a brief, clear explanation of what this medication is used for based on the INDICATIONS information below.
+    const prompt = `You are MedGuide Assistant. Provide a brief, clear explanation of what this medication is used for based STRICTLY on the INDICATIONS information below.
 
 LANGUAGE: Respond in ${language}
 
@@ -319,10 +378,13 @@ ${drugData}
 
 USER QUESTION: ${message}
 
-Instructions:
-- Explain what the medication is used for in a friendly, conversational way
-- Keep it concise (2-3 sentences)
-- Add this at the end: "If you'd like more information, you can ask about: ${keywordList}."`;
+CRITICAL RULES:
+1. Use ONLY the information provided in the INDICATIONS field above
+2. If INDICATIONS shows "Not available", respond: "The indication information is not available in our database. Please consult your pharmacist for information about what this medication is used for."
+3. Do NOT add any medical advice, suggestions, or information not explicitly stated in the database
+4. Explain what the medication is used for in a friendly, conversational way
+5. Keep it concise (2-3 sentences)
+6. Add this at the end: "If you'd like more information, you can ask about: ${keywordList}."`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -334,19 +396,25 @@ Instructions:
     // Return multilingual error message based on language
     const keywordMessages: Record<string, string> = {
       English:
-        "I can only provide specific information when you use these keywords in your question:\n\n• Counseling (how to take the medication)\n• Adverse effects (side effects)\n• Pregnancy precautions\n• Children precautions\n• Breastfeeding precautions\n\nFor example, you can ask: 'What are the adverse effects?' or 'Tell me about pregnancy precautions.'",
+        "I can only provide specific information about medications in the database when you ask about:\n\n• How to take the medication\n• Side effects\n• Safety for pregnancy\n• Safety for children\n• Safety for breastfeeding\n\nFor example, you can ask: 'What are the side effects of [medication name]?' or 'Is [medication name] safe during pregnancy?'",
 
       Chinese:
-        "我只能在您的问题中使用这些关键词时提供具体信息：\n\n• 咨询/用法（如何服用药物）\n• 不良反应/副作用\n• 妊娠注意事项/怀孕\n• 儿童注意事项/儿童\n• 哺乳注意事项/哺乳\n\n例如，您可以问：'不良反应是什么？'或'告诉我关于妊娠注意事项'。",
+        "当您询问以下内容时，我只能提供数据库中药物的具体信息：\n\n• 如何服用药物\n• 副作用\n• 怀孕期间的安全性\n• 儿童的安全性\n• 哺乳期间的安全性\n\n例如，您可以问：'[药物名称]的副作用是什么？'或'[药物名称]在怀孕期间安全吗？'",
 
       Korean:
-        "다음 키워드를 질문에 사용할 때만 구체적인 정보를 제공할 수 있습니다:\n\n• 상담/복용법 (약물 복용 방법)\n• 부작용\n• 임신 주의사항/임신\n• 어린이 주의사항/어린이\n• 수유 주의사항/수유\n\n예를 들어: '부작용은 무엇인가요?' 또는 '임신 주의사항에 대해 알려주세요'라고 물어볼 수 있습니다.",
+        "다음에 대해 질문할 때만 데이터베이스의 약물에 대한 구체적인 정보를 제공할 수 있습니다:\n\n• 약물 복용 방법\n• 부작용\n• 임신 중 안전성\n• 어린이 안전성\n• 수유 중 안전성\n\n예: '[약물명]의 부작용은 무엇인가요?' 또는 '[약물명]은 임신 중 안전한가요?'",
 
       Spanish:
-        "Solo puedo proporcionar información específica cuando usa estas palabras clave en su pregunta:\n\n• Asesoramiento/consejos (cómo tomar el medicamento)\n• Efectos adversos/efectos secundarios\n• Precauciones durante el embarazo/embarazo\n• Precauciones para niños/niños\n• Precauciones durante la lactancia/lactancia\n\nPor ejemplo, puede preguntar: '¿Cuáles son los efectos adversos?' o 'Cuéntame sobre las precauciones durante el embarazo'.",
+        "Solo puedo proporcionar información específica sobre medicamentos en la base de datos cuando pregunta sobre:\n\n• Cómo tomar el medicamento\n• Efectos secundarios\n• Seguridad durante el embarazo\n• Seguridad para niños\n• Seguridad durante la lactancia\n\nPor ejemplo: '¿Cuáles son los efectos secundarios de [nombre del medicamento]?' o '¿Es seguro [nombre del medicamento] durante el embarazo?'",
 
       Italian:
-        "Posso fornire informazioni specifiche solo quando usi queste parole chiave nella tua domanda:\n\n• Consulenza/consigli (come assumere il farmaco)\n• Effetti avversi/effetti collaterali\n• Precauzioni in gravidanza/gravidanza\n• Precauzioni per bambini/bambini\n• Precauzioni durante l'allattamento/allattamento\n\nAd esempio, puoi chiedere: 'Quali sono gli effetti avversi?' o 'Dimmi delle precauzioni in gravidanza'.",
+        "Posso fornire informazioni specifiche sui farmaci nel database solo quando chiedi di:\n\n• Come assumere il farmaco\n• Effetti collaterali\n• Sicurezza in gravidanza\n• Sicurezza per bambini\n• Sicurezza durante l'allattamento\n\nAd esempio: 'Quali sono gli effetti collaterali di [nome del farmaco]?' o '[nome del farmaco] è sicuro in gravidanza?'",
+
+      Indonesian:
+        "Saya hanya dapat memberikan informasi spesifik tentang obat dalam database ketika Anda bertanya tentang:\n\n• Cara mengonsumsi obat\n• Efek samping\n• Keamanan untuk kehamilan\n• Keamanan untuk anak-anak\n• Keamanan untuk menyusui\n\nContoh: 'Apa efek samping dari [nama obat]?' atau 'Apakah [nama obat] aman selama kehamilan?'",
+
+      Hindi:
+        "मैं केवल डेटाबेस में दवाओं के बारे में विशिष्ट जानकारी प्रदान कर सकता हूं जब आप निम्नलिखित के बारे में पूछें:\n\n• दवा कैसे लें\n• दुष्प्रभाव\n• गर्भावस्था के लिए सुरक्षा\n• बच्चों के लिए सुरक्षा\n• स्तनपान के लिए सुरक्षा\n\nउदाहरण: '[दवा का नाम] के दुष्प्रभाव क्या हैं?' या 'क्या [दवा का नाम] गर्भावस्था के दौरान सुरक्षित है?'",
     };
 
     return keywordMessages[language] || keywordMessages['English'];
@@ -358,17 +426,22 @@ Instructions:
   const prompt = `You are MedGuide Assistant. Answer the user's question using ONLY the information from the database below.
 
 CRITICAL RULES:
-1. Only provide information that is explicitly in the DATABASE INFORMATION section
-2. Focus on the specific aspect the user asked about (counseling, adverse effects, pregnancy precautions, children precautions, or breastfeeding precautions)
-3. Be concise and clear
-4. Always add a disclaimer: "This is for informational purposes only. Please consult your healthcare provider."
+1. ONLY provide information that is explicitly stated in the DATABASE INFORMATION section below
+2. If any requested field shows "Not available", you MUST state: "This information is not available in our database. Please consult your pharmacist for details."
+3. Do NOT make up, infer, or add ANY information that is not explicitly written in the database
+4. Do NOT provide medical advice, suggestions, or recommendations beyond what is in the database
+5. Focus on the specific aspect the user asked about (counseling, adverse effects, pregnancy precautions, children precautions, or breastfeeding precautions)
+6. Be concise and clear
+7. Always end with: "This information is from our database and is for informational purposes only. Please consult your pharmacist or healthcare provider for personalized medical advice."
 
 LANGUAGE: Respond in ${language}
 
 DATABASE INFORMATION:
 ${drugData}
 
-USER QUESTION: ${message}`;
+USER QUESTION: ${message}
+
+Remember: If the specific information requested is "Not available" in the database, you must tell the user to consult their pharmacist instead of trying to provide general information.`;
 
   const result = await model.generateContent(prompt);
   const response = await result.response;
