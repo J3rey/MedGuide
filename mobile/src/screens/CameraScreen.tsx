@@ -1269,7 +1269,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: theme.spacing.xl,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
