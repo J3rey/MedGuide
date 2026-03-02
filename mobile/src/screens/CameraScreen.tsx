@@ -957,7 +957,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 
   if (photoUri) {
     return (
-      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.container} edges={['top']}>
         <Image
           source={{ uri: photoUri }}
           style={styles.preview}
