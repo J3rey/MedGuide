@@ -37,9 +37,9 @@ router.post('/ocr/extract', async (req: Request, res: Response) => {
 
     console.log('[OCR Extract] Processing base64 image, length:', image.length);
 
-    // Use gemini-1.5-flash model for vision
+    // Use gemini-1.5-flash-latest model for vision
     const genAI = getGeminiAI();
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
     const prompt = `Extract ONLY medication/drug names from this image. Look for drug names on medicine labels, packages, boxes, or prescriptions. 
 Return each drug name on a new line, nothing else. 
@@ -155,9 +155,9 @@ router.post(
       const base64Image = fileData.buffer.toString('base64');
       const mimeType = fileData.mimetype || 'image/jpeg';
 
-      // Use gemini-1.5-flash model for vision
+      // Use gemini-1.5-flash-latest model for vision
       const genAI = getGeminiAI();
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
       const prompt = `Extract ONLY medication/drug names from this image. Look for drug names on medicine labels, packages, boxes, or prescriptions. 
 Return each drug name on a new line, nothing else. 
