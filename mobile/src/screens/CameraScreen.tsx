@@ -682,7 +682,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       );
       // Show preview after capture
       return (
-        <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <SafeAreaView style={styles.container} edges={['top']}>
           <Image
             source={{ uri: webImageUri }}
             style={styles.preview}
@@ -764,7 +764,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     // Show camera capture interface
     if (webCameraStream) {
       return (
-        <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <SafeAreaView style={styles.container} edges={['top']}>
           <video
             ref={videoRef}
             autoPlay
@@ -782,7 +782,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             </View>
           )}
 
-          <View style={styles.topControls}>
+          <SafeAreaView style={styles.topControls} edges={['top']}>
             <TouchableOpacity
               style={styles.controlButton}
               onPress={toggleWebFlash}
@@ -811,7 +811,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
                   : t('camera.cameraFront')}
               </Text>
             </TouchableOpacity>
-          </View>
+          </SafeAreaView>
 
           {webZoom > 1 && (
             <View style={styles.zoomIndicator}>
@@ -858,27 +858,41 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.captureBar}>
+          <SafeAreaView style={styles.captureBar} edges={['bottom']}>
             <View style={styles.captureContent}>
-              <Text style={styles.captureText}>
-                {t('camera.positionLabel')}
-              </Text>
               <TouchableOpacity
-                style={[styles.shutter, isCapturing && styles.shutterDisabled]}
-                onPress={takeWebPhoto}
-                disabled={isCapturing}
+                style={styles.galleryButton}
+                onPress={pickFromGallery}
                 activeOpacity={0.8}
-                accessibilityLabel={t('camera.accessibility.shutter')}
+                accessibilityLabel={t('camera.accessibility.chooseGallery')}
                 accessibilityRole="button"
               >
-                {isCapturing ? (
-                  <ActivityIndicator color={theme.colors.primary} />
-                ) : (
-                  <View style={styles.shutterInner} />
-                )}
+                <Text style={styles.galleryButtonText}>📁</Text>
               </TouchableOpacity>
+
+              <View style={styles.centerColumn}>
+                <Text style={styles.captureText}>
+                  {t('camera.positionLabel')}
+                </Text>
+                <TouchableOpacity
+                  style={[styles.shutter, isCapturing && styles.shutterDisabled]}
+                  onPress={takeWebPhoto}
+                  disabled={isCapturing}
+                  activeOpacity={0.8}
+                  accessibilityLabel={t('camera.accessibility.shutter')}
+                  accessibilityRole="button"
+                >
+                  {isCapturing ? (
+                    <ActivityIndicator color={theme.colors.primary} />
+                  ) : (
+                    <View style={styles.shutterInner} />
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.galleryButtonSpacer} />
             </View>
-          </View>
+          </SafeAreaView>
         </SafeAreaView>
       );
     }
