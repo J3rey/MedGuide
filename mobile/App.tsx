@@ -1,6 +1,7 @@
 // App.tsx
 import 'intl-pluralrules'; // Polyfill for i18next plural rules
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Platform } from 'react-native';
 import './src/i18n/index'; // MUST be here
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -19,6 +20,13 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
+  // Set document title for web
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      document.title = 'MedGuide';
+    }
+  }, []);
+
   return (
     <SafeAreaProvider>
       <ScanProvider>

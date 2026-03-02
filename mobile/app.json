@@ -5,6 +5,12 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
 
     "ios": {
       "supportsTablet": true,
@@ -12,12 +18,33 @@
     },
 
     "android": {
-      "package": "com.medguide.app"
+      "package": "com.medguide.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
     },
 
     "web": {
       "favicon": "./assets/favicon.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "name": "MedGuide",
+      "shortName": "MedGuide",
+      "description": "Medication information and management app",
+      "themeColor": "#3B82F6",
+      "backgroundColor": "#FFFFFF",
+      "display": "standalone",
+      "orientation": "portrait",
+      "scope": "/",
+      "startUrl": "/",
+      "icons": {
+        "apple": [
+          {
+            "url": "./assets/icon.png",
+            "sizes": "1024x1024"
+          }
+        ]
+      }
     },
 
     "plugins": [
