@@ -1,0 +1,105 @@
+{
+  "common": {
+    "save": "Simpan",
+    "cancel": "Batal",
+    "delete": "Hapus",
+    "add": "Tambah",
+    "edit": "Edit",
+    "done": "Selesai",
+    "back": "Kembali"
+  },
+  "languageSelection": {
+    "title": "MedGuide",
+    "subtitle": "Pilih bahasa pilihan Anda"
+  },
+  "navigation": {
+    "schedule": "Jadwal",
+    "camera": "Kamera",
+    "chat": "Obrolan",
+    "settings": "Pengaturan"
+  },
+  "schedule": {
+    "title": "Jadwal Obat",
+    "subtitle": "Kelola pengingat obat Anda",
+    "addAlarm": "Tambah Alarm Baru",
+    "time": "Waktu",
+    "medication": "Obat",
+    "days": "Hari",
+    "daily": "Harian",
+    "noAlarms": "Tidak ada alarm",
+    "mon": "Sen",
+    "tue": "Sel",
+    "wed": "Rab",
+    "thu": "Kam",
+    "fri": "Jum",
+    "sat": "Sab",
+    "sun": "Min"
+  },
+  "camera": {
+    "title": "Pindai Obat",
+    "subtitle": "Ambil foto resep Anda",
+    "takePicture": "Ambil Gambar",
+    "scanPrescription": "Pindai Resep",
+    "scanMedication": "Pindai Obat",
+    "retake": "Ambil Ulang",
+    "flashOff": "Flash: Mati",
+    "flashOn": "Flash: Hidup",
+    "flashAuto": "Flash: Otomatis",
+    "cameraBack": "Belakang",
+    "cameraFront": "Depan",
+    "openCamera": "Buka Kamera",
+    "fromGallery": "Pilih dari Galeri",
+    "positionLabel": "Posisikan label obat di dalam bingkai",
+    "switching": "Mengganti kamera...",
+    "processing": "Memproses gambar...",
+    "permissions": {
+      "title": "Akses Kamera",
+      "required": "Akses Kamera Diperlukan",
+      "message": "MedGuide memerlukan akses kamera untuk memindai label obat dan resep dengan akurat.",
+      "grant": "Berikan Izin",
+      "denied": "Harap aktifkan akses kamera di pengaturan perangkat Anda.",
+      "checking": "Memeriksa izin kamera..."
+    },
+    "errors": {
+      "captureFailedTitle": "Pengambilan Gagal",
+      "captureFailedMessage": "Tidak dapat mengambil foto. Silakan coba lagi.",
+      "cameraErrorTitle": "Kesalahan Kamera",
+      "cameraErrorMessage": "Tidak dapat mengakses kamera. Silakan periksa izin.",
+      "switchErrorMessage": "Tidak dapat mengganti kamera. Silakan coba lagi.",
+      "processingErrorTitle": "Kesalahan",
+      "processingErrorMessage": "Gagal memproses gambar. Silakan coba lagi.",
+      "galleryErrorTitle": "Kesalahan Galeri",
+      "galleryErrorMessage": "Tidak dapat mengakses galeri. Silakan coba lagi."
+    },
+    "accessibility": {
+      "shutter": "Ambil foto",
+      "retake": "Ambil ulang foto",
+      "scan": "Pindai obat",
+      "toggleFlash": "Alihkan flash",
+      "toggleCamera": "Ganti kamera",
+      "zoomIn": "Perbesar",
+      "zoomOut": "Perkecil",
+      "openCamera": "Buka kamera",
+      "chooseGallery": "Pilih dari galeri"
+    }
+  },
+  "chat": {
+    "title": "Asisten Medis",
+    "subtitle": "Tanyakan tentang obat Anda",
+    "placeholder": "Ketik pertanyaan Anda...",
+    "greeting": "Halo! Saya asisten Medguide Anda. Bagaimana saya bisa membantu Anda hari ini?",
+    "defaultResponse": "Saya mengerti Anda memiliki pertanyaan tentang obat Anda. Silakan konsultasikan dengan penyedia layanan kesehatan Anda untuk saran medis khusus.",
+    "tellMeAbout": "Beritahu saya tentang"
+  },
+  "manualSearch": {
+    "title": "Pencarian Obat Manual",
+    "searchPlaceholder": "Ketik nama obat...",
+    "helperText": "Ketik setidaknya 2 karakter. Saran akan muncul saat Anda mengetik untuk membantu dengan ejaan.",
+    "suggestions": "Saran:",
+    "noResults": "Tidak ada obat yang ditemukan untuk",
+    "tryAgain": "Coba periksa ejaan atau gunakan lebih sedikit karakter",
+    "selectedDrug": "Obat yang Dipilih:",
+    "askChatbot": "Tanyakan Chatbot Tentang Obat Ini",
+    "back": "Kembali"
+  }
+}

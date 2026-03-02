@@ -6,6 +6,8 @@ import zh from './locales/zh.json';
 import es from './locales/es.json';
 import ko from './locales/ko.json';
 import it from './locales/it.json';
+import id from './locales/id.json';
+import hi from './locales/hi.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -14,6 +16,8 @@ i18n.use(initReactI18next).init({
     es: { translation: es },
     ko: { translation: ko },
     it: { translation: it },
+    id: { translation: id },
+    hi: { translation: hi },
   },
   lng: 'en',
   fallbackLng: 'en',
