@@ -8,7 +8,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build:web": "expo export --platform web",
+    "build:web": "expo export --platform web && node scripts/inject-pwa-tags.js",
     "test": "echo \"No tests yet\" && exit 0",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
