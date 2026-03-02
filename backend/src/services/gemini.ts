@@ -194,7 +194,7 @@ export const chat = async (
   console.log('[Gemini Chat] Language:', language);
 
   const genAI = getGeminiAI();
-  const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   // Define multilingual "Tell me about" phrases
   const tellMeAboutPhrases = [
