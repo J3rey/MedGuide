@@ -22,11 +22,18 @@
     "title": "Jadwal Obat",
     "subtitle": "Kelola pengingat obat Anda",
     "addAlarm": "Tambah Alarm Baru",
+    "editAlarm": "Edit Alarm",
+    "addAlarmBtn": "Tambah Alarm",
+    "updateAlarm": "Perbarui Alarm",
     "time": "Waktu",
     "medication": "Obat",
+    "medicationPlaceholder": "Masukkan nama obat",
+    "repeat": "Ulangi",
     "days": "Hari",
     "daily": "Harian",
     "noAlarms": "Tidak ada alarm",
+    "noAlarmsSubtext": "Ketuk tombol + untuk menambahkan",
+    "loading": "Memuat alarm...",
     "mon": "Sen",
     "tue": "Sel",
     "wed": "Rab",
@@ -113,6 +120,10 @@
     "selectedDrug": "Obat yang Dipilih:",
     "askChatbot": "Tanyakan Chatbot Tentang Obat Ini",
     "back": "Kembali"
+  },
+  "settings": {
+    "title": "Pengaturan",
+    "changeLanguage": "Ubah Bahasa"
   },
   "scanResults": {
     "possibleMatches": "Kemungkinan kecocokan",

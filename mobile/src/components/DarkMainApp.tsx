@@ -20,6 +20,7 @@ import AlarmScreen from '../screens/AlarmScreen';
 import { snoozeAlarm, dismissAlarm } from '../services/notificationService';
 import { ScanProvider, useScan } from '../contexts/ScanContext';
 import theme from '../styles/theme';
+import { useTranslation } from 'react-i18next';
 import { CameraStackParamList } from '../types/navigation';
 
 type Tab = 'schedule' | 'camera' | 'chat' | 'settings';
@@ -46,6 +47,7 @@ function CameraStackScreen() {
 }
 
 function DarkMainAppContent({ onBack }: DarkMainAppProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<Tab>('camera');
   const [showAlarm, setShowAlarm] = useState(false);
   const [currentAlarm, setCurrentAlarm] = useState<AlarmData | null>(null);
@@ -164,7 +166,9 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
                 ]}
               >
                 <View style={styles.headerLeft}>
-                  <Text style={styles.settingsTitle}>Settings</Text>
+                  <Text style={styles.settingsTitle}>
+                    {t('settings.title')}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -175,7 +179,9 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
               ]}
             >
               <TouchableOpacity style={styles.settingsOption} onPress={onBack}>
-                <Text style={styles.settingsOptionText}>Change Language</Text>
+                <Text style={styles.settingsOptionText}>
+                  {t('settings.changeLanguage')}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

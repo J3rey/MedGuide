@@ -40,6 +40,23 @@ interface Alarm {
 
 export default function ScheduleScreen(): React.JSX.Element {
   const { t } = useTranslation();
+
+  const dayOptions = [
+    { key: 'Daily', label: t('schedule.daily') },
+    { key: 'Mon', label: t('schedule.mon') },
+    { key: 'Tue', label: t('schedule.tue') },
+    { key: 'Wed', label: t('schedule.wed') },
+    { key: 'Thu', label: t('schedule.thu') },
+    { key: 'Fri', label: t('schedule.fri') },
+    { key: 'Sat', label: t('schedule.sat') },
+    { key: 'Sun', label: t('schedule.sun') },
+  ];
+
+  const getDayLabel = (day: string): string => {
+    const found = dayOptions.find((d) => d.key === day);
+    return found ? found.label : day;
+  };
+
   const { width: screenWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [alarms, setAlarms] = useState<Alarm[]>([]);
@@ -384,22 +401,22 @@ export default function ScheduleScreen(): React.JSX.Element {
             ]}
           >
             <Text style={styles.addAlarmTitle}>
-              {editingAlarm ? 'Edit Alarm' : 'Add New Alarm'}
+              {editingAlarm ? t('schedule.editAlarm') : t('schedule.addAlarm')}
             </Text>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Medication</Text>
+              <Text style={styles.label}>{t('schedule.medication')}</Text>
               <TextInput
                 style={styles.input}
                 value={newAlarmMed}
                 onChangeText={setNewAlarmMed}
-                placeholder="Enter medication name"
+                placeholder={t('schedule.medicationPlaceholder')}
                 placeholderTextColor={theme.colors.mutedForeground}
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Time</Text>
+              <Text style={styles.label}>{t('schedule.time')}</Text>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => setShowTimePicker(true)}
@@ -412,30 +429,28 @@ export default function ScheduleScreen(): React.JSX.Element {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Repeat</Text>
+              <Text style={styles.label}>{t('schedule.repeat')}</Text>
               <View style={styles.daysSelector}>
-                {['Daily', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(
-                  (day) => (
-                    <TouchableOpacity
-                      key={day}
+                {dayOptions.map(({ key, label }) => (
+                  <TouchableOpacity
+                    key={key}
+                    style={[
+                      styles.dayButton,
+                      selectedDays.includes(key) && styles.dayButtonActive,
+                    ]}
+                    onPress={() => toggleDay(key)}
+                  >
+                    <Text
                       style={[
-                        styles.dayButton,
-                        selectedDays.includes(day) && styles.dayButtonActive,
+                        styles.dayButtonText,
+                        selectedDays.includes(key) &&
+                          styles.dayButtonTextActive,
                       ]}
-                      onPress={() => toggleDay(day)}
                     >
-                      <Text
-                        style={[
-                          styles.dayButtonText,
-                          selectedDays.includes(day) &&
-                            styles.dayButtonTextActive,
-                        ]}
-                      >
-                        {day}
-                      </Text>
-                    </TouchableOpacity>
-                  )
-                )}
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             </View>
             <View style={styles.buttonRow}>
@@ -444,14 +459,18 @@ export default function ScheduleScreen(): React.JSX.Element {
                 style={[styles.button, styles.addButtonStyle]}
               >
                 <Text style={styles.buttonText}>
-                  {editingAlarm ? 'Update Alarm' : 'Add Alarm'}
+                  {editingAlarm
+                    ? t('schedule.updateAlarm')
+                    : t('schedule.addAlarmBtn')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={cancelEdit}
                 style={[styles.button, styles.cancelButton]}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>
+                  {t('common.cancel')}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -469,7 +488,7 @@ export default function ScheduleScreen(): React.JSX.Element {
         >
           {loading ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>Loading alarms...</Text>
+              <Text style={styles.emptyText}>{t('schedule.loading')}</Text>
             </View>
           ) : (
             alarms.map((alarm) => (
@@ -511,7 +530,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                                 : styles.dayTextInactive,
                             ]}
                           >
-                            {day}
+                            {getDayLabel(day)}
                           </Text>
                         </View>
                       ))}
@@ -548,8 +567,10 @@ export default function ScheduleScreen(): React.JSX.Element {
 
         {!loading && alarms.length === 0 && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No alarms set</Text>
-            <Text style={styles.emptySubtext}>Tap the + button to add one</Text>
+            <Text style={styles.emptyText}>{t('schedule.noAlarms')}</Text>
+            <Text style={styles.emptySubtext}>
+              {t('schedule.noAlarmsSubtext')}
+            </Text>
           </View>
         )}
       </ScrollView>
@@ -571,13 +592,15 @@ export default function ScheduleScreen(): React.JSX.Element {
               <View style={styles.timePickerContainer}>
                 <View style={styles.timePickerHeader}>
                   <TouchableOpacity onPress={() => setShowTimePicker(false)}>
-                    <Text style={styles.timePickerButton}>Cancel</Text>
+                    <Text style={styles.timePickerButton}>
+                      {t('common.cancel')}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => setShowTimePicker(false)}>
                     <Text
                       style={[styles.timePickerButton, styles.timePickerDone]}
                     >
-                      Done
+                      {t('common.done')}
                     </Text>
                   </TouchableOpacity>
                 </View>

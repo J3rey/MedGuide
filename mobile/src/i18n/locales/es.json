@@ -22,11 +22,18 @@
     "title": "Horario de Medicamentos",
     "subtitle": "Administre sus recordatorios de medicamentos",
     "addAlarm": "Agregar Nueva Alarma",
+    "editAlarm": "Editar Alarma",
+    "addAlarmBtn": "Agregar Alarma",
+    "updateAlarm": "Actualizar Alarma",
     "time": "Hora",
     "medication": "Medicamento",
+    "medicationPlaceholder": "Ingrese el nombre del medicamento",
+    "repeat": "Repetir",
     "days": "Días",
     "daily": "Diario",
     "noAlarms": "No hay alarmas configuradas",
+    "noAlarmsSubtext": "Toque el botón + para agregar una",
+    "loading": "Cargando alarmas...",
     "mon": "Lun",
     "tue": "Mar",
     "wed": "Mié",
@@ -113,6 +120,10 @@
     "selectedDrug": "Medicamento Seleccionado:",
     "askChatbot": "Preguntar al Chatbot Sobre Este Medicamento",
     "back": "Atrás"
+  },
+  "settings": {
+    "title": "Configuración",
+    "changeLanguage": "Cambiar idioma"
   },
   "scanResults": {
     "possibleMatches": "Posibles coincidencias",

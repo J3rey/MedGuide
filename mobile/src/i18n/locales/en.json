@@ -22,11 +22,18 @@
     "title": "Medication Schedule",
     "subtitle": "Manage your medication reminders",
     "addAlarm": "Add New Alarm",
+    "editAlarm": "Edit Alarm",
+    "addAlarmBtn": "Add Alarm",
+    "updateAlarm": "Update Alarm",
     "time": "Time",
     "medication": "Medication",
+    "medicationPlaceholder": "Enter medication name",
+    "repeat": "Repeat",
     "days": "Days",
     "daily": "Daily",
     "noAlarms": "No alarms set",
+    "noAlarmsSubtext": "Tap the + button to add one",
+    "loading": "Loading alarms...",
     "mon": "Mon",
     "tue": "Tue",
     "wed": "Wed",
@@ -113,6 +120,10 @@
     "selectedDrug": "Selected Drug:",
     "askChatbot": "Ask Chatbot About This Drug",
     "back": "Back"
+  },
+  "settings": {
+    "title": "Settings",
+    "changeLanguage": "Change Language"
   },
   "scanResults": {
     "possibleMatches": "Possible matches",

@@ -22,11 +22,18 @@
     "title": "दवा अनुसूची",
     "subtitle": "अपनी दवा रिमाइंडर प्रबंधित करें",
     "addAlarm": "नया अलार्म जोड़ें",
+    "editAlarm": "अलार्म संपादित करें",
+    "addAlarmBtn": "अलार्म जोड़ें",
+    "updateAlarm": "अलार्म अपडेट करें",
     "time": "समय",
     "medication": "दवा",
+    "medicationPlaceholder": "दवा का नाम दर्ज करें",
+    "repeat": "दोहराएं",
     "days": "दिन",
     "daily": "दैनिक",
     "noAlarms": "कोई अलार्म सेट नहीं है",
+    "noAlarmsSubtext": "जोड़ने के लिए + बटन दबाएं",
+    "loading": "अलार्म लोड हो रहे हैं...",
     "mon": "सोम",
     "tue": "मंगल",
     "wed": "बुध",
@@ -113,6 +120,10 @@
     "selectedDrug": "चयनित दवा:",
     "askChatbot": "इस दवा के बारे में चैटबॉट से पूछें",
     "back": "वापस"
+  },
+  "settings": {
+    "title": "सेटिंग्स",
+    "changeLanguage": "भाषा बदलें"
   },
   "scanResults": {
     "possibleMatches": "संभावित मिलान",
