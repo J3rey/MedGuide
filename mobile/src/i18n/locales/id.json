@@ -101,5 +101,14 @@
     "selectedDrug": "Obat yang Dipilih:",
     "askChatbot": "Tanyakan Chatbot Tentang Obat Ini",
     "back": "Kembali"
+  },
+  "scanResults": {
+    "possibleMatches": "Kemungkinan kecocokan",
+    "noMatchesFound": "Tidak ada kecocokan ditemukan",
+    "tapToLearnMore": "Ketuk obat untuk mempelajari lebih lanjut",
+    "scanning": "Memindai...",
+    "noMatchesMessage": "Coba foto lain dengan pencahayaan lebih baik atau lebih sedikit silau, atau cari obat secara manual.",
+    "retryScan": "Coba pindai lagi",
+    "manualSearch": "Pencarian manual"
   }
 }

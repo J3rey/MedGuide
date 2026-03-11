@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { findDrugMatchesFromImage } from '../services/matchDrugsFromImage';
 import { useScan } from '../contexts/ScanContext';
 import type { Drug } from '../types/drug';
@@ -20,6 +21,7 @@ export default function ScanResultsScreen({
 }: ScanResultsScreenProps) {
   const { uri } = route.params;
   const { setScannedDrug } = useScan();
+  const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
   const [matches, setMatches] = useState<Drug[]>([]);
@@ -67,7 +69,7 @@ export default function ScanResultsScreen({
     return (
       <SafeAreaView style={styles.center} edges={['top']}>
         <ActivityIndicator />
-        <Text style={styles.subtleText}>Scanning...</Text>
+        <Text style={styles.subtleText}>{t('scanResults.scanning')}</Text>
       </SafeAreaView>
     );
   }
@@ -82,11 +84,13 @@ export default function ScanResultsScreen({
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <Text style={styles.title}>
-        {hasMatches ? 'Possible matches' : 'No matches found'}
+        {hasMatches
+          ? t('scanResults.possibleMatches')
+          : t('scanResults.noMatchesFound')}
       </Text>
 
       {hasMatches && (
-        <Text style={styles.subtitle}>Tap a medication to learn more</Text>
+        <Text style={styles.subtitle}>{t('scanResults.tapToLearnMore')}</Text>
       )}
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -111,10 +115,7 @@ export default function ScanResultsScreen({
           )}
         />
       ) : (
-        <Text style={styles.bodyText}>
-          Try another photo with better lighting or less glare, or search for
-          the drug manually.
-        </Text>
+        <Text style={styles.bodyText}>{t('scanResults.noMatchesMessage')}</Text>
       )}
 
       <View style={styles.actions}>
@@ -122,14 +123,14 @@ export default function ScanResultsScreen({
           style={styles.button}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.buttonText}>Retry scan</Text>
+          <Text style={styles.buttonText}>{t('scanResults.retryScan')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate('ManualSearch')}
         >
-          <Text style={styles.buttonText}>Manual search</Text>
+          <Text style={styles.buttonText}>{t('scanResults.manualSearch')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

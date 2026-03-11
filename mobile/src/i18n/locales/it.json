@@ -101,5 +101,14 @@
     "selectedDrug": "Farmaco Selezionato:",
     "askChatbot": "Chiedi al Chatbot Su Questo Farmaco",
     "back": "Indietro"
+  },
+  "scanResults": {
+    "possibleMatches": "Possibili corrispondenze",
+    "noMatchesFound": "Nessuna corrispondenza trovata",
+    "tapToLearnMore": "Tocca un farmaco per saperne di più",
+    "scanning": "Scansione...",
+    "noMatchesMessage": "Prova un'altra foto con una migliore illuminazione o meno riflessi, oppure cerca il farmaco manualmente.",
+    "retryScan": "Riprova scansione",
+    "manualSearch": "Ricerca manuale"
   }
 }

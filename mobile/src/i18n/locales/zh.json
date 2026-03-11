@@ -101,5 +101,14 @@
     "selectedDrug": "选定的药物：",
     "askChatbot": "向聊天机器人询问此药物",
     "back": "返回"
+  },
+  "scanResults": {
+    "possibleMatches": "可能的匹配",
+    "noMatchesFound": "未找到匹配项",
+    "tapToLearnMore": "点击药物以了解更多信息",
+    "scanning": "扫描中...",
+    "noMatchesMessage": "尝试使用光照更好或反光更少的另一张照片，或手动搜索药物。",
+    "retryScan": "重新扫描",
+    "manualSearch": "手动搜索"
   }
 }
