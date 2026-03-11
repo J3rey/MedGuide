@@ -351,7 +351,7 @@ export const chat = async (
     // Define keyword list for different languages
     const keywordListForPrompt: Record<string, string> = {
       English:
-        'how to take it, side effects, if it\'s safe for pregnancy, for children, or for breastfeeding individuals',
+        "how to take it, side effects, if it's safe for pregnancy, for children, or for breastfeeding individuals",
       Chinese:
         '如何服用、副作用、怀孕期间是否安全、儿童是否安全或哺乳期间是否安全',
       Korean:
