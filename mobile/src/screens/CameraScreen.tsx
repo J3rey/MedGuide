@@ -875,7 +875,10 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
                   {t('camera.positionLabel')}
                 </Text>
                 <TouchableOpacity
-                  style={[styles.shutter, isCapturing && styles.shutterDisabled]}
+                  style={[
+                    styles.shutter,
+                    isCapturing && styles.shutterDisabled,
+                  ]}
                   onPress={takeWebPhoto}
                   disabled={isCapturing}
                   activeOpacity={0.8}
