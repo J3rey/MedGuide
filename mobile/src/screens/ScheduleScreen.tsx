@@ -190,13 +190,19 @@ export default function ScheduleScreen(): React.JSX.Element {
       console.error('Error toggling alarm:', error);
       // Revert on error
       setAlarms(alarms.map((a) => (a.id === alarm.id ? alarm : a)));
-      Alert.alert(t('schedule.errors.error'), t('schedule.errors.failedToUpdate'));
+      Alert.alert(
+        t('schedule.errors.error'),
+        t('schedule.errors.failedToUpdate')
+      );
     }
   };
 
   const addAlarm = async (): Promise<void> => {
     if (!newAlarmMed.trim()) {
-      Alert.alert(t('schedule.errors.error'), t('schedule.errors.selectMedication'));
+      Alert.alert(
+        t('schedule.errors.error'),
+        t('schedule.errors.selectMedication')
+      );
       return;
     }
 
@@ -232,7 +238,10 @@ export default function ScheduleScreen(): React.JSX.Element {
       setEditingAlarm(null);
     } catch (error) {
       console.error('Error adding alarm:', error);
-      Alert.alert(t('schedule.errors.error'), t('schedule.errors.failedToCreate'));
+      Alert.alert(
+        t('schedule.errors.error'),
+        t('schedule.errors.failedToCreate')
+      );
     }
   };
 
@@ -253,7 +262,10 @@ export default function ScheduleScreen(): React.JSX.Element {
 
   const updateAlarm = async (): Promise<void> => {
     if (!newAlarmMed.trim() || !editingAlarm) {
-      Alert.alert(t('schedule.errors.error'), t('schedule.errors.enterMedication'));
+      Alert.alert(
+        t('schedule.errors.error'),
+        t('schedule.errors.enterMedication')
+      );
       return;
     }
 
@@ -297,7 +309,10 @@ export default function ScheduleScreen(): React.JSX.Element {
       setEditingAlarm(null);
     } catch (error) {
       console.error('Error updating alarm:', error);
-      Alert.alert(t('schedule.errors.error'), t('schedule.errors.failedToUpdate'));
+      Alert.alert(
+        t('schedule.errors.error'),
+        t('schedule.errors.failedToUpdate')
+      );
     }
   };
 
@@ -328,7 +343,10 @@ export default function ScheduleScreen(): React.JSX.Element {
       setAlarms(alarms.filter((a) => a.id !== alarm.id));
     } catch (error) {
       console.error('Error removing alarm:', error);
-      Alert.alert(t('schedule.errors.error'), t('schedule.errors.failedToDelete'));
+      Alert.alert(
+        t('schedule.errors.error'),
+        t('schedule.errors.failedToDelete')
+      );
     }
   };
 
