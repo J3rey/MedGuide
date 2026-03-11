@@ -189,11 +189,6 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.foreground,
   },
-  rowSubtitle: {
-    fontSize: theme.typography.fontSize.sm,
-    color: theme.colors.mutedForeground,
-    marginTop: 3,
-  },
 
   actions: { marginTop: theme.spacing.lg },
   button: {
