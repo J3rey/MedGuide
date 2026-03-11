@@ -110,5 +110,29 @@
     "noMatchesMessage": "बेहतर रोशनी या कम चमक के साथ दूसरी फोटो का प्रयास करें, या मैन्युअल रूप से दवा खोजें।",
     "retryScan": "फिर से स्कैन करें",
     "manualSearch": "मैनुअल खोज"
+  },
+  "alarm": {
+    "title": "दवा अलार्म",
+    "subtitle": "अपनी दवा लेने का समय है",
+    "dismiss": "मैंने ले ली",
+    "snoozeLabel": "स्नूज़:",
+    "snooze5": "5 मिनट",
+    "snooze10": "10 मिनट",
+    "snooze15": "15 मिनट"
+  },
+  "drugDetails": {
+    "loading": "लोड हो रहा है...",
+    "notFound": "दवा नहीं मिली",
+    "goBack": "वापस जाएं",
+    "back": "\u2190 वापस",
+    "indications": "संकेत",
+    "counselingPoints": "परामर्श बिंदु",
+    "counseling": "परामर्श",
+    "adverseEffects": "दुष्प्रभाव",
+    "precautionsPregnancy": "सावधानियां (गर्भावस्था)",
+    "precautionsChildren": "सावधानियां (बच्चे)",
+    "pregnancyPrecautions": "गर्भावस्था सावधानियां",
+    "childrenPrecautions": "बच्चों की सावधानियां",
+    "breastfeedingPrecautions": "स्तनपान सावधानियां"
   }
 }

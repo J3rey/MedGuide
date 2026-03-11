@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { Drug } from '../types/drug';
 import theme from '../styles/theme';
@@ -24,6 +25,7 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
   const { drugId } = route.params;
   const [drug, setDrug] = useState<Drug | null>(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     (async () => {
@@ -69,7 +71,7 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
     return (
       <View style={styles.center}>
         <ActivityIndicator />
-        <Text style={styles.loadingText}>Loading...</Text>
+        <Text style={styles.loadingText}>{t('drugDetails.loading')}</Text>
       </View>
     );
   }
@@ -77,12 +79,12 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
   if (!drug) {
     return (
       <View style={styles.center}>
-        <Text style={styles.errorText}>Drug not found</Text>
+        <Text style={styles.errorText}>{t('drugDetails.notFound')}</Text>
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.buttonText}>Go Back</Text>
+          <Text style={styles.buttonText}>{t('drugDetails.goBack')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -97,42 +99,52 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
           navigation.goBack();
         }}
       >
-        <Text style={styles.backText}>← Back</Text>
+        <Text style={styles.backText}>{t('drugDetails.back')}</Text>
       </TouchableOpacity>
 
       <Text style={styles.brandName}>{drug.drug_name}</Text>
 
       {drug.indications && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Indications</Text>
+          <Text style={styles.sectionTitle}>
+            {t('drugDetails.indications')}
+          </Text>
           <Text style={styles.sectionText}>{drug.indications}</Text>
         </View>
       )}
 
       {drug.counseling && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Counseling Points</Text>
+          <Text style={styles.sectionTitle}>
+            {t('drugDetails.counselingPoints')}
+          </Text>
           <Text style={styles.sectionText}>{drug.counseling}</Text>
         </View>
       )}
 
       {drug.adverse_effects && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Adverse Effects</Text>
+          <Text style={styles.sectionTitle}>
+            {t('drugDetails.adverseEffects')}
+          </Text>
           <Text style={styles.sectionText}>{drug.adverse_effects}</Text>
         </View>
       )}
 
       {drug.precautions_pregnancy && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Precautions (Pregnancy)</Text>
+          <Text style={styles.sectionTitle}>
+            {t('drugDetails.precautionsPregnancy')}
+          </Text>
           <Text style={styles.sectionText}>{drug.precautions_pregnancy}</Text>
         </View>
       )}
 
       {drug.precautions_children && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Precautions (Children)</Text>
+          <Text style={styles.sectionTitle}>
+            {t('drugDetails.precautionsChildren')}
+          </Text>
           <Text style={styles.sectionText}>{drug.precautions_children}</Text>
         </View>
       )}

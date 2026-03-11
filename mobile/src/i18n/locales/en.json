@@ -110,5 +110,29 @@
     "noMatchesMessage": "Try another photo with better lighting or less glare, or search for the drug manually.",
     "retryScan": "Retry scan",
     "manualSearch": "Manual search"
+  },
+  "alarm": {
+    "title": "MEDICATION ALARM",
+    "subtitle": "Time to take your medication",
+    "dismiss": "I Took It",
+    "snoozeLabel": "Snooze for:",
+    "snooze5": "5 min",
+    "snooze10": "10 min",
+    "snooze15": "15 min"
+  },
+  "drugDetails": {
+    "loading": "Loading...",
+    "notFound": "Drug not found",
+    "goBack": "Go Back",
+    "back": "\u2190 Back",
+    "indications": "Indications",
+    "counselingPoints": "Counseling Points",
+    "counseling": "Counseling",
+    "adverseEffects": "Adverse Effects",
+    "precautionsPregnancy": "Precautions (Pregnancy)",
+    "precautionsChildren": "Precautions (Children)",
+    "pregnancyPrecautions": "Pregnancy Precautions",
+    "childrenPrecautions": "Children Precautions",
+    "breastfeedingPrecautions": "Breastfeeding Precautions"
   }
 }

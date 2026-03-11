@@ -11,6 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { searchDrugs } from '../services/drugSearch';
 import { useScan } from '../contexts/ScanContext';
 import type { Drug } from '../types/drug';
@@ -19,6 +20,7 @@ import theme from '../styles/theme';
 export default function ManualSearchScreen() {
   const navigation = useNavigation();
   const { setScannedDrug } = useScan();
+  const { t } = useTranslation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<Drug[]>([]);
@@ -75,15 +77,15 @@ export default function ManualSearchScreen() {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>{t('drugDetails.back')}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Manual Drug Search</Text>
+        <Text style={styles.title}>{t('manualSearch.title')}</Text>
       </View>
 
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Type drug name..."
+          placeholder={t('manualSearch.searchPlaceholder')}
           placeholderTextColor={theme.colors.mutedForeground}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -102,14 +104,15 @@ export default function ManualSearchScreen() {
 
       <View style={styles.helperText}>
         <Text style={styles.helperTextContent}>
-          💡 Type at least 2 characters. Suggestions will appear as you type to
-          help with spelling.
+          💡 {t('manualSearch.helperText')}
         </Text>
       </View>
 
       {showSuggestions && suggestions.length > 0 && (
         <View style={styles.suggestionsContainer}>
-          <Text style={styles.suggestionsTitle}>Suggestions:</Text>
+          <Text style={styles.suggestionsTitle}>
+            {t('manualSearch.suggestions')}
+          </Text>
           <FlatList
             data={suggestions}
             keyExtractor={(item) => item.id.toString()}
@@ -136,23 +139,27 @@ export default function ManualSearchScreen() {
         searchQuery.trim().length >= 2 && (
           <View style={styles.noResultsContainer}>
             <Text style={styles.noResultsText}>
-              No drugs found matching "{searchQuery}"
+              {t('manualSearch.noResults')} "{searchQuery}"
             </Text>
             <Text style={styles.noResultsSubtext}>
-              Try checking the spelling or use fewer characters
+              {t('manualSearch.tryAgain')}
             </Text>
           </View>
         )}
 
       {selectedDrug && !showSuggestions && (
         <View style={styles.selectedDrugContainer}>
-          <Text style={styles.selectedDrugTitle}>Selected Drug:</Text>
+          <Text style={styles.selectedDrugTitle}>
+            {t('manualSearch.selectedDrug')}
+          </Text>
           <View style={styles.drugCard}>
             <Text style={styles.drugName}>{selectedDrug.drug_name}</Text>
 
             {selectedDrug.indications && (
               <View style={styles.drugSection}>
-                <Text style={styles.drugSectionTitle}>Indications:</Text>
+                <Text style={styles.drugSectionTitle}>
+                  {t('drugDetails.indications')}:
+                </Text>
                 <Text style={styles.drugSectionText}>
                   {selectedDrug.indications}
                 </Text>
@@ -161,7 +168,9 @@ export default function ManualSearchScreen() {
 
             {selectedDrug.counseling && (
               <View style={styles.drugSection}>
-                <Text style={styles.drugSectionTitle}>Counseling:</Text>
+                <Text style={styles.drugSectionTitle}>
+                  {t('drugDetails.counseling')}:
+                </Text>
                 <Text style={styles.drugSectionText}>
                   {selectedDrug.counseling}
                 </Text>
@@ -170,7 +179,9 @@ export default function ManualSearchScreen() {
 
             {selectedDrug.adverse_effects && (
               <View style={styles.drugSection}>
-                <Text style={styles.drugSectionTitle}>Adverse Effects:</Text>
+                <Text style={styles.drugSectionTitle}>
+                  {t('drugDetails.adverseEffects')}:
+                </Text>
                 <Text style={styles.drugSectionText}>
                   {selectedDrug.adverse_effects}
                 </Text>
@@ -180,7 +191,7 @@ export default function ManualSearchScreen() {
             {selectedDrug.precautions_pregnancy && (
               <View style={styles.drugSection}>
                 <Text style={styles.drugSectionTitle}>
-                  Pregnancy Precautions:
+                  {t('drugDetails.pregnancyPrecautions')}:
                 </Text>
                 <Text style={styles.drugSectionText}>
                   {selectedDrug.precautions_pregnancy}
@@ -191,7 +202,7 @@ export default function ManualSearchScreen() {
             {selectedDrug.precautions_children && (
               <View style={styles.drugSection}>
                 <Text style={styles.drugSectionTitle}>
-                  Children Precautions:
+                  {t('drugDetails.childrenPrecautions')}:
                 </Text>
                 <Text style={styles.drugSectionText}>
                   {selectedDrug.precautions_children}
@@ -202,7 +213,7 @@ export default function ManualSearchScreen() {
             {selectedDrug.precautions_breastfeeding && (
               <View style={styles.drugSection}>
                 <Text style={styles.drugSectionTitle}>
-                  Breastfeeding Precautions:
+                  {t('drugDetails.breastfeedingPrecautions')}:
                 </Text>
                 <Text style={styles.drugSectionText}>
                   {selectedDrug.precautions_breastfeeding}
@@ -216,7 +227,7 @@ export default function ManualSearchScreen() {
             onPress={handleAskChatbot}
           >
             <Text style={styles.chatButtonText}>
-              Ask Chatbot About This Drug
+              {t('manualSearch.askChatbot')}
             </Text>
           </TouchableOpacity>
         </View>
