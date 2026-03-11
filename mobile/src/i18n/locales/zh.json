@@ -110,5 +110,29 @@
     "noMatchesMessage": "尝试使用光照更好或反光更少的另一张照片，或手动搜索药物。",
     "retryScan": "重新扫描",
     "manualSearch": "手动搜索"
+  },
+  "alarm": {
+    "title": "药物提醒",
+    "subtitle": "该服药了",
+    "dismiss": "已服用",
+    "snoozeLabel": "稍候提醒：",
+    "snooze5": "5分钟",
+    "snooze10": "10分钟",
+    "snooze15": "15分钟"
+  },
+  "drugDetails": {
+    "loading": "加载中...",
+    "notFound": "未找到药物",
+    "goBack": "返回",
+    "back": "\u2190 返回",
+    "indications": "适应症",
+    "counselingPoints": "用药指导要点",
+    "counseling": "用药指导",
+    "adverseEffects": "不良反应",
+    "precautionsPregnancy": "注意事项（奶妇）",
+    "precautionsChildren": "注意事项（儿童）",
+    "pregnancyPrecautions": "奶妇注意事项",
+    "childrenPrecautions": "儿童注意事项",
+    "breastfeedingPrecautions": "哺乳注意事项"
   }
 }

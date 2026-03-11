@@ -110,5 +110,29 @@
     "noMatchesMessage": "Intente con otra foto con mejor iluminación o menos brillo, o busque el medicamento manualmente.",
     "retryScan": "Reintentar escaneo",
     "manualSearch": "Búsqueda manual"
+  },
+  "alarm": {
+    "title": "ALARMA DE MEDICAMENTO",
+    "subtitle": "Es hora de tomar su medicamento",
+    "dismiss": "Lo Tomé",
+    "snoozeLabel": "Posponer por:",
+    "snooze5": "5 min",
+    "snooze10": "10 min",
+    "snooze15": "15 min"
+  },
+  "drugDetails": {
+    "loading": "Cargando...",
+    "notFound": "Medicamento no encontrado",
+    "goBack": "Volver",
+    "back": "\u2190 Atrás",
+    "indications": "Indicaciones",
+    "counselingPoints": "Puntos de Asesoramiento",
+    "counseling": "Asesoramiento",
+    "adverseEffects": "Efectos Adversos",
+    "precautionsPregnancy": "Precauciones (Embarazo)",
+    "precautionsChildren": "Precauciones (Niños)",
+    "pregnancyPrecautions": "Precauciones de Embarazo",
+    "childrenPrecautions": "Precauciones para Niños",
+    "breastfeedingPrecautions": "Precauciones de Lactancia"
   }
 }

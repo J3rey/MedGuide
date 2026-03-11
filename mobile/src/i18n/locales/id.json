@@ -110,5 +110,29 @@
     "noMatchesMessage": "Coba foto lain dengan pencahayaan lebih baik atau lebih sedikit silau, atau cari obat secara manual.",
     "retryScan": "Coba pindai lagi",
     "manualSearch": "Pencarian manual"
+  },
+  "alarm": {
+    "title": "ALARM OBAT",
+    "subtitle": "Waktunya minum obat Anda",
+    "dismiss": "Sudah Diminum",
+    "snoozeLabel": "Tunda untuk:",
+    "snooze5": "5 mnt",
+    "snooze10": "10 mnt",
+    "snooze15": "15 mnt"
+  },
+  "drugDetails": {
+    "loading": "Memuat...",
+    "notFound": "Obat tidak ditemukan",
+    "goBack": "Kembali",
+    "back": "\u2190 Kembali",
+    "indications": "Indikasi",
+    "counselingPoints": "Poin Konsultasi",
+    "counseling": "Konsultasi",
+    "adverseEffects": "Efek Samping",
+    "precautionsPregnancy": "Perhatian (Kehamilan)",
+    "precautionsChildren": "Perhatian (Anak-anak)",
+    "pregnancyPrecautions": "Perhatian Kehamilan",
+    "childrenPrecautions": "Perhatian Anak-anak",
+    "breastfeedingPrecautions": "Perhatian Menyusui"
   }
 }

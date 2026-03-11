@@ -8,6 +8,7 @@ import {
   Vibration,
   Modal,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 
 interface AlarmScreenProps {
@@ -24,6 +25,7 @@ export default function AlarmScreen({
   onSnooze,
 }: AlarmScreenProps): React.JSX.Element {
   const [pulseAnim] = useState(new Animated.Value(1));
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (visible) {
@@ -73,9 +75,9 @@ export default function AlarmScreen({
             <View style={styles.medicationIcon} />
           </Animated.View>
 
-          <Text style={styles.title}>MEDICATION ALARM</Text>
+          <Text style={styles.title}>{t('alarm.title')}</Text>
           <Text style={styles.medicationName}>{medicationName}</Text>
-          <Text style={styles.subtitle}>Time to take your medication</Text>
+          <Text style={styles.subtitle}>{t('alarm.subtitle')}</Text>
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity
@@ -83,18 +85,20 @@ export default function AlarmScreen({
               onPress={onDismiss}
               activeOpacity={0.8}
             >
-              <Text style={styles.dismissButtonText}>I Took It</Text>
+              <Text style={styles.dismissButtonText}>{t('alarm.dismiss')}</Text>
             </TouchableOpacity>
 
             <View style={styles.snoozeContainer}>
-              <Text style={styles.snoozeLabel}>Snooze for:</Text>
+              <Text style={styles.snoozeLabel}>{t('alarm.snoozeLabel')}</Text>
               <View style={styles.snoozeButtons}>
                 <TouchableOpacity
                   style={[styles.button, styles.snoozeButton]}
                   onPress={() => onSnooze(5)}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.snoozeButtonText}>5 min</Text>
+                  <Text style={styles.snoozeButtonText}>
+                    {t('alarm.snooze5')}
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -102,7 +106,9 @@ export default function AlarmScreen({
                   onPress={() => onSnooze(10)}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.snoozeButtonText}>10 min</Text>
+                  <Text style={styles.snoozeButtonText}>
+                    {t('alarm.snooze10')}
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -110,7 +116,9 @@ export default function AlarmScreen({
                   onPress={() => onSnooze(15)}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.snoozeButtonText}>15 min</Text>
+                  <Text style={styles.snoozeButtonText}>
+                    {t('alarm.snooze15')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
