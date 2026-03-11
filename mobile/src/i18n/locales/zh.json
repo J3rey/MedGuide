@@ -33,7 +33,17 @@
     "thu": "周四",
     "fri": "周五",
     "sat": "周六",
-    "sun": "周日"
+    "sun": "周日",
+    "errors": {
+      "alarmsDisabledTitle": "闹钟已禁用",
+      "alarmsDisabledMessage": "请在设备设置中启用通知，以接收药物闹钟。",
+      "error": "错误",
+      "failedToUpdate": "更新闹钟失败",
+      "selectMedication": "请选择药物",
+      "failedToCreate": "创建闹钟失败",
+      "enterMedication": "请输入药物",
+      "failedToDelete": "删除闹钟失败"
+    }
   },
   "camera": {
     "title": "扫描药物",
@@ -61,6 +71,8 @@
       "checking": "检查相机权限中..."
     },
     "errors": {
+      "imageLoadErrorTitle": "图片加载错误",
+      "imageLoadErrorMessage": "无法显示拍摄的照片。请重试。",
       "captureFailedTitle": "拍摄失败",
       "captureFailedMessage": "无法拍照。请重试。",
       "cameraErrorTitle": "相机错误",
@@ -107,6 +119,7 @@
     "noMatchesFound": "未找到匹配项",
     "tapToLearnMore": "点击药物以了解更多信息",
     "scanning": "扫描中...",
+    "scanFailed": "扫描失败。请重试。",
     "noMatchesMessage": "尝试使用光照更好或反光更少的另一张照片，或手动搜索药物。",
     "retryScan": "重新扫描",
     "manualSearch": "手动搜索"

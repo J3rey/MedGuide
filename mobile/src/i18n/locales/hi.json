@@ -33,7 +33,17 @@
     "thu": "गुरु",
     "fri": "शुक्र",
     "sat": "शनि",
-    "sun": "रवि"
+    "sun": "रवि",
+    "errors": {
+      "alarmsDisabledTitle": "अलार्म अक्षम",
+      "alarmsDisabledMessage": "दवा अलार्म प्राप्त करने के लिए अपनी डिवाइस सेटिंग्स में अधिसूचनाएं सक्षम करें।",
+      "error": "त्रुटि",
+      "failedToUpdate": "अलार्म अपडेट करने में विफल",
+      "selectMedication": "कृपया दवा चुनें",
+      "failedToCreate": "अलार्म बनाने में विफल",
+      "enterMedication": "कृपया दवा दर्ज करें",
+      "failedToDelete": "अलार्म हटाने में विफल"
+    }
   },
   "camera": {
     "title": "दवा स्कैन करें",
@@ -61,6 +71,8 @@
       "checking": "कैमरा अनुमतियां जांच रहे हैं..."
     },
     "errors": {
+      "imageLoadErrorTitle": "चित्र लोड त्रुटि",
+      "imageLoadErrorMessage": "खिंची गई फोटो दिखाने में विफल। कृपया पुनः प्रयास करें।",
       "captureFailedTitle": "कैप्चर विफल",
       "captureFailedMessage": "फोटो लेने में असमर्थ। कृपया पुनः प्रयास करें।",
       "cameraErrorTitle": "कैमरा त्रुटि",
@@ -107,6 +119,7 @@
     "noMatchesFound": "कोई मिलान नहीं मिला",
     "tapToLearnMore": "अधिक जानने के लिए दवा पर टैप करें",
     "scanning": "स्कैन हो रहा है...",
+    "scanFailed": "स्कैन विफल। कृपया पुनः प्रयास करें।",
     "noMatchesMessage": "बेहतर रोशनी या कम चमक के साथ दूसरी फोटो का प्रयास करें, या मैन्युअल रूप से दवा खोजें।",
     "retryScan": "फिर से स्कैन करें",
     "manualSearch": "मैनुअल खोज"
