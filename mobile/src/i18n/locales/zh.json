@@ -22,11 +22,18 @@
     "title": "用药时间表",
     "subtitle": "管理您的用药提醒",
     "addAlarm": "添加新闹钟",
+    "editAlarm": "编辑闹钟",
+    "addAlarmBtn": "添加闹钟",
+    "updateAlarm": "更新闹钟",
     "time": "时间",
     "medication": "药物",
+    "medicationPlaceholder": "输入药物名称",
+    "repeat": "重复",
     "days": "天数",
     "daily": "每天",
     "noAlarms": "未设置闹钟",
+    "noAlarmsSubtext": "点击 + 按鈕添加",
+    "loading": "加载闹钟...",
     "mon": "周一",
     "tue": "周二",
     "wed": "周三",
@@ -113,6 +120,10 @@
     "selectedDrug": "选定的药物：",
     "askChatbot": "向聊天机器人询问此药物",
     "back": "返回"
+  },
+  "settings": {
+    "title": "设置",
+    "changeLanguage": "更改语言"
   },
   "scanResults": {
     "possibleMatches": "可能的匹配",

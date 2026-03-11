@@ -22,11 +22,18 @@
     "title": "Programma Farmaci",
     "subtitle": "Gestisci i tuoi promemoria farmaci",
     "addAlarm": "Aggiungi Nuova Sveglia",
+    "editAlarm": "Modifica Sveglia",
+    "addAlarmBtn": "Aggiungi Sveglia",
+    "updateAlarm": "Aggiorna Sveglia",
     "time": "Ora",
     "medication": "Farmaco",
+    "medicationPlaceholder": "Inserisci il nome del farmaco",
+    "repeat": "Ripeti",
     "days": "Giorni",
     "daily": "Giornaliero",
     "noAlarms": "Nessuna sveglia impostata",
+    "noAlarmsSubtext": "Tocca il pulsante + per aggiungerne una",
+    "loading": "Caricamento sveglie...",
     "mon": "Lun",
     "tue": "Mar",
     "wed": "Mer",
@@ -113,6 +120,10 @@
     "selectedDrug": "Farmaco Selezionato:",
     "askChatbot": "Chiedi al Chatbot Su Questo Farmaco",
     "back": "Indietro"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "changeLanguage": "Cambia lingua"
   },
   "scanResults": {
     "possibleMatches": "Possibili corrispondenze",

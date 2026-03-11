@@ -22,11 +22,18 @@
     "title": "약물 일정",
     "subtitle": "약물 알림 관리",
     "addAlarm": "새 알람 추가",
+    "editAlarm": "알람 편집",
+    "addAlarmBtn": "알람 추가",
+    "updateAlarm": "알람 업데이트",
     "time": "시간",
     "medication": "약물",
+    "medicationPlaceholder": "약물 이름을 입력하세요",
+    "repeat": "반복",
     "days": "요일",
     "daily": "매일",
     "noAlarms": "설정된 알람 없음",
+    "noAlarmsSubtext": "+ 버튼을 탭하여 추가하세요",
+    "loading": "알람 로딩 중...",
     "mon": "월",
     "tue": "화",
     "wed": "수",
@@ -113,6 +120,10 @@
     "selectedDrug": "선택된 약물:",
     "askChatbot": "이 약물에 대해 챗봇에게 물어보기",
     "back": "뒤로"
+  },
+  "settings": {
+    "title": "설정",
+    "changeLanguage": "언어 변경"
   },
   "scanResults": {
     "possibleMatches": "가능한 일치 항목",
