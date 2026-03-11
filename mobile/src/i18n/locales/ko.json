@@ -101,5 +101,14 @@
     "selectedDrug": "선택된 약물:",
     "askChatbot": "이 약물에 대해 챗봇에게 물어보기",
     "back": "뒤로"
+  },
+  "scanResults": {
+    "possibleMatches": "가능한 일치 항목",
+    "noMatchesFound": "일치 항목을 찾을 수 없습니다",
+    "tapToLearnMore": "약물을 탭하여 자세히 알아보세요",
+    "scanning": "스캔 중...",
+    "noMatchesMessage": "더 나은 조명이나 반사가 적은 다른 사진을 시도하거나 수동으로 약물을 검색하세요.",
+    "retryScan": "다시 스캔",
+    "manualSearch": "수동 검색"
   }
 }
