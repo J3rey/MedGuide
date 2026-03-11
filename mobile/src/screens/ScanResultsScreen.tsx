@@ -106,11 +106,6 @@ export default function ScanResultsScreen({
               onPress={() => selectMedication(item)}
             >
               <Text style={styles.rowTitle}>{item.drug_name}</Text>
-              {item.indications && (
-                <Text style={styles.rowSubtitle} numberOfLines={2}>
-                  {item.indications}
-                </Text>
-              )}
             </TouchableOpacity>
           )}
         />
