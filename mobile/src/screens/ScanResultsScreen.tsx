@@ -53,7 +53,7 @@ export default function ScanResultsScreen({
         console.error('[ScanResults] Scan error:', e);
         if (!mounted) return;
         const message =
-          e instanceof Error ? e.message : 'Scan failed. Please try again.';
+          e instanceof Error ? e.message : t('scanResults.scanFailed');
         setError(message);
         setMatches([]);
         setLoading(false);

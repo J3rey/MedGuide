@@ -33,7 +33,17 @@
     "thu": "Gio",
     "fri": "Ven",
     "sat": "Sab",
-    "sun": "Dom"
+    "sun": "Dom",
+    "errors": {
+      "alarmsDisabledTitle": "Sveglie Disabilitate",
+      "alarmsDisabledMessage": "Abilita le notifiche nelle impostazioni del dispositivo per ricevere le sveglie dei farmaci.",
+      "error": "Errore",
+      "failedToUpdate": "Impossibile aggiornare la sveglia",
+      "selectMedication": "Seleziona un farmaco",
+      "failedToCreate": "Impossibile creare la sveglia",
+      "enterMedication": "Inserisci un farmaco",
+      "failedToDelete": "Impossibile eliminare la sveglia"
+    }
   },
   "camera": {
     "title": "Scansiona Farmaco",
@@ -61,6 +71,8 @@
       "checking": "Verifica dei permessi della fotocamera..."
     },
     "errors": {
+      "imageLoadErrorTitle": "Errore Caricamento Immagine",
+      "imageLoadErrorMessage": "Impossibile visualizzare la foto acquisita. Riprova.",
       "captureFailedTitle": "Scatto Fallito",
       "captureFailedMessage": "Impossibile scattare la foto. Riprova.",
       "cameraErrorTitle": "Errore Fotocamera",
@@ -107,6 +119,7 @@
     "noMatchesFound": "Nessuna corrispondenza trovata",
     "tapToLearnMore": "Tocca un farmaco per saperne di più",
     "scanning": "Scansione...",
+    "scanFailed": "Scansione fallita. Riprova.",
     "noMatchesMessage": "Prova un'altra foto con una migliore illuminazione o meno riflessi, oppure cerca il farmaco manualmente.",
     "retryScan": "Riprova scansione",
     "manualSearch": "Ricerca manuale"

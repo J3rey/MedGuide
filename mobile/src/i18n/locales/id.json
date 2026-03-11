@@ -33,7 +33,17 @@
     "thu": "Kam",
     "fri": "Jum",
     "sat": "Sab",
-    "sun": "Min"
+    "sun": "Min",
+    "errors": {
+      "alarmsDisabledTitle": "Alarm Dinonaktifkan",
+      "alarmsDisabledMessage": "Harap aktifkan notifikasi di pengaturan perangkat Anda untuk menerima alarm obat.",
+      "error": "Kesalahan",
+      "failedToUpdate": "Gagal memperbarui alarm",
+      "selectMedication": "Silakan pilih obat",
+      "failedToCreate": "Gagal membuat alarm",
+      "enterMedication": "Silakan masukkan obat",
+      "failedToDelete": "Gagal menghapus alarm"
+    }
   },
   "camera": {
     "title": "Pindai Obat",
@@ -61,6 +71,8 @@
       "checking": "Memeriksa izin kamera..."
     },
     "errors": {
+      "imageLoadErrorTitle": "Kesalahan Memuat Gambar",
+      "imageLoadErrorMessage": "Gagal menampilkan foto yang diambil. Silakan coba lagi.",
       "captureFailedTitle": "Pengambilan Gagal",
       "captureFailedMessage": "Tidak dapat mengambil foto. Silakan coba lagi.",
       "cameraErrorTitle": "Kesalahan Kamera",
@@ -107,6 +119,7 @@
     "noMatchesFound": "Tidak ada kecocokan ditemukan",
     "tapToLearnMore": "Ketuk obat untuk mempelajari lebih lanjut",
     "scanning": "Memindai...",
+    "scanFailed": "Pemindaian gagal. Silakan coba lagi.",
     "noMatchesMessage": "Coba foto lain dengan pencahayaan lebih baik atau lebih sedikit silau, atau cari obat secara manual.",
     "retryScan": "Coba pindai lagi",
     "manualSearch": "Pencarian manual"

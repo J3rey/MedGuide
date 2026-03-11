@@ -978,8 +978,8 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
           onError={(error) => {
             console.error('Image load error:', error);
             Alert.alert(
-              'Image Load Error',
-              'Failed to display captured photo. Please try again.',
+              t('camera.errors.imageLoadErrorTitle'),
+              t('camera.errors.imageLoadErrorMessage'),
               [{ text: 'OK', onPress: retake }]
             );
           }}

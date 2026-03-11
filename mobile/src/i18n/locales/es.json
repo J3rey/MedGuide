@@ -33,7 +33,17 @@
     "thu": "Jue",
     "fri": "Vie",
     "sat": "Sáb",
-    "sun": "Dom"
+    "sun": "Dom",
+    "errors": {
+      "alarmsDisabledTitle": "Alarmas Desactivadas",
+      "alarmsDisabledMessage": "Por favor habilite las notificaciones en la configuración de su dispositivo para recibir alarmas de medicamentos.",
+      "error": "Error",
+      "failedToUpdate": "Error al actualizar la alarma",
+      "selectMedication": "Por favor seleccione un medicamento",
+      "failedToCreate": "Error al crear la alarma",
+      "enterMedication": "Por favor ingrese un medicamento",
+      "failedToDelete": "Error al eliminar la alarma"
+    }
   },
   "camera": {
     "title": "Escanear Medicamento",
@@ -61,6 +71,8 @@
       "checking": "Verificando permisos de cámara..."
     },
     "errors": {
+      "imageLoadErrorTitle": "Error al Cargar Imagen",
+      "imageLoadErrorMessage": "Error al mostrar la foto capturada. Por favor intente nuevamente.",
       "captureFailedTitle": "Captura Fallida",
       "captureFailedMessage": "No se pudo tomar la foto. Por favor intente nuevamente.",
       "cameraErrorTitle": "Error de Cámara",
@@ -107,6 +119,7 @@
     "noMatchesFound": "No se encontraron coincidencias",
     "tapToLearnMore": "Toque un medicamento para obtener más información",
     "scanning": "Escaneando...",
+    "scanFailed": "Escaneo fallido. Por favor intente nuevamente.",
     "noMatchesMessage": "Intente con otra foto con mejor iluminación o menos brillo, o busque el medicamento manualmente.",
     "retryScan": "Reintentar escaneo",
     "manualSearch": "Búsqueda manual"

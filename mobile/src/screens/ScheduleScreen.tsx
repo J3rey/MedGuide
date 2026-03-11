@@ -111,8 +111,8 @@ export default function ScheduleScreen(): React.JSX.Element {
     } catch (error) {
       console.error('Failed to register for notifications:', error);
       Alert.alert(
-        'Alarms Disabled',
-        'Please enable notifications in your device settings to receive medication alarms.'
+        t('schedule.errors.alarmsDisabledTitle'),
+        t('schedule.errors.alarmsDisabledMessage')
       );
     }
   };
@@ -190,13 +190,13 @@ export default function ScheduleScreen(): React.JSX.Element {
       console.error('Error toggling alarm:', error);
       // Revert on error
       setAlarms(alarms.map((a) => (a.id === alarm.id ? alarm : a)));
-      Alert.alert('Error', 'Failed to update alarm');
+      Alert.alert(t('schedule.errors.error'), t('schedule.errors.failedToUpdate'));
     }
   };
 
   const addAlarm = async (): Promise<void> => {
     if (!newAlarmMed.trim()) {
-      Alert.alert('Error', 'Please select a medication');
+      Alert.alert(t('schedule.errors.error'), t('schedule.errors.selectMedication'));
       return;
     }
 
@@ -232,7 +232,7 @@ export default function ScheduleScreen(): React.JSX.Element {
       setEditingAlarm(null);
     } catch (error) {
       console.error('Error adding alarm:', error);
-      Alert.alert('Error', 'Failed to create alarm');
+      Alert.alert(t('schedule.errors.error'), t('schedule.errors.failedToCreate'));
     }
   };
 
@@ -253,7 +253,7 @@ export default function ScheduleScreen(): React.JSX.Element {
 
   const updateAlarm = async (): Promise<void> => {
     if (!newAlarmMed.trim() || !editingAlarm) {
-      Alert.alert('Error', 'Please enter a medication');
+      Alert.alert(t('schedule.errors.error'), t('schedule.errors.enterMedication'));
       return;
     }
 
@@ -297,7 +297,7 @@ export default function ScheduleScreen(): React.JSX.Element {
       setEditingAlarm(null);
     } catch (error) {
       console.error('Error updating alarm:', error);
-      Alert.alert('Error', 'Failed to update alarm');
+      Alert.alert(t('schedule.errors.error'), t('schedule.errors.failedToUpdate'));
     }
   };
 
@@ -328,7 +328,7 @@ export default function ScheduleScreen(): React.JSX.Element {
       setAlarms(alarms.filter((a) => a.id !== alarm.id));
     } catch (error) {
       console.error('Error removing alarm:', error);
-      Alert.alert('Error', 'Failed to delete alarm');
+      Alert.alert(t('schedule.errors.error'), t('schedule.errors.failedToDelete'));
     }
   };
 

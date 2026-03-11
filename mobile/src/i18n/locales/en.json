@@ -33,7 +33,17 @@
     "thu": "Thu",
     "fri": "Fri",
     "sat": "Sat",
-    "sun": "Sun"
+    "sun": "Sun",
+    "errors": {
+      "alarmsDisabledTitle": "Alarms Disabled",
+      "alarmsDisabledMessage": "Please enable notifications in your device settings to receive medication alarms.",
+      "error": "Error",
+      "failedToUpdate": "Failed to update alarm",
+      "selectMedication": "Please select a medication",
+      "failedToCreate": "Failed to create alarm",
+      "enterMedication": "Please enter a medication",
+      "failedToDelete": "Failed to delete alarm"
+    }
   },
   "camera": {
     "title": "Scan Medication",
@@ -61,6 +71,8 @@
       "checking": "Checking camera permissions..."
     },
     "errors": {
+      "imageLoadErrorTitle": "Image Load Error",
+      "imageLoadErrorMessage": "Failed to display captured photo. Please try again.",
       "captureFailedTitle": "Capture Failed",
       "captureFailedMessage": "Unable to take photo. Please try again.",
       "cameraErrorTitle": "Camera Error",
@@ -107,6 +119,7 @@
     "noMatchesFound": "No matches found",
     "tapToLearnMore": "Tap a medication to learn more",
     "scanning": "Scanning...",
+    "scanFailed": "Scan failed. Please try again.",
     "noMatchesMessage": "Try another photo with better lighting or less glare, or search for the drug manually.",
     "retryScan": "Retry scan",
     "manualSearch": "Manual search"
