@@ -1301,7 +1301,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: 120,
     justifyContent: 'center',
     alignItems: 'center',
     pointerEvents: 'none',
@@ -1326,7 +1326,7 @@ const styles = StyleSheet.create({
   // ─── Zoom Pill ───
   zoomPillRow: {
     position: 'absolute',
-    bottom: 140,
+    bottom: 130,
     left: 0,
     right: 0,
     alignItems: 'center',

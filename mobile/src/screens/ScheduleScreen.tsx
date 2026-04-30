@@ -11,6 +11,7 @@ import {
   Platform,
   Alert,
   Modal,
+  KeyboardAvoidingView,
 } from 'react-native';
 import DateTimePicker, {
   DateTimePickerEvent,
@@ -545,23 +546,27 @@ export default function ScheduleScreen(): React.JSX.Element {
         </View>
       </ScrollView>
 
-      {/* ─── Bottom Sheet Form Modal ─── */}
+      {/* ─── Top Sheet Form Modal ─── */}
       <Modal
         visible={showForm}
         transparent={true}
-        animationType="slide"
+        animationType="fade"
         onRequestClose={resetForm}
       >
-        <TouchableOpacity
+        <KeyboardAvoidingView
           style={styles.sheetOverlay}
-          activeOpacity={1}
-          onPress={resetForm}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           <TouchableOpacity
+            style={styles.sheetOverlay}
             activeOpacity={1}
-            onPress={() => {}}
-            style={styles.sheetContainer}
+            onPress={resetForm}
           >
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => {}}
+              style={styles.sheetContainer}
+            >
             {/* Handle bar */}
             <View style={styles.sheetHandle} />
 
@@ -585,14 +590,54 @@ export default function ScheduleScreen(): React.JSX.Element {
             {/* Time picker */}
             <View style={styles.fieldGroup}>
               <Text style={styles.fieldLabel}>{t('schedule.time')}</Text>
-              <TouchableOpacity
-                style={styles.timePickerBtn}
-                onPress={() => setShowTimePicker(true)}
-              >
-                <Text style={styles.timePickerBtnText}>
-                  {formatTime(newAlarmTime)}
-                </Text>
-              </TouchableOpacity>
+              {Platform.OS === 'web' ? (
+                <View style={styles.webTimeRow}>
+                  <TouchableOpacity
+                    style={styles.webTimeBtn}
+                    onPress={() => {
+                      const newDate = new Date(newAlarmTime);
+                      newDate.setHours((newDate.getHours() + 1) % 24);
+                      setNewAlarmTime(newDate);
+                    }}
+                  >
+                    <Text style={styles.webTimeBtnText}>+</Text>
+                  </TouchableOpacity>
+                  <View style={styles.webTimeDisplay}>
+                    <Text style={styles.webTimeText}>
+                      {formatTime(newAlarmTime)}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.webTimeBtn}
+                    onPress={() => {
+                      const newDate = new Date(newAlarmTime);
+                      newDate.setMinutes((newDate.getMinutes() + 5) % 60);
+                      setNewAlarmTime(newDate);
+                    }}
+                  >
+                    <Text style={styles.webTimeBtnText}>+5m</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.webTimeBtn}
+                    onPress={() => {
+                      const newDate = new Date(newAlarmTime);
+                      newDate.setMinutes((newDate.getMinutes() - 5 + 60) % 60);
+                      setNewAlarmTime(newDate);
+                    }}
+                  >
+                    <Text style={styles.webTimeBtnText}>-5m</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.timePickerBtn}
+                  onPress={() => setShowTimePicker(true)}
+                >
+                  <Text style={styles.timePickerBtnText}>
+                    {formatTime(newAlarmTime)}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             {/* Day selector */}
@@ -651,12 +696,13 @@ export default function ScheduleScreen(): React.JSX.Element {
                 <Text style={styles.deleteBtnText}>{t('common.delete')}</Text>
               </TouchableOpacity>
             )}
+            </TouchableOpacity>
           </TouchableOpacity>
-        </TouchableOpacity>
+        </KeyboardAvoidingView>
       </Modal>
 
-      {/* Time Picker Modal (iOS) */}
-      {showTimePicker &&
+      {/* Time Picker Modal */}
+      {showTimePicker && Platform.OS !== 'web' &&
         (Platform.OS === 'ios' ? (
           <Modal
             visible={showTimePicker}
@@ -665,7 +711,7 @@ export default function ScheduleScreen(): React.JSX.Element {
             onRequestClose={() => setShowTimePicker(false)}
           >
             <TouchableOpacity
-              style={styles.sheetOverlay}
+              style={styles.timePickerOverlay}
               activeOpacity={1}
               onPress={() => setShowTimePicker(false)}
             >
@@ -929,20 +975,21 @@ const styles = StyleSheet.create({
       theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
   },
 
-  // ─── Bottom Sheet ───
+  // ─── Top Sheet ───
   sheetOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
   },
   sheetContainer: {
     backgroundColor: theme.colors.card,
-    borderTopLeftRadius: theme.radius['2xl'],
-    borderTopRightRadius: theme.radius['2xl'],
+    borderBottomLeftRadius: theme.radius['2xl'],
+    borderBottomRightRadius: theme.radius['2xl'],
     paddingHorizontal: theme.spacing.xl,
-    paddingBottom: theme.spacing['2xl'],
-    paddingTop: theme.spacing.md,
+    paddingBottom: theme.spacing.xl,
+    paddingTop: theme.spacing.xl,
     maxHeight: '85%',
+    ...theme.shadows.elevated,
   },
   sheetHandle: {
     width: 36,
@@ -1067,7 +1114,47 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.semibold,
   },
 
+  // ─── Web Time Controls ───
+  webTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  webTimeDisplay: {
+    flex: 1,
+    backgroundColor: theme.colors.inputBackground,
+    borderRadius: theme.radius.lg,
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+  },
+  webTimeText: {
+    fontSize: theme.typography.fontSize.xl,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.foreground,
+  },
+  webTimeBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  webTimeBtnText: {
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.primary,
+  },
+
   // ─── Time Picker Sheet ───
+  timePickerOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'flex-end',
+  },
   timePickerSheet: {
     backgroundColor: theme.colors.card,
     borderTopLeftRadius: theme.radius['2xl'],
