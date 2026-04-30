@@ -38,41 +38,8 @@ interface Alarm {
   last_snoozed?: string;
 }
 
-// Geometric Edit (Pencil) Icon
-function EditIcon() {
-  return (
-    <View style={iconStyles.editContainer}>
-      <View style={iconStyles.editBody} />
-      <View style={iconStyles.editTip} />
-    </View>
-  );
-}
-
-// Geometric Delete (Trash) Icon
-function DeleteIcon() {
-  return (
-    <View style={iconStyles.deleteContainer}>
-      <View style={iconStyles.deleteLid} />
-      <View style={iconStyles.deleteBody}>
-        <View style={iconStyles.deleteLine} />
-        <View style={iconStyles.deleteLine} />
-      </View>
-    </View>
-  );
-}
-
-// Geometric Clock Icon
-function ClockIcon() {
-  return (
-    <View style={iconStyles.clockContainer}>
-      <View style={iconStyles.clockFace}>
-        <View style={iconStyles.clockHandH} />
-        <View style={iconStyles.clockHandM} />
-        <View style={iconStyles.clockCenter} />
-      </View>
-    </View>
-  );
-}
+// All 7 day keys in order (Mon–Sun)
+const ALL_DAY_KEYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function ScheduleScreen(): React.JSX.Element {
   const { t } = useTranslation();
@@ -88,16 +55,22 @@ export default function ScheduleScreen(): React.JSX.Element {
     { key: 'Sun', label: t('schedule.sun') },
   ];
 
-  const getDayLabel = (day: string): string => {
-    const found = dayOptions.find((d) => d.key === day);
-    return found ? found.label : day;
+  // Single-letter labels for the compact day dots row
+  const dayDotLabels: Record<string, string> = {
+    Mon: 'M',
+    Tue: 'T',
+    Wed: 'W',
+    Thu: 'T',
+    Fri: 'F',
+    Sat: 'S',
+    Sun: 'S',
   };
 
   const { width: screenWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [alarms, setAlarms] = useState<Alarm[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAddAlarm, setShowAddAlarm] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [newAlarmTime, setNewAlarmTime] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [newAlarmMed, setNewAlarmMed] = useState('');
@@ -132,15 +105,6 @@ export default function ScheduleScreen(): React.JSX.Element {
     setNewAlarmTime(currentDate);
   };
 
-  const formatTime = (date: Date): string => {
-    let hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    return `${hours}:${minutes} ${ampm}`;
-  };
-
   const formatTime24 = (date: Date): string => {
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -151,11 +115,31 @@ export default function ScheduleScreen(): React.JSX.Element {
     const [hoursStr, minutesStr] = time24.split(':');
     let hours = parseInt(hoursStr, 10);
     const minutes = minutesStr;
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return `${hours}:${minutes}`;
+  };
+
+  const displayAmPm = (time24: string): string => {
+    const [hoursStr] = time24.split(':');
+    const hours = parseInt(hoursStr, 10);
+    return hours >= 12 ? 'PM' : 'AM';
+  };
+
+  const formatTime = (date: Date): string => {
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
     hours = hours ? hours : 12;
     return `${hours}:${minutes} ${ampm}`;
   };
+
+  const isDayActive = (alarm: Alarm, dayKey: string): boolean => {
+    if (alarm.days.includes('Daily')) return true;
+    return alarm.days.includes(dayKey);
+  };
+
 
   const initializeNotifications = async (): Promise<void> => {
     try {
@@ -276,11 +260,7 @@ export default function ScheduleScreen(): React.JSX.Element {
       if (error) throw error;
 
       setAlarms([...alarms, data]);
-      setNewAlarmMed('');
-      setNewAlarmTime(new Date());
-      setSelectedDays(['Daily']);
-      setShowAddAlarm(false);
-      setEditingAlarm(null);
+      resetForm();
     } catch (error) {
       console.error('Error adding alarm:', error);
       Alert.alert(
@@ -301,7 +281,7 @@ export default function ScheduleScreen(): React.JSX.Element {
     setNewAlarmTime(date);
 
     setSelectedDays(alarm.days);
-    setShowAddAlarm(true);
+    setShowForm(true);
   };
 
   const updateAlarm = async (): Promise<void> => {
@@ -342,11 +322,7 @@ export default function ScheduleScreen(): React.JSX.Element {
       if (error) throw error;
 
       setAlarms(alarms.map((a) => (a.id === editingAlarm.id ? data : a)));
-      setNewAlarmMed('');
-      setNewAlarmTime(new Date());
-      setSelectedDays(['Daily']);
-      setShowAddAlarm(false);
-      setEditingAlarm(null);
+      resetForm();
     } catch (error) {
       console.error('Error updating alarm:', error);
       Alert.alert(
@@ -356,11 +332,11 @@ export default function ScheduleScreen(): React.JSX.Element {
     }
   };
 
-  const cancelEdit = (): void => {
+  const resetForm = (): void => {
     setNewAlarmMed('');
     setNewAlarmTime(new Date());
     setSelectedDays(['Daily']);
-    setShowAddAlarm(false);
+    setShowForm(false);
     setEditingAlarm(null);
   };
 
@@ -387,9 +363,24 @@ export default function ScheduleScreen(): React.JSX.Element {
     }
   };
 
-  const containerPadding = screenWidth > 768 ? 48 : 24;
-  const maxContentWidth =
-    screenWidth > 768 ? 800 : screenWidth - containerPadding * 2;
+  const confirmDelete = (alarm: Alarm): void => {
+    Alert.alert(
+      t('common.delete'),
+      `${alarm.medication_name} — ${displayTime(alarm.time)} ${displayAmPm(alarm.time)}`,
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.delete'),
+          style: 'destructive',
+          onPress: () => removeAlarm(alarm),
+        },
+      ]
+    );
+  };
+
+  const containerPadding = screenWidth > 768 ? 48 : 20;
+
+  // ─── Render ──────────────────────────────────────────────
 
   return (
     <View style={styles.container}>
@@ -404,75 +395,224 @@ export default function ScheduleScreen(): React.JSX.Element {
             styles.header,
             {
               paddingHorizontal: containerPadding,
-              paddingTop: Math.max(insets.top, theme.spacing.base) + theme.spacing.sm,
+              paddingTop: Math.max(insets.top, theme.spacing.base) + theme.spacing.md,
             },
           ]}
         >
-          <Text style={styles.title}>{t('schedule.title')}</Text>
+          <View>
+            <Text style={styles.title}>{t('schedule.title')}</Text>
+            <Text style={styles.subtitle}>
+              {alarms.length > 0
+                ? `${alarms.filter((a) => a.enabled).length} active`
+                : t('schedule.subtitle')}
+            </Text>
+          </View>
           <TouchableOpacity
-            onPress={() => setShowAddAlarm(!showAddAlarm)}
+            onPress={() => {
+              setEditingAlarm(null);
+              setNewAlarmMed('');
+              setNewAlarmTime(new Date());
+              setSelectedDays(['Daily']);
+              setShowForm(true);
+            }}
             style={styles.addButton}
           >
-            <Text style={styles.addButtonText}>+</Text>
+            <View style={styles.plusIcon}>
+              <View style={styles.plusH} />
+              <View style={styles.plusV} />
+            </View>
           </TouchableOpacity>
         </View>
 
-        {/* Add/Edit Form */}
-        {showAddAlarm && (
-          <View
-            style={[
-              styles.formCard,
-              styles.responsiveContainer,
-              {
-                marginHorizontal: containerPadding,
-                maxWidth: maxContentWidth,
-              },
-            ]}
+        {/* Alarm List */}
+        <View style={{ paddingHorizontal: containerPadding }}>
+          {loading ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>{t('schedule.loading')}</Text>
+            </View>
+          ) : alarms.length === 0 ? (
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIconCircle}>
+                <View style={styles.emptyClockFace}>
+                  <View style={styles.emptyClockHandH} />
+                  <View style={styles.emptyClockHandM} />
+                  <View style={styles.emptyClockDot} />
+                </View>
+              </View>
+              <Text style={styles.emptyTitle}>{t('schedule.noAlarms')}</Text>
+              <Text style={styles.emptySubtext}>
+                {t('schedule.noAlarmsSubtext')}
+              </Text>
+            </View>
+          ) : (
+            alarms.map((alarm, index) => (
+              <TouchableOpacity
+                key={alarm.id}
+                style={[
+                  styles.alarmRow,
+                  index === 0 && styles.alarmRowFirst,
+                  index === alarms.length - 1 && styles.alarmRowLast,
+                ]}
+                onPress={() => startEditAlarm(alarm)}
+                onLongPress={() => confirmDelete(alarm)}
+                activeOpacity={0.7}
+              >
+                {/* Left: Color bar */}
+                <View
+                  style={[
+                    styles.colorBar,
+                    {
+                      backgroundColor: alarm.enabled
+                        ? theme.colors.primary
+                        : theme.colors.muted,
+                    },
+                  ]}
+                />
+
+                {/* Center: Time + Med + Days */}
+                <View style={styles.alarmBody}>
+                  <View style={styles.timeRow}>
+                    <Text
+                      style={[
+                        styles.timeText,
+                        !alarm.enabled && styles.textDisabled,
+                      ]}
+                    >
+                      {displayTime(alarm.time)}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.ampmText,
+                        !alarm.enabled && styles.textDisabled,
+                      ]}
+                    >
+                      {displayAmPm(alarm.time)}
+                    </Text>
+                  </View>
+
+                  <Text
+                    style={[
+                      styles.medName,
+                      !alarm.enabled && styles.textMutedDisabled,
+                    ]}
+                  >
+                    {alarm.medication_name}
+                  </Text>
+
+                  {/* Day dots row */}
+                  <View style={styles.dayDotsRow}>
+                    {ALL_DAY_KEYS.map((dayKey) => {
+                      const active = isDayActive(alarm, dayKey);
+                      return (
+                        <View
+                          key={dayKey}
+                          style={[
+                            styles.dayDot,
+                            active && alarm.enabled
+                              ? styles.dayDotActive
+                              : styles.dayDotInactive,
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.dayDotText,
+                              active && alarm.enabled
+                                ? styles.dayDotTextActive
+                                : styles.dayDotTextInactive,
+                            ]}
+                          >
+                            {dayDotLabels[dayKey]}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                </View>
+
+                {/* Right: Switch */}
+                <Switch
+                  value={alarm.enabled}
+                  onValueChange={() => toggleAlarm(alarm)}
+                  trackColor={{
+                    false: theme.colors.switchBackground,
+                    true: theme.colors.primary,
+                  }}
+                  thumbColor={theme.colors.card}
+                />
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
+      </ScrollView>
+
+      {/* ─── Bottom Sheet Form Modal ─── */}
+      <Modal
+        visible={showForm}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={resetForm}
+      >
+        <TouchableOpacity
+          style={styles.sheetOverlay}
+          activeOpacity={1}
+          onPress={resetForm}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => {}}
+            style={styles.sheetContainer}
           >
-            <Text style={styles.formTitle}>
+            {/* Handle bar */}
+            <View style={styles.sheetHandle} />
+
+            <Text style={styles.sheetTitle}>
               {editingAlarm ? t('schedule.editAlarm') : t('schedule.addAlarm')}
             </Text>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>{t('schedule.medication')}</Text>
+            {/* Medication input */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>{t('schedule.medication')}</Text>
               <TextInput
-                style={styles.input}
+                style={styles.fieldInput}
                 value={newAlarmMed}
                 onChangeText={setNewAlarmMed}
                 placeholder={t('schedule.medicationPlaceholder')}
                 placeholderTextColor={theme.colors.mutedForeground}
+                autoFocus={!editingAlarm}
               />
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>{t('schedule.time')}</Text>
+            {/* Time picker */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>{t('schedule.time')}</Text>
               <TouchableOpacity
-                style={styles.timeButton}
+                style={styles.timePickerBtn}
                 onPress={() => setShowTimePicker(true)}
               >
-                <Text style={styles.timeButtonText}>
+                <Text style={styles.timePickerBtnText}>
                   {formatTime(newAlarmTime)}
                 </Text>
-                <ClockIcon />
               </TouchableOpacity>
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>{t('schedule.repeat')}</Text>
-              <View style={styles.daysSelector}>
+            {/* Day selector */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>{t('schedule.repeat')}</Text>
+              <View style={styles.dayChipsRow}>
                 {dayOptions.map(({ key, label }) => (
                   <TouchableOpacity
                     key={key}
                     style={[
                       styles.dayChip,
-                      selectedDays.includes(key) && styles.dayChipActive,
+                      selectedDays.includes(key) && styles.dayChipSelected,
                     ]}
                     onPress={() => toggleDay(key)}
                   >
                     <Text
                       style={[
-                        styles.dayChipText,
-                        selectedDays.includes(key) && styles.dayChipTextActive,
+                        styles.dayChipLabel,
+                        selectedDays.includes(key) &&
+                          styles.dayChipLabelSelected,
                       ]}
                     >
                       {label}
@@ -482,132 +622,40 @@ export default function ScheduleScreen(): React.JSX.Element {
               </View>
             </View>
 
-            <View style={styles.buttonRow}>
+            {/* Actions */}
+            <View style={styles.sheetActions}>
+              <TouchableOpacity onPress={resetForm} style={styles.cancelBtn}>
+                <Text style={styles.cancelBtnText}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
               <TouchableOpacity
                 onPress={editingAlarm ? updateAlarm : addAlarm}
-                style={styles.primaryBtn}
+                style={styles.saveBtn}
               >
-                <Text style={styles.primaryBtnText}>
+                <Text style={styles.saveBtnText}>
                   {editingAlarm
                     ? t('schedule.updateAlarm')
                     : t('schedule.addAlarmBtn')}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={cancelEdit} style={styles.secondaryBtn}>
-                <Text style={styles.secondaryBtnText}>
-                  {t('common.cancel')}
-                </Text>
+            </View>
+
+            {/* Delete button for editing */}
+            {editingAlarm && (
+              <TouchableOpacity
+                onPress={() => {
+                  resetForm();
+                  confirmDelete(editingAlarm);
+                }}
+                style={styles.deleteBtn}
+              >
+                <Text style={styles.deleteBtnText}>{t('common.delete')}</Text>
               </TouchableOpacity>
-            </View>
-          </View>
-        )}
+            )}
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
 
-        {/* Alarm List */}
-        <View
-          style={[
-            styles.alarmsList,
-            styles.responsiveContainer,
-            {
-              paddingHorizontal: containerPadding,
-              maxWidth: maxContentWidth,
-            },
-          ]}
-        >
-          {loading ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>{t('schedule.loading')}</Text>
-            </View>
-          ) : (
-            alarms.map((alarm) => (
-              <View key={alarm.id} style={styles.alarmCard}>
-                <View style={styles.alarmContent}>
-                  <View style={styles.alarmInfo}>
-                    <Text
-                      style={[
-                        styles.alarmTime,
-                        !alarm.enabled && styles.disabledText,
-                      ]}
-                    >
-                      {displayTime(alarm.time)}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.alarmMedName,
-                        !alarm.enabled && styles.disabledSubtext,
-                      ]}
-                    >
-                      {alarm.medication_name}
-                    </Text>
-                    <View style={styles.dayBadges}>
-                      {alarm.days.map((day, idx) => (
-                        <View
-                          key={idx}
-                          style={[
-                            styles.dayBadge,
-                            alarm.enabled
-                              ? styles.dayBadgeActive
-                              : styles.dayBadgeInactive,
-                          ]}
-                        >
-                          <Text
-                            style={[
-                              styles.dayBadgeText,
-                              alarm.enabled
-                                ? styles.dayBadgeTextActive
-                                : styles.dayBadgeTextInactive,
-                            ]}
-                          >
-                            {getDayLabel(day)}
-                          </Text>
-                        </View>
-                      ))}
-                    </View>
-                  </View>
-                  <View style={styles.alarmActions}>
-                    <TouchableOpacity
-                      onPress={() => startEditAlarm(alarm)}
-                      style={styles.actionBtn}
-                      accessibilityLabel={t('common.edit')}
-                    >
-                      <EditIcon />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => removeAlarm(alarm)}
-                      style={styles.actionBtn}
-                      accessibilityLabel={t('common.delete')}
-                    >
-                      <DeleteIcon />
-                    </TouchableOpacity>
-                    <Switch
-                      value={alarm.enabled}
-                      onValueChange={() => toggleAlarm(alarm)}
-                      trackColor={{
-                        false: theme.colors.switchBackground,
-                        true: theme.colors.primary,
-                      }}
-                      thumbColor={theme.colors.card}
-                    />
-                  </View>
-                </View>
-              </View>
-            ))
-          )}
-        </View>
-
-        {!loading && alarms.length === 0 && (
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIcon}>
-              <ClockIcon />
-            </View>
-            <Text style={styles.emptyText}>{t('schedule.noAlarms')}</Text>
-            <Text style={styles.emptySubtext}>
-              {t('schedule.noAlarmsSubtext')}
-            </Text>
-          </View>
-        )}
-      </ScrollView>
-
-      {/* Time Picker Modal */}
+      {/* Time Picker Modal (iOS) */}
       {showTimePicker &&
         (Platform.OS === 'ios' ? (
           <Modal
@@ -617,18 +665,22 @@ export default function ScheduleScreen(): React.JSX.Element {
             onRequestClose={() => setShowTimePicker(false)}
           >
             <TouchableOpacity
-              style={styles.modalOverlay}
+              style={styles.sheetOverlay}
               activeOpacity={1}
               onPress={() => setShowTimePicker(false)}
             >
-              <View style={styles.timePickerContainer}>
-                <View style={styles.timePickerHeader}>
-                  <TouchableOpacity onPress={() => setShowTimePicker(false)}>
+              <View style={styles.timePickerSheet}>
+                <View style={styles.timePickerSheetHeader}>
+                  <TouchableOpacity
+                    onPress={() => setShowTimePicker(false)}
+                  >
                     <Text style={styles.timePickerCancel}>
                       {t('common.cancel')}
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setShowTimePicker(false)}>
+                  <TouchableOpacity
+                    onPress={() => setShowTimePicker(false)}
+                  >
                     <Text style={styles.timePickerDone}>
                       {t('common.done')}
                     </Text>
@@ -658,103 +710,6 @@ export default function ScheduleScreen(): React.JSX.Element {
   );
 }
 
-// Geometric icon styles
-const iconStyles = StyleSheet.create({
-  editContainer: {
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  editBody: {
-    width: 12,
-    height: 3,
-    backgroundColor: theme.colors.mutedForeground,
-    borderRadius: 1,
-    transform: [{ rotate: '-45deg' }, { translateY: -2 }],
-  },
-  editTip: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 2,
-    borderRightWidth: 2,
-    borderTopWidth: 4,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderTopColor: theme.colors.mutedForeground,
-    transform: [{ rotate: '-45deg' }, { translateX: -4 }, { translateY: -2 }],
-  },
-  deleteContainer: {
-    width: 20,
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  deleteLid: {
-    width: 14,
-    height: 2,
-    backgroundColor: theme.colors.destructive,
-    borderRadius: 1,
-    marginBottom: 1,
-  },
-  deleteBody: {
-    width: 10,
-    height: 10,
-    borderWidth: 1.5,
-    borderColor: theme.colors.destructive,
-    borderRadius: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    paddingHorizontal: 1,
-  },
-  deleteLine: {
-    width: 1.5,
-    height: 5,
-    backgroundColor: theme.colors.destructive,
-    borderRadius: 1,
-  },
-  clockContainer: {
-    width: 18,
-    height: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  clockFace: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 1.5,
-    borderColor: theme.colors.mutedForeground,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  clockHandH: {
-    position: 'absolute',
-    width: 4,
-    height: 1.5,
-    backgroundColor: theme.colors.mutedForeground,
-    borderRadius: 1,
-    right: 3,
-    top: 6.25,
-  },
-  clockHandM: {
-    position: 'absolute',
-    width: 1.5,
-    height: 4,
-    backgroundColor: theme.colors.mutedForeground,
-    borderRadius: 1,
-    top: 2,
-    left: 6.25,
-  },
-  clockCenter: {
-    width: 2,
-    height: 2,
-    borderRadius: 1,
-    backgroundColor: theme.colors.mutedForeground,
-  },
-});
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -764,243 +719,205 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: theme.spacing['2xl'],
+    paddingBottom: theme.spacing['3xl'],
   },
+
+  // ─── Header ───
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom: theme.spacing.lg,
-    backgroundColor: theme.colors.card,
-    borderBottomLeftRadius: theme.radius['2xl'],
-    borderBottomRightRadius: theme.radius['2xl'],
-    marginBottom: theme.spacing.lg,
-    ...theme.shadows.card,
+    paddingBottom: theme.spacing.xl,
   },
   title: {
     fontSize: theme.typography.fontSize['2xl'],
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.foreground,
   },
+  subtitle: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.mutedForeground,
+    marginTop: 2,
+  },
   addButton: {
-    backgroundColor: theme.colors.primary,
     width: 44,
     height: 44,
-    borderRadius: theme.radius.full,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     ...theme.shadows.interactive,
   },
-  addButtonText: {
-    fontSize: theme.typography.fontSize.xl,
-    color: theme.colors.primaryForeground,
-    fontWeight: theme.typography.fontWeight.bold,
+  plusIcon: {
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  responsiveContainer: {
-    alignSelf: 'center',
-    width: '100%',
+  plusH: {
+    position: 'absolute',
+    width: 18,
+    height: 2.5,
+    borderRadius: 2,
+    backgroundColor: theme.colors.primaryForeground,
+  },
+  plusV: {
+    position: 'absolute',
+    width: 2.5,
+    height: 18,
+    borderRadius: 2,
+    backgroundColor: theme.colors.primaryForeground,
   },
 
-  // Form Card
-  formCard: {
+  // ─── Alarm Row ───
+  alarmRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: theme.colors.card,
-    borderRadius: theme.radius['2xl'],
-    padding: theme.spacing.xl,
-    marginBottom: theme.spacing.lg,
-    ...theme.shadows.card,
+    paddingVertical: theme.spacing.base,
+    paddingRight: theme.spacing.base,
+    paddingLeft: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    overflow: 'hidden',
   },
-  formTitle: {
-    fontSize: theme.typography.fontSize.xl,
+  alarmRowFirst: {
+    borderTopLeftRadius: theme.radius.xl,
+    borderTopRightRadius: theme.radius.xl,
+  },
+  alarmRowLast: {
+    borderBottomLeftRadius: theme.radius.xl,
+    borderBottomRightRadius: theme.radius.xl,
+    borderBottomWidth: 0,
+  },
+  colorBar: {
+    width: 4,
+    alignSelf: 'stretch',
+    borderTopRightRadius: 2,
+    borderBottomRightRadius: 2,
+    marginRight: theme.spacing.base,
+  },
+  alarmBody: {
+    flex: 1,
+    paddingVertical: theme.spacing.xs,
+  },
+  timeRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: theme.spacing.xs,
+  },
+  timeText: {
+    fontSize: 32,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.foreground,
-    marginBottom: theme.spacing.lg,
+    letterSpacing: -1,
   },
-  inputGroup: {
-    marginBottom: theme.spacing.lg,
-  },
-  label: {
+  ampmText: {
     fontSize: theme.typography.fontSize.sm,
-    color: theme.colors.foreground,
-    marginBottom: theme.spacing.sm,
     fontWeight: theme.typography.fontWeight.semibold,
-  },
-  input: {
-    backgroundColor: theme.colors.inputBackground,
-    borderRadius: theme.radius.xl,
-    paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.md,
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.foreground,
-  },
-  timeButton: {
-    backgroundColor: theme.colors.inputBackground,
-    borderRadius: theme.radius.xl,
-    paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.md,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  timeButtonText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.foreground,
-    fontWeight: theme.typography.fontWeight.medium,
-  },
-  daysSelector: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: theme.spacing.sm,
-  },
-  dayChip: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.muted,
-  },
-  dayChipActive: {
-    backgroundColor: theme.colors.primary,
-  },
-  dayChipText: {
-    fontSize: theme.typography.fontSize.sm,
     color: theme.colors.mutedForeground,
-    fontWeight: theme.typography.fontWeight.medium,
   },
-  dayChipTextActive: {
-    color: theme.colors.primaryForeground,
-    fontWeight: theme.typography.fontWeight.bold,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: theme.spacing.md,
-    marginTop: theme.spacing.sm,
-  },
-  primaryBtn: {
-    flex: 1,
-    minHeight: 48,
-    paddingVertical: theme.spacing.md,
-    borderRadius: theme.radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.primary,
-    ...theme.shadows.interactive,
-  },
-  primaryBtnText: {
-    color: theme.colors.primaryForeground,
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: theme.typography.fontWeight.bold,
-  },
-  secondaryBtn: {
-    flex: 1,
-    minHeight: 48,
-    paddingVertical: theme.spacing.md,
-    borderRadius: theme.radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.muted,
-  },
-  secondaryBtnText: {
-    color: theme.colors.foreground,
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: theme.typography.fontWeight.semibold,
-  },
-
-  // Alarm List
-  alarmsList: {
-    gap: theme.spacing.md,
-  },
-  alarmCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.xl,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.sm,
-    ...theme.shadows.card,
-  },
-  alarmContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: theme.spacing.base,
-  },
-  alarmInfo: {
-    flex: 1,
-  },
-  alarmTime: {
-    fontSize: theme.typography.fontSize['2xl'],
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.foreground,
-    marginBottom: theme.spacing.xs,
-  },
-  alarmMedName: {
+  medName: {
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.primary,
+    fontWeight: theme.typography.fontWeight.medium,
+    marginTop: 2,
     marginBottom: theme.spacing.sm,
-    fontWeight: theme.typography.fontWeight.semibold,
   },
-  disabledText: {
+  textDisabled: {
     color: theme.colors.mutedForeground,
   },
-  disabledSubtext: {
+  textMutedDisabled: {
     color: theme.colors.mutedForeground,
+    opacity: 0.6,
   },
-  dayBadges: {
+
+  // ─── Day Dots ───
+  dayDotsRow: {
     flexDirection: 'row',
     gap: theme.spacing.xs,
-    flexWrap: 'wrap',
   },
-  dayBadge: {
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: theme.spacing.xs,
-    borderRadius: theme.radius.full,
+  dayDot: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  dayBadgeActive: {
+  dayDotActive: {
     backgroundColor: theme.colors.primaryLight,
   },
-  dayBadgeInactive: {
+  dayDotInactive: {
     backgroundColor: theme.colors.muted,
   },
-  dayBadgeText: {
-    fontSize: theme.typography.fontSize.xs,
-    fontWeight: theme.typography.fontWeight.medium,
+  dayDotText: {
+    fontSize: 10,
+    fontWeight: theme.typography.fontWeight.bold,
   },
-  dayBadgeTextActive: {
+  dayDotTextActive: {
     color: theme.colors.primary,
   },
-  dayBadgeTextInactive: {
+  dayDotTextInactive: {
     color: theme.colors.mutedForeground,
   },
-  alarmActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.xs,
-  },
-  actionBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: theme.radius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.inputBackground,
-  },
 
-  // Empty State
+  // ─── Empty State ───
   emptyState: {
     alignItems: 'center',
     paddingVertical: theme.spacing['5xl'],
     paddingHorizontal: theme.spacing.xl,
   },
-  emptyIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: theme.radius.full,
+  emptyIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: theme.colors.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: theme.spacing.lg,
   },
-  emptyText: {
+  emptyClockFace: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 2.5,
+    borderColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyClockHandH: {
+    position: 'absolute',
+    width: 9,
+    height: 2.5,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 1.5,
+    right: 7,
+    top: 15.5,
+  },
+  emptyClockHandM: {
+    position: 'absolute',
+    width: 2.5,
+    height: 9,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 1.5,
+    top: 5,
+    left: 15.5,
+  },
+  emptyClockDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: theme.colors.primary,
+  },
+  emptyTitle: {
     fontSize: theme.typography.fontSize.lg,
-    color: theme.colors.foreground,
     fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.foreground,
+    textAlign: 'center',
+  },
+  emptyText: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.mutedForeground,
     textAlign: 'center',
   },
   emptySubtext: {
@@ -1012,19 +929,152 @@ const styles = StyleSheet.create({
       theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
   },
 
-  // Time Picker Modal
-  modalOverlay: {
+  // ─── Bottom Sheet ───
+  sheetOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'flex-end',
   },
-  timePickerContainer: {
+  sheetContainer: {
+    backgroundColor: theme.colors.card,
+    borderTopLeftRadius: theme.radius['2xl'],
+    borderTopRightRadius: theme.radius['2xl'],
+    paddingHorizontal: theme.spacing.xl,
+    paddingBottom: theme.spacing['2xl'],
+    paddingTop: theme.spacing.md,
+    maxHeight: '85%',
+  },
+  sheetHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: theme.colors.muted,
+    alignSelf: 'center',
+    marginBottom: theme.spacing.lg,
+  },
+  sheetTitle: {
+    fontSize: theme.typography.fontSize.xl,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.foreground,
+    marginBottom: theme.spacing.xl,
+  },
+
+  // ─── Form Fields ───
+  fieldGroup: {
+    marginBottom: theme.spacing.lg,
+  },
+  fieldLabel: {
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.mutedForeground,
+    marginBottom: theme.spacing.sm,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  fieldInput: {
+    backgroundColor: theme.colors.inputBackground,
+    borderRadius: theme.radius.lg,
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: 14,
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.foreground,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  timePickerBtn: {
+    backgroundColor: theme.colors.inputBackground,
+    borderRadius: theme.radius.lg,
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  timePickerBtnText: {
+    fontSize: theme.typography.fontSize.xl,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.foreground,
+  },
+  dayChipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: theme.spacing.sm,
+  },
+  dayChip: {
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.inputBackground,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  dayChipSelected: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  dayChipLabel: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.foreground,
+    fontWeight: theme.typography.fontWeight.medium,
+  },
+  dayChipLabelSelected: {
+    color: theme.colors.primaryForeground,
+    fontWeight: theme.typography.fontWeight.bold,
+  },
+
+  // ─── Sheet Actions ───
+  sheetActions: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+    marginTop: theme.spacing.md,
+  },
+  cancelBtn: {
+    flex: 1,
+    minHeight: 50,
+    borderRadius: theme.radius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.muted,
+  },
+  cancelBtnText: {
+    color: theme.colors.foreground,
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semibold,
+  },
+  saveBtn: {
+    flex: 2,
+    minHeight: 50,
+    borderRadius: theme.radius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.primary,
+    ...theme.shadows.interactive,
+  },
+  saveBtnText: {
+    color: theme.colors.primaryForeground,
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.bold,
+  },
+  deleteBtn: {
+    marginTop: theme.spacing.md,
+    minHeight: 44,
+    borderRadius: theme.radius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteBtnText: {
+    color: theme.colors.destructive,
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semibold,
+  },
+
+  // ─── Time Picker Sheet ───
+  timePickerSheet: {
     backgroundColor: theme.colors.card,
     borderTopLeftRadius: theme.radius['2xl'],
     borderTopRightRadius: theme.radius['2xl'],
     paddingBottom: theme.spacing.xl,
   },
-  timePickerHeader: {
+  timePickerSheetHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: theme.spacing.base,
