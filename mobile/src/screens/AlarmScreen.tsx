@@ -85,7 +85,7 @@ export default function AlarmScreen({
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              style={[styles.button, styles.dismissButton]}
+              style={styles.dismissButton}
               onPress={onDismiss}
               activeOpacity={0.8}
             >
@@ -96,7 +96,7 @@ export default function AlarmScreen({
               <Text style={styles.snoozeLabel}>{t('alarm.snoozeLabel')}</Text>
               <View style={styles.snoozeButtons}>
                 <TouchableOpacity
-                  style={[styles.button, styles.snoozeButton]}
+                  style={styles.snoozeButton}
                   onPress={() => onSnooze(5)}
                   activeOpacity={0.8}
                 >
@@ -106,7 +106,7 @@ export default function AlarmScreen({
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.button, styles.snoozeButton]}
+                  style={styles.snoozeButton}
                   onPress={() => onSnooze(10)}
                   activeOpacity={0.8}
                 >
@@ -116,7 +116,7 @@ export default function AlarmScreen({
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.button, styles.snoozeButton]}
+                  style={styles.snoozeButton}
                   onPress={() => onSnooze(15)}
                   activeOpacity={0.8}
                 >
@@ -150,18 +150,18 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing['3xl'],
   },
   medicationIcon: {
-    width: 80,
-    height: 80,
+    width: 88,
+    height: 88,
     borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.alarmForeground + '30',
-    borderWidth: 4,
+    backgroundColor: theme.colors.alarmForeground + '25',
+    borderWidth: 3,
     borderColor: theme.colors.alarmForeground,
     justifyContent: 'center',
     alignItems: 'center',
   },
   crossH: {
     position: 'absolute',
-    width: 28,
+    width: 30,
     height: 6,
     backgroundColor: theme.colors.alarmForeground,
     borderRadius: 3,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   crossV: {
     position: 'absolute',
     width: 6,
-    height: 28,
+    height: 30,
     backgroundColor: theme.colors.alarmForeground,
     borderRadius: 3,
   },
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: theme.typography.fontSize.lg,
-    color: theme.colors.alarmForeground + 'E6',
+    color: theme.colors.alarmForeground + 'CC',
     marginBottom: theme.spacing['4xl'],
     textAlign: 'center',
   },
@@ -198,18 +198,14 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: theme.spacing.xl,
   },
-  button: {
-    minHeight: 48,
+  dismissButton: {
+    minHeight: 64,
     paddingVertical: theme.spacing.lg,
     paddingHorizontal: theme.spacing.xl,
-    borderRadius: theme.radius.xl,
+    borderRadius: theme.radius.full,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  dismissButton: {
     backgroundColor: theme.colors.alarmForeground,
-    minHeight: 70,
-    ...theme.shadows.interactive,
   },
   dismissButtonText: {
     fontSize: theme.typography.fontSize.xl,
@@ -222,7 +218,7 @@ const styles = StyleSheet.create({
   },
   snoozeLabel: {
     fontSize: theme.typography.fontSize.base,
-    color: theme.colors.alarmForeground + 'E6',
+    color: theme.colors.alarmForeground + 'CC',
     textAlign: 'center',
   },
   snoozeButtons: {
@@ -232,9 +228,15 @@ const styles = StyleSheet.create({
   },
   snoozeButton: {
     flex: 1,
-    backgroundColor: theme.colors.alarmForeground + '33',
+    minHeight: 48,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.base,
+    borderRadius: theme.radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.alarmForeground + '30',
     borderWidth: 2,
-    borderColor: theme.colors.alarmForeground + '80',
+    borderColor: theme.colors.alarmForeground + '60',
   },
   snoozeButtonText: {
     fontSize: theme.typography.fontSize.base,

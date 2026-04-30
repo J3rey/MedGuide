@@ -122,22 +122,32 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
   const containerPadding = screenWidth > 768 ? 48 : 24;
   const maxContentWidth = screenWidth > 768 ? 800 : screenWidth;
 
+  // Send arrow icon
+  const SendIcon = () => (
+    <View style={styles.sendIcon}>
+      <View style={styles.sendArrowLine} />
+      <View style={styles.sendArrowHead} />
+    </View>
+  );
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
+      {/* Header */}
       <View
         style={[
           styles.header,
           {
             paddingHorizontal: containerPadding,
-            paddingTop: Math.max(insets.top, theme.spacing.base),
+            paddingTop: Math.max(insets.top, theme.spacing.base) + theme.spacing.sm,
           },
         ]}
       >
         <View style={styles.headerContent}>
+          <View style={styles.headerDot} />
           <View>
             <Text style={styles.headerTitle}>{t('chat.title')}</Text>
             <Text style={styles.headerSubtitle}>{t('chat.subtitle')}</Text>
@@ -145,6 +155,7 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
         </View>
       </View>
 
+      {/* Messages */}
       <ScrollView
         ref={scrollViewRef}
         style={styles.messagesContainer}
@@ -159,6 +170,7 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
         onContentSizeChange={() =>
           scrollViewRef.current?.scrollToEnd({ animated: true })
         }
+        showsVerticalScrollIndicator={false}
       >
         {messages.map((message) => (
           <View
@@ -189,10 +201,17 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
                 {message.text}
               </Text>
             </View>
+            <Text style={styles.timestamp}>
+              {message.timestamp.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </Text>
           </View>
         ))}
       </ScrollView>
 
+      {/* Input */}
       <View
         style={[
           styles.inputContainer,
@@ -203,26 +222,27 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
           },
         ]}
       >
-        <TextInput
-          style={styles.input}
-          value={inputMessage}
-          onChangeText={setInputMessage}
-          placeholder={t('chat.placeholder')}
-          placeholderTextColor={theme.colors.mutedForeground}
-          multiline
-          maxLength={500}
-        />
-
-        <TouchableOpacity
-          onPress={() => sendMessage()}
-          style={[
-            styles.sendButton,
-            !inputMessage.trim() && styles.sendButtonDisabled,
-          ]}
-          disabled={!inputMessage.trim()}
-        >
-          <Text style={styles.sendText}>{t('chat.send')}</Text>
-        </TouchableOpacity>
+        <View style={styles.inputRow}>
+          <TextInput
+            style={styles.input}
+            value={inputMessage}
+            onChangeText={setInputMessage}
+            placeholder={t('chat.placeholder')}
+            placeholderTextColor={theme.colors.mutedForeground}
+            multiline
+            maxLength={500}
+          />
+          <TouchableOpacity
+            onPress={() => sendMessage()}
+            style={[
+              styles.sendButton,
+              !inputMessage.trim() && styles.sendButtonDisabled,
+            ]}
+            disabled={!inputMessage.trim()}
+          >
+            <SendIcon />
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -234,15 +254,22 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
-    paddingVertical: theme.spacing.base,
-    paddingHorizontal: theme.spacing.xl,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    paddingBottom: theme.spacing.lg,
     backgroundColor: theme.colors.card,
+    borderBottomLeftRadius: theme.radius['2xl'],
+    borderBottomRightRadius: theme.radius['2xl'],
+    ...theme.shadows.card,
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: theme.spacing.md,
+  },
+  headerDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: theme.colors.success,
   },
   headerTitle: {
     fontSize: theme.typography.fontSize.xl,
@@ -258,8 +285,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   messagesContent: {
-    paddingVertical: theme.spacing.base,
-    paddingHorizontal: theme.spacing.xl,
+    paddingVertical: theme.spacing.lg,
     gap: theme.spacing.base,
   },
   responsiveContent: {
@@ -276,18 +302,20 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   messageBubble: {
-    maxWidth: '75%',
+    maxWidth: '78%',
     borderRadius: theme.radius.chatBubble,
     paddingHorizontal: theme.spacing.base,
     paddingVertical: theme.spacing.md,
   },
   userMessage: {
     backgroundColor: theme.colors.primary,
+    borderBottomRightRadius: theme.spacing.xs,
+    ...theme.shadows.interactive,
   },
   botMessage: {
-    backgroundColor: theme.colors.botBubble,
-    borderWidth: 1,
-    borderColor: theme.colors.botBubbleBorder,
+    backgroundColor: theme.colors.card,
+    borderBottomLeftRadius: theme.spacing.xs,
+    ...theme.shadows.card,
   },
   messageText: {
     fontSize: theme.typography.fontSize.base,
@@ -300,45 +328,70 @@ const styles = StyleSheet.create({
   botMessageText: {
     color: theme.colors.foreground,
   },
+  timestamp: {
+    fontSize: theme.typography.fontSize.xs,
+    color: theme.colors.mutedForeground,
+    marginTop: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.xs,
+  },
   inputContainer: {
+    paddingVertical: theme.spacing.md,
+    backgroundColor: theme.colors.card,
+    borderTopLeftRadius: theme.radius['2xl'],
+    borderTopRightRadius: theme.radius['2xl'],
+    ...theme.shadows.elevated,
+  },
+  inputRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingHorizontal: theme.spacing.xl,
-    paddingVertical: theme.spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-    backgroundColor: theme.colors.card,
     gap: theme.spacing.sm,
   },
   input: {
     flex: 1,
     backgroundColor: theme.colors.inputBackground,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
     borderRadius: theme.radius.xl,
     paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.foreground,
     maxHeight: 100,
   },
   sendButton: {
     backgroundColor: theme.colors.primary,
-    paddingHorizontal: theme.spacing.lg,
-    minHeight: 48,
-    borderRadius: theme.radius.xl,
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.full,
     alignItems: 'center',
     justifyContent: 'center',
     ...theme.shadows.interactive,
   },
   sendButtonDisabled: {
     backgroundColor: theme.colors.muted,
-    opacity: 0.5,
     ...theme.shadows.none,
   },
-  sendText: {
-    color: theme.colors.primaryForeground,
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: theme.typography.fontWeight.bold,
+  sendIcon: {
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sendArrowLine: {
+    width: 12,
+    height: 2,
+    backgroundColor: theme.colors.primaryForeground,
+    borderRadius: 1,
+    transform: [{ rotate: '-45deg' }],
+  },
+  sendArrowHead: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    width: 0,
+    height: 0,
+    borderBottomWidth: 5,
+    borderLeftWidth: 5,
+    borderBottomColor: 'transparent',
+    borderLeftColor: theme.colors.primaryForeground,
+    transform: [{ rotate: '-45deg' }],
   },
 });

@@ -68,8 +68,10 @@ export default function ScanResultsScreen({
   if (loading) {
     return (
       <SafeAreaView style={styles.center} edges={['top']}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={styles.subtleText}>{t('scanResults.scanning')}</Text>
+        <View style={styles.loadingCard}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.loadingText}>{t('scanResults.scanning')}</Text>
+        </View>
       </SafeAreaView>
     );
   }
@@ -88,26 +90,32 @@ export default function ScanResultsScreen({
             ? t('scanResults.possibleMatches')
             : t('scanResults.noMatchesFound')}
         </Text>
-
         {hasMatches && (
           <Text style={styles.subtitle}>{t('scanResults.tapToLearnMore')}</Text>
         )}
       </View>
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {error ? (
+        <View style={styles.errorCard}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : null}
 
       {hasMatches ? (
         <FlatList
           data={matches}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={styles.row}
+              style={styles.matchCard}
               onPress={() => selectMedication(item)}
+              activeOpacity={0.7}
             >
-              <Text style={styles.rowTitle}>{item.drug_name}</Text>
-              <View style={styles.rowArrow}>
+              <View style={styles.matchDot} />
+              <Text style={styles.matchName}>{item.drug_name}</Text>
+              <View style={styles.matchArrow}>
                 <View style={styles.arrowLine} />
                 <View style={styles.arrowHead} />
               </View>
@@ -115,22 +123,32 @@ export default function ScanResultsScreen({
           )}
         />
       ) : (
-        <Text style={styles.bodyText}>{t('scanResults.noMatchesMessage')}</Text>
+        <View style={styles.noMatchCard}>
+          <Text style={styles.noMatchText}>
+            {t('scanResults.noMatchesMessage')}
+          </Text>
+        </View>
       )}
 
       <View style={styles.actions}>
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={() => navigation.goBack()}
+          activeOpacity={0.7}
         >
-          <Text style={styles.primaryButtonText}>{t('scanResults.retryScan')}</Text>
+          <Text style={styles.primaryButtonText}>
+            {t('scanResults.retryScan')}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => navigation.navigate('ManualSearch')}
+          activeOpacity={0.7}
         >
-          <Text style={styles.secondaryButtonText}>{t('scanResults.manualSearch')}</Text>
+          <Text style={styles.secondaryButtonText}>
+            {t('scanResults.manualSearch')}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -150,8 +168,20 @@ const styles = StyleSheet.create({
     padding: theme.spacing.xl,
     backgroundColor: theme.colors.background,
   },
+  loadingCard: {
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius['2xl'],
+    padding: theme.spacing['3xl'],
+    alignItems: 'center',
+    gap: theme.spacing.lg,
+    ...theme.shadows.card,
+  },
+  loadingText: {
+    color: theme.colors.mutedForeground,
+    fontSize: theme.typography.fontSize.base,
+  },
   headerSection: {
-    marginBottom: theme.spacing.base,
+    marginBottom: theme.spacing.lg,
   },
   title: {
     fontSize: theme.typography.fontSize.xl,
@@ -163,50 +193,45 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.sm,
     color: theme.colors.mutedForeground,
   },
-  bodyText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.mutedForeground,
-    marginTop: theme.spacing.sm,
-    lineHeight:
-      theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
-  },
-  subtleText: {
-    marginTop: theme.spacing.md,
-    color: theme.colors.mutedForeground,
-    fontSize: theme.typography.fontSize.base,
-  },
-  error: {
-    marginTop: theme.spacing.sm,
+  errorCard: {
+    backgroundColor: theme.colors.destructive + '15',
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.base,
     marginBottom: theme.spacing.md,
+  },
+  errorText: {
     color: theme.colors.destructive,
     fontSize: theme.typography.fontSize.sm,
   },
   list: {
-    paddingTop: theme.spacing.sm,
+    paddingTop: theme.spacing.xs,
+    gap: theme.spacing.md,
   },
-  row: {
-    paddingVertical: theme.spacing.base,
+  matchCard: {
+    paddingVertical: theme.spacing.lg,
     paddingHorizontal: theme.spacing.lg,
-    marginVertical: theme.spacing.xs,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
     borderRadius: theme.radius.xl,
     backgroundColor: theme.colors.card,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    ...theme.shadows.surface,
+    gap: theme.spacing.md,
+    ...theme.shadows.card,
   },
-  rowTitle: {
+  matchDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: theme.colors.primary,
+  },
+  matchName: {
     fontSize: theme.typography.fontSize.base,
     fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.foreground,
     flex: 1,
   },
-  rowArrow: {
+  matchArrow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: theme.spacing.sm,
   },
   arrowLine: {
     width: 8,
@@ -223,14 +248,26 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
     borderLeftColor: theme.colors.mutedForeground,
   },
+  noMatchCard: {
+    backgroundColor: theme.colors.secondaryLight,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.xl,
+    marginTop: theme.spacing.sm,
+  },
+  noMatchText: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.mutedForeground,
+    lineHeight:
+      theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
+  },
   actions: {
-    marginTop: theme.spacing.lg,
-    gap: theme.spacing.sm,
+    marginTop: theme.spacing.xl,
+    gap: theme.spacing.md,
   },
   primaryButton: {
-    minHeight: 48,
+    minHeight: 52,
     paddingVertical: theme.spacing.md,
-    borderRadius: theme.radius.xl,
+    borderRadius: theme.radius.full,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: theme.colors.primary,
@@ -242,14 +279,13 @@ const styles = StyleSheet.create({
     color: theme.colors.primaryForeground,
   },
   secondaryButton: {
-    minHeight: 48,
+    minHeight: 52,
     paddingVertical: theme.spacing.md,
-    borderWidth: 1,
-    borderRadius: theme.radius.xl,
-    borderColor: theme.colors.border,
+    borderRadius: theme.radius.full,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: theme.colors.card,
+    ...theme.shadows.surface,
   },
   secondaryButtonText: {
     fontSize: theme.typography.fontSize.base,

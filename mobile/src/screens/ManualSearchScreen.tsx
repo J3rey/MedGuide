@@ -73,7 +73,16 @@ export default function ManualSearchScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, theme.spacing.base) + theme.spacing.sm }]}>
+      {/* Header */}
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop:
+              Math.max(insets.top, theme.spacing.base) + theme.spacing.sm,
+          },
+        ]}
+      >
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -83,32 +92,31 @@ export default function ManualSearchScreen() {
         <Text style={styles.title}>{t('manualSearch.title')}</Text>
       </View>
 
+      {/* Search */}
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder={t('manualSearch.searchPlaceholder')}
-          placeholderTextColor={theme.colors.mutedForeground}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          autoCapitalize="words"
-          autoCorrect={false}
-          autoFocus={true}
-        />
-        {loading && (
-          <ActivityIndicator
-            style={styles.loadingIndicator}
-            size="small"
-            color={theme.colors.primary}
+        <View style={styles.searchInputWrapper}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder={t('manualSearch.searchPlaceholder')}
+            placeholderTextColor={theme.colors.mutedForeground}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCapitalize="words"
+            autoCorrect={false}
+            autoFocus={true}
           />
-        )}
+          {loading && (
+            <ActivityIndicator
+              style={styles.loadingIndicator}
+              size="small"
+              color={theme.colors.primary}
+            />
+          )}
+        </View>
+        <Text style={styles.helperText}>{t('manualSearch.helperText')}</Text>
       </View>
 
-      <View style={styles.helperText}>
-        <Text style={styles.helperTextContent}>
-          {t('manualSearch.helperText')}
-        </Text>
-      </View>
-
+      {/* Suggestions */}
       {showSuggestions && suggestions.length > 0 && (
         <View style={styles.suggestionsContainer}>
           <Text style={styles.suggestionsTitle}>
@@ -117,40 +125,49 @@ export default function ManualSearchScreen() {
           <FlatList
             data={suggestions}
             keyExtractor={(item) => item.id.toString()}
+            showsVerticalScrollIndicator={false}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={styles.suggestionItem}
+                style={styles.suggestionCard}
                 onPress={() => handleSelectDrug(item)}
+                activeOpacity={0.7}
               >
-                <Text style={styles.suggestionName}>{item.drug_name}</Text>
-                {item.indications && (
-                  <Text style={styles.suggestionSubtext} numberOfLines={1}>
-                    {item.indications}
-                  </Text>
-                )}
+                <View style={styles.suggestionDot} />
+                <View style={styles.suggestionInfo}>
+                  <Text style={styles.suggestionName}>{item.drug_name}</Text>
+                  {item.indications && (
+                    <Text style={styles.suggestionSubtext} numberOfLines={1}>
+                      {item.indications}
+                    </Text>
+                  )}
+                </View>
               </TouchableOpacity>
             )}
           />
         </View>
       )}
 
+      {/* No Results */}
       {showSuggestions &&
         !loading &&
         suggestions.length === 0 &&
         searchQuery.trim().length >= 2 && (
           <View style={styles.noResultsContainer}>
-            <Text style={styles.noResultsText}>
-              {t('manualSearch.noResults')} "{searchQuery}"
-            </Text>
-            <Text style={styles.noResultsSubtext}>
-              {t('manualSearch.tryAgain')}
-            </Text>
+            <View style={styles.noResultsCard}>
+              <Text style={styles.noResultsText}>
+                {t('manualSearch.noResults')} "{searchQuery}"
+              </Text>
+              <Text style={styles.noResultsSubtext}>
+                {t('manualSearch.tryAgain')}
+              </Text>
+            </View>
           </View>
         )}
 
+      {/* Selected Drug */}
       {selectedDrug && !showSuggestions && (
-        <View style={styles.selectedDrugContainer}>
-          <Text style={styles.selectedDrugTitle}>
+        <View style={styles.selectedContainer}>
+          <Text style={styles.selectedLabel}>
             {t('manualSearch.selectedDrug')}
           </Text>
           <View style={styles.drugCard}>
@@ -226,6 +243,7 @@ export default function ManualSearchScreen() {
           <TouchableOpacity
             style={styles.chatButton}
             onPress={handleAskChatbot}
+            activeOpacity={0.7}
           >
             <Text style={styles.chatButtonText}>
               {t('manualSearch.askChatbot')}
@@ -244,10 +262,11 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: theme.spacing.xl,
-    paddingBottom: theme.spacing.base,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    paddingBottom: theme.spacing.lg,
     backgroundColor: theme.colors.card,
+    borderBottomLeftRadius: theme.radius['2xl'],
+    borderBottomRightRadius: theme.radius['2xl'],
+    ...theme.shadows.card,
   },
   backButton: {
     marginBottom: theme.spacing.sm,
@@ -263,52 +282,64 @@ const styles = StyleSheet.create({
     color: theme.colors.foreground,
   },
   searchContainer: {
+    paddingHorizontal: theme.spacing.xl,
+    paddingTop: theme.spacing.lg,
+  },
+  searchInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.xl,
-    paddingTop: theme.spacing.base,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.xl,
+    paddingHorizontal: theme.spacing.base,
+    ...theme.shadows.surface,
   },
   searchInput: {
     flex: 1,
     minHeight: 48,
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.xl,
-    paddingHorizontal: theme.spacing.base,
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.foreground,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
   },
   loadingIndicator: {
     marginLeft: theme.spacing.sm,
   },
   helperText: {
-    paddingHorizontal: theme.spacing.xl,
-    paddingTop: theme.spacing.sm,
-  },
-  helperTextContent: {
     fontSize: theme.typography.fontSize.xs,
     color: theme.colors.mutedForeground,
     fontStyle: 'italic',
+    marginTop: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.xs,
   },
   suggestionsContainer: {
     flex: 1,
     paddingHorizontal: theme.spacing.xl,
-    paddingTop: theme.spacing.base,
+    paddingTop: theme.spacing.lg,
   },
   suggestionsTitle: {
-    fontSize: theme.typography.fontSize.sm,
+    fontSize: theme.typography.fontSize.xs,
     fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.mutedForeground,
     marginBottom: theme.spacing.sm,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
-  suggestionItem: {
+  suggestionCard: {
     backgroundColor: theme.colors.card,
     padding: theme.spacing.base,
     borderRadius: theme.radius.xl,
     marginBottom: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    ...theme.shadows.surface,
+  },
+  suggestionDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: theme.colors.primary,
+  },
+  suggestionInfo: {
+    flex: 1,
   },
   suggestionName: {
     fontSize: theme.typography.fontSize.base,
@@ -326,6 +357,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: theme.spacing.xl,
   },
+  noResultsCard: {
+    backgroundColor: theme.colors.secondaryLight,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.xl,
+    alignItems: 'center',
+  },
   noResultsText: {
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.foreground,
@@ -337,25 +374,25 @@ const styles = StyleSheet.create({
     color: theme.colors.mutedForeground,
     textAlign: 'center',
   },
-  selectedDrugContainer: {
+  selectedContainer: {
     flex: 1,
     paddingHorizontal: theme.spacing.xl,
-    paddingTop: theme.spacing.base,
+    paddingTop: theme.spacing.lg,
   },
-  selectedDrugTitle: {
-    fontSize: theme.typography.fontSize.sm,
+  selectedLabel: {
+    fontSize: theme.typography.fontSize.xs,
     fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.mutedForeground,
     marginBottom: theme.spacing.sm,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   drugCard: {
     backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.xl,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.base,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    ...theme.shadows.surface,
+    borderRadius: theme.radius['2xl'],
+    padding: theme.spacing.xl,
+    marginBottom: theme.spacing.lg,
+    ...theme.shadows.card,
   },
   drugName: {
     fontSize: theme.typography.fontSize.xl,
@@ -364,7 +401,10 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.base,
   },
   drugSection: {
-    marginTop: theme.spacing.sm,
+    marginTop: theme.spacing.md,
+    paddingTop: theme.spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
   },
   drugSectionTitle: {
     fontSize: theme.typography.fontSize.sm,
@@ -380,10 +420,10 @@ const styles = StyleSheet.create({
   },
   chatButton: {
     backgroundColor: theme.colors.primary,
-    minHeight: 48,
+    minHeight: 52,
     paddingVertical: theme.spacing.base,
     paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.radius.xl,
+    borderRadius: theme.radius.full,
     alignItems: 'center',
     justifyContent: 'center',
     ...theme.shadows.interactive,

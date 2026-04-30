@@ -1,6 +1,7 @@
 /**
- * Design System Theme - Based on Figma Design Tokens
- * Converted from globals.css to React Native compatible theme
+ * MedGuide Design System - Warm Gradient Medical Theme
+ * Inspired by modern health app design with soft gradients,
+ * frosted glass cards, and warm blue-orange palette.
  */
 
 type ColorPalette = {
@@ -12,8 +13,10 @@ type ColorPalette = {
   popoverForeground: string;
   primary: string;
   primaryForeground: string;
+  primaryLight: string;
   secondary: string;
   secondaryForeground: string;
+  secondaryLight: string;
   muted: string;
   mutedForeground: string;
   accent: string;
@@ -45,94 +48,137 @@ type ColorPalette = {
   cameraSurface: string;
   cameraOverlay: string;
   cameraText: string;
+  // Warm theme additions
+  gradientStart: string;
+  gradientMid: string;
+  gradientEnd: string;
+  navBar: string;
+  navBarBorder: string;
+  navPill: string;
+  navPillText: string;
+  navInactiveText: string;
+  headerGradientStart: string;
+  headerGradientEnd: string;
+  success: string;
+  successLight: string;
 };
 
 export const colors: ColorPalette = {
-  background: '#FAFBFD',
-  foreground: '#1A1D2E',
+  background: '#F0F4FA',
+  foreground: '#1A2B4A',
   card: '#FFFFFF',
-  cardForeground: '#1A1D2E',
+  cardForeground: '#1A2B4A',
   popover: '#FFFFFF',
-  popoverForeground: '#1A1D2E',
-  primary: '#3344FF',
+  popoverForeground: '#1A2B4A',
+  primary: '#4A8FE7',
   primaryForeground: '#FFFFFF',
-  secondary: '#FFB845',
-  secondaryForeground: '#1A1D2E',
-  muted: '#F3F4F6',
-  mutedForeground: '#6B7280',
-  accent: '#FFB845',
-  accentForeground: '#1A1D2E',
-  destructive: '#EF4444',
+  primaryLight: '#E8F2FD',
+  secondary: '#F5A623',
+  secondaryForeground: '#FFFFFF',
+  secondaryLight: '#FEF3E0',
+  muted: '#E8EDF5',
+  mutedForeground: '#8494AD',
+  accent: '#FF8C42',
+  accentForeground: '#FFFFFF',
+  destructive: '#E74C3C',
   destructiveForeground: '#FFFFFF',
-  border: '#E5E7EB',
+  border: '#E0E6F0',
   input: 'transparent',
-  inputBackground: '#F9FAFB',
-  switchBackground: '#D1D5DB',
-  ring: '#3344FF',
-  chart1: '#3344FF',
-  chart2: '#FFB845',
-  chart3: '#10B981',
-  chart4: '#8B5CF6',
-  chart5: '#EC4899',
+  inputBackground: '#F5F8FC',
+  switchBackground: '#CBD5E1',
+  ring: '#4A8FE7',
+  chart1: '#4A8FE7',
+  chart2: '#F5A623',
+  chart3: '#2ECC71',
+  chart4: '#9B59B6',
+  chart5: '#E74C3C',
   sidebar: '#FFFFFF',
-  sidebarForeground: '#1A1D2E',
-  sidebarPrimary: '#3344FF',
+  sidebarForeground: '#1A2B4A',
+  sidebarPrimary: '#4A8FE7',
   sidebarPrimaryForeground: '#FFFFFF',
-  sidebarAccent: '#F9FAFB',
-  sidebarAccentForeground: '#1A1D2E',
-  sidebarBorder: '#E5E7EB',
-  sidebarRing: '#3344FF',
-  botBubble: '#F0F2FF',
-  botBubbleBorder: '#E0E5FF',
-  alarmBackground: '#DC2626',
+  sidebarAccent: '#F5F8FC',
+  sidebarAccentForeground: '#1A2B4A',
+  sidebarBorder: '#E0E6F0',
+  sidebarRing: '#4A8FE7',
+  botBubble: '#F5F7FB',
+  botBubbleBorder: '#E8EDF5',
+  alarmBackground: '#E74C3C',
   alarmForeground: '#FFFFFF',
   cameraSurface: '#000000',
   cameraOverlay: 'rgba(0, 0, 0, 0.7)',
   cameraText: '#FFFFFF',
+  // Warm theme
+  gradientStart: '#E8F0FE',
+  gradientMid: '#F0F4FA',
+  gradientEnd: '#FDE8D8',
+  navBar: '#FFFFFF',
+  navBarBorder: '#E8EDF5',
+  navPill: '#4A8FE7',
+  navPillText: '#FFFFFF',
+  navInactiveText: '#8494AD',
+  headerGradientStart: '#E8F0FE',
+  headerGradientEnd: '#FDE8D8',
+  success: '#2ECC71',
+  successLight: '#E8F8F0',
 };
 
 export const darkColors: ColorPalette = {
-  background: '#0F1117',
-  foreground: '#FFFFFF',
-  card: '#1A1D2E',
-  cardForeground: '#FFFFFF',
-  popover: '#1A1D2E',
-  popoverForeground: '#FFFFFF',
-  primary: '#3344FF',
+  background: '#0D1B2A',
+  foreground: '#E8EDF5',
+  card: '#1B2838',
+  cardForeground: '#E8EDF5',
+  popover: '#1B2838',
+  popoverForeground: '#E8EDF5',
+  primary: '#5B9FEF',
   primaryForeground: '#FFFFFF',
-  secondary: '#FFB845',
-  secondaryForeground: '#1A1D2E',
-  muted: '#1F2937',
-  mutedForeground: '#9CA3AF',
-  accent: '#FFB845',
+  primaryLight: '#1B2838',
+  secondary: '#F5A623',
+  secondaryForeground: '#1A2B4A',
+  secondaryLight: '#2A2010',
+  muted: '#1F3044',
+  mutedForeground: '#8494AD',
+  accent: '#FF8C42',
   accentForeground: '#FFFFFF',
-  destructive: '#DC2626',
+  destructive: '#E74C3C',
   destructiveForeground: '#FEE2E2',
-  border: '#374151',
-  input: '#1F2937',
-  inputBackground: '#1F2937',
-  switchBackground: '#4B5563',
-  ring: '#3344FF',
-  chart1: '#3344FF',
-  chart2: '#FFB845',
-  chart3: '#10B981',
-  chart4: '#8B5CF6',
-  chart5: '#EC4899',
-  sidebar: '#1A1D2E',
-  sidebarForeground: '#FFFFFF',
-  sidebarPrimary: '#3344FF',
+  border: '#2A3A50',
+  input: '#1F3044',
+  inputBackground: '#1F3044',
+  switchBackground: '#3A4A5C',
+  ring: '#5B9FEF',
+  chart1: '#5B9FEF',
+  chart2: '#F5A623',
+  chart3: '#2ECC71',
+  chart4: '#9B59B6',
+  chart5: '#E74C3C',
+  sidebar: '#1B2838',
+  sidebarForeground: '#E8EDF5',
+  sidebarPrimary: '#5B9FEF',
   sidebarPrimaryForeground: '#FFFFFF',
-  sidebarAccent: '#1F2937',
-  sidebarAccentForeground: '#FFFFFF',
-  sidebarBorder: '#374151',
-  sidebarRing: '#3344FF',
-  botBubble: '#1E2140',
-  botBubbleBorder: '#2A2D4A',
-  alarmBackground: '#DC2626',
+  sidebarAccent: '#1F3044',
+  sidebarAccentForeground: '#E8EDF5',
+  sidebarBorder: '#2A3A50',
+  sidebarRing: '#5B9FEF',
+  botBubble: '#1F3044',
+  botBubbleBorder: '#2A3A50',
+  alarmBackground: '#E74C3C',
   alarmForeground: '#FFFFFF',
   cameraSurface: '#000000',
   cameraOverlay: 'rgba(0, 0, 0, 0.7)',
   cameraText: '#FFFFFF',
+  // Warm theme dark
+  gradientStart: '#0D1B2A',
+  gradientMid: '#0D1B2A',
+  gradientEnd: '#1A1510',
+  navBar: '#1B2838',
+  navBarBorder: '#2A3A50',
+  navPill: '#5B9FEF',
+  navPillText: '#FFFFFF',
+  navInactiveText: '#6B7B8D',
+  headerGradientStart: '#1B2838',
+  headerGradientEnd: '#1A1510',
+  success: '#2ECC71',
+  successLight: '#1A2A20',
 };
 
 type Typography = {
@@ -167,8 +213,8 @@ export const typography: Typography = {
     lg: 17,
     xl: 20,
     '2xl': 24,
-    '3xl': 28,
-    '4xl': 34,
+    '3xl': 30,
+    '4xl': 36,
   },
   fontWeight: {
     normal: '400',
@@ -214,16 +260,18 @@ type Radius = {
   md: number;
   lg: number;
   xl: number;
+  '2xl': number;
   chatBubble: number;
   full: number;
 };
 
 export const radius: Radius = {
-  sm: 6,
-  md: 8,
-  lg: 10,
-  xl: 14,
-  chatBubble: 18,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  '2xl': 24,
+  chatBubble: 20,
   full: 9999,
 };
 
@@ -238,7 +286,9 @@ type Shadow = {
 type Shadows = {
   none: Shadow;
   surface: Shadow;
+  card: Shadow;
   interactive: Shadow;
+  elevated: Shadow;
 };
 
 export const shadows: Shadows = {
@@ -250,18 +300,32 @@ export const shadows: Shadows = {
     elevation: 0,
   },
   surface: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowColor: '#4A8FE7',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  card: {
+    shadowColor: '#1A2B4A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 3,
   },
   interactive: {
-    shadowColor: '#3344FF',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowColor: '#4A8FE7',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  elevated: {
+    shadowColor: '#1A2B4A',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 24,
+    elevation: 6,
   },
 };
 

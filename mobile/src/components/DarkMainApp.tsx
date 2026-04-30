@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
   useWindowDimensions,
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -149,83 +150,80 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
         const containerPadding = screenWidth > 768 ? 48 : 24;
         return (
           <View style={styles.settingsScreen}>
+            {/* Header with gradient feel */}
             <View
               style={[
                 styles.settingsHeader,
-                { paddingTop: Math.max(insets.top, theme.spacing.base) },
+                { paddingTop: Math.max(insets.top, theme.spacing.base) + theme.spacing.sm },
               ]}
             >
-              <View
-                style={[
-                  styles.headerContent,
-                  { paddingHorizontal: containerPadding },
-                ]}
-              >
-                <Text style={styles.settingsTitle}>
-                  {t('settings.title')}
-                </Text>
+              <View style={[styles.headerInner, { paddingHorizontal: containerPadding }]}>
+                <Text style={styles.settingsTitle}>{t('settings.title')}</Text>
               </View>
             </View>
-            <View
-              style={[
+
+            <ScrollView
+              style={styles.settingsScroll}
+              contentContainerStyle={[
                 styles.settingsContent,
                 { paddingHorizontal: containerPadding },
               ]}
+              showsVerticalScrollIndicator={false}
             >
-              {/* Preferences Section */}
+              {/* Preferences */}
               <Text style={styles.sectionLabel}>Preferences</Text>
-              <View style={styles.settingsGroup}>
-                <TouchableOpacity style={styles.settingsOption} onPress={onBack}>
-                  <View style={styles.settingsOptionContent}>
-                    <View style={styles.settingsIconContainer}>
+              <View style={styles.settingsCard}>
+                <TouchableOpacity style={styles.settingsRow} onPress={onBack}>
+                  <View style={styles.settingsRowLeft}>
+                    <View style={styles.settingsIconBubble}>
                       <View style={styles.globeIcon}>
                         <View style={styles.globeCircle} />
                         <View style={styles.globeLineH} />
                         <View style={styles.globeLineV} />
                       </View>
                     </View>
-                    <View style={styles.settingsTextContainer}>
-                      <Text style={styles.settingsOptionText}>
+                    <View style={styles.settingsRowText}>
+                      <Text style={styles.settingsRowTitle}>
                         {t('settings.changeLanguage')}
                       </Text>
-                      <Text style={styles.settingsOptionSubtext}>
+                      <Text style={styles.settingsRowSubtitle}>
                         Select your preferred language
                       </Text>
                     </View>
                   </View>
                   <View style={styles.chevron}>
-                    <View style={styles.chevronLine1} />
-                    <View style={styles.chevronLine2} />
+                    <View style={styles.chevronTop} />
+                    <View style={styles.chevronBottom} />
                   </View>
                 </TouchableOpacity>
               </View>
 
-              {/* About Section */}
+              {/* About */}
               <Text style={styles.sectionLabel}>About</Text>
-              <View style={styles.settingsGroup}>
-                <View style={styles.aboutItem}>
+              <View style={styles.settingsCard}>
+                <View style={styles.aboutRow}>
                   <Text style={styles.aboutLabel}>Application</Text>
                   <Text style={styles.aboutValue}>MedGuide</Text>
                 </View>
-                <View style={styles.aboutDivider} />
-                <View style={styles.aboutItem}>
+                <View style={styles.divider} />
+                <View style={styles.aboutRow}>
                   <Text style={styles.aboutLabel}>Version</Text>
                   <Text style={styles.aboutValue}>2.0.0</Text>
                 </View>
-                <View style={styles.aboutDivider} />
-                <View style={styles.aboutItem}>
+                <View style={styles.divider} />
+                <View style={styles.aboutRow}>
                   <Text style={styles.aboutLabel}>Purpose</Text>
                   <Text style={styles.aboutValue}>Medication Assistant</Text>
                 </View>
               </View>
 
               {/* Disclaimer */}
-              <View style={styles.disclaimerContainer}>
+              <View style={styles.disclaimerCard}>
                 <Text style={styles.disclaimerText}>
                   MedGuide is designed to assist with medication information. Always consult your healthcare provider for medical advice.
                 </Text>
               </View>
-            </View>
+            </ScrollView>
           </View>
         );
       }
@@ -266,20 +264,21 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
+
+  // Settings
   settingsScreen: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
   settingsHeader: {
-    paddingVertical: theme.spacing.lg,
-    marginBottom: theme.spacing.sm,
     backgroundColor: theme.colors.card,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    paddingBottom: theme.spacing.lg,
+    borderBottomLeftRadius: theme.radius['2xl'],
+    borderBottomRightRadius: theme.radius['2xl'],
+    ...theme.shadows.card,
   },
-  headerContent: {
+  headerInner: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
   settingsTitle: {
@@ -287,56 +286,58 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.foreground,
   },
-  settingsContent: {
+  settingsScroll: {
     flex: 1,
-    paddingTop: theme.spacing.base,
+  },
+  settingsContent: {
+    paddingTop: theme.spacing.lg,
+    paddingBottom: theme.spacing['3xl'],
   },
   sectionLabel: {
-    fontSize: theme.typography.fontSize.sm,
+    fontSize: theme.typography.fontSize.xs,
     fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.mutedForeground,
     marginBottom: theme.spacing.sm,
-    marginTop: theme.spacing.base,
+    marginTop: theme.spacing.lg,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 1,
+    paddingLeft: theme.spacing.xs,
   },
-  settingsGroup: {
+  settingsCard: {
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.xl,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
     overflow: 'hidden',
-    ...theme.shadows.surface,
+    ...theme.shadows.card,
   },
-  settingsOption: {
-    padding: theme.spacing.lg,
+  settingsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: theme.spacing.lg,
   },
-  settingsOptionContent: {
+  settingsRowLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
     gap: theme.spacing.base,
   },
-  settingsIconContainer: {
-    width: 40,
-    height: 40,
+  settingsIconBubble: {
+    width: 42,
+    height: 42,
     borderRadius: theme.radius.lg,
-    backgroundColor: theme.colors.primary + '10',
+    backgroundColor: theme.colors.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  settingsTextContainer: {
+  settingsRowText: {
     flex: 1,
   },
-  settingsOptionText: {
+  settingsRowTitle: {
     fontSize: theme.typography.fontSize.base,
-    color: theme.colors.foreground,
     fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.foreground,
   },
-  settingsOptionSubtext: {
+  settingsRowSubtitle: {
     fontSize: theme.typography.fontSize.sm,
     color: theme.colors.mutedForeground,
     marginTop: theme.spacing.xs,
@@ -347,21 +348,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  chevronLine1: {
+  chevronTop: {
     width: 7,
     height: 1.5,
     backgroundColor: theme.colors.mutedForeground,
     borderRadius: 1,
     transform: [{ rotate: '45deg' }, { translateY: -1.5 }],
   },
-  chevronLine2: {
+  chevronBottom: {
     width: 7,
     height: 1.5,
     backgroundColor: theme.colors.mutedForeground,
     borderRadius: 1,
     transform: [{ rotate: '-45deg' }, { translateY: 1.5 }],
   },
-  aboutItem: {
+  aboutRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -377,14 +378,16 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.mutedForeground,
   },
-  aboutDivider: {
+  divider: {
     height: 1,
     backgroundColor: theme.colors.border,
     marginHorizontal: theme.spacing.lg,
   },
-  disclaimerContainer: {
+  disclaimerCard: {
     marginTop: theme.spacing['2xl'],
-    paddingHorizontal: theme.spacing.base,
+    backgroundColor: theme.colors.secondaryLight,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
   },
   disclaimerText: {
     fontSize: theme.typography.fontSize.sm,
@@ -393,7 +396,8 @@ const styles = StyleSheet.create({
     lineHeight:
       theme.typography.lineHeight.relaxed * theme.typography.fontSize.sm,
   },
-  // Globe icon for language
+
+  // Globe icon
   globeIcon: {
     width: 18,
     height: 18,

@@ -42,8 +42,12 @@ export default function LanguageSelectionScreen({
 
   return (
     <View style={styles.container}>
+      {/* Decorative gradient blobs */}
+      <View style={styles.blobTopRight} />
+      <View style={styles.blobBottomLeft} />
+
       <View style={styles.header}>
-        <Logo size={80} />
+        <Logo size={72} />
         <Text style={styles.title}>{t('languageSelection.title')}</Text>
         <Text style={styles.subtitle}>{t('languageSelection.subtitle')}</Text>
       </View>
@@ -64,6 +68,10 @@ export default function LanguageSelectionScreen({
               <Text style={styles.languageName}>{language.nativeName}</Text>
               <Text style={styles.languageSubtext}>{language.name}</Text>
             </View>
+            <View style={styles.arrow}>
+              <View style={styles.arrowLine} />
+              <View style={styles.arrowHead} />
+            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -75,11 +83,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    overflow: 'hidden',
+  },
+  // Decorative blobs for warmth
+  blobTopRight: {
+    position: 'absolute',
+    top: -60,
+    right: -60,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: theme.colors.gradientEnd,
+    opacity: 0.6,
+  },
+  blobBottomLeft: {
+    position: 'absolute',
+    bottom: -80,
+    left: -80,
+    width: 240,
+    height: 240,
+    borderRadius: 120,
+    backgroundColor: theme.colors.gradientStart,
+    opacity: 0.5,
   },
   header: {
     alignItems: 'center',
     paddingTop: theme.spacing['5xl'],
-    paddingBottom: theme.spacing['3xl'],
+    paddingBottom: theme.spacing['2xl'],
     paddingHorizontal: theme.spacing.xl,
   },
   title: {
@@ -102,7 +132,7 @@ const styles = StyleSheet.create({
   },
   languageListContent: {
     paddingHorizontal: theme.spacing.xl,
-    paddingBottom: theme.spacing.xl,
+    paddingBottom: theme.spacing['3xl'],
     gap: theme.spacing.md,
   },
   languageButton: {
@@ -110,12 +140,15 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.xl,
     paddingVertical: theme.spacing.lg,
     paddingHorizontal: theme.spacing.xl,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    ...theme.shadows.card,
   },
   languageInfo: {
     flexDirection: 'column',
     gap: theme.spacing.xs,
+    flex: 1,
   },
   languageName: {
     fontSize: theme.typography.fontSize.lg,
@@ -126,5 +159,25 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.sm,
     color: theme.colors.mutedForeground,
     fontWeight: theme.typography.fontWeight.normal,
+  },
+  arrow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  arrowLine: {
+    width: 10,
+    height: 1.5,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 1,
+  },
+  arrowHead: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 4,
+    borderBottomWidth: 4,
+    borderLeftWidth: 5,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderLeftColor: theme.colors.primary,
   },
 });

@@ -7,6 +7,7 @@ import {
   Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import theme from '../styles/theme';
 import { ScheduleIcon, CameraIcon, ChatIcon, SettingsIcon } from './TabIcons';
 
@@ -30,28 +31,19 @@ interface TabItemProps {
 function TabItem({ label, Icon, isActive, onPress }: TabItemProps) {
   return (
     <TouchableOpacity
-      style={styles.tab}
+      style={[styles.tab, isActive && styles.activeTab]}
       onPress={onPress}
       activeOpacity={0.7}
       accessibilityRole="tab"
       accessibilityState={{ selected: isActive }}
       accessibilityLabel={label}
     >
-      <View
-        style={isActive ? styles.activeIconContainer : styles.iconContainer}
-      >
-        <Icon active={isActive} />
-      </View>
-      <Text
-        style={[
-          styles.label,
-          isActive && styles.activeLabel,
-        ]}
-        numberOfLines={1}
-        ellipsizeMode="tail"
-      >
-        {label}
-      </Text>
+      <Icon active={isActive} />
+      {isActive ? (
+        <Text style={styles.activeLabelText}>{label}</Text>
+      ) : (
+        <Text style={styles.inactiveLabel}>{label}</Text>
+      )}
     </TouchableOpacity>
   );
 }
@@ -61,6 +53,7 @@ export default function DarkBottomNavigation({
   onTabChange,
 }: DarkBottomNavigationProps): React.JSX.Element {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const tabs = [
     {
@@ -78,7 +71,12 @@ export default function DarkBottomNavigation({
   ];
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { paddingBottom: Math.max(insets.bottom, theme.spacing.sm) },
+      ]}
+    >
       <View style={styles.tabBar}>
         {tabs.map((tab) => (
           <TabItem
@@ -97,53 +95,56 @@ export default function DarkBottomNavigation({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.navBar,
     borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
+    borderTopColor: theme.colors.navBarBorder,
+    paddingTop: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    ...theme.shadows.elevated,
   },
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.base,
-    paddingTop: theme.spacing.sm,
-    paddingBottom: theme.spacing.sm,
-    width: '100%',
+    height: 52,
   },
   tab: {
-    flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: theme.spacing.xs,
     paddingVertical: theme.spacing.xs,
-    maxWidth: 100,
-  },
-  iconContainer: {
-    width: 44,
-    height: 44,
+    paddingHorizontal: theme.spacing.md,
     borderRadius: theme.radius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    gap: theme.spacing.xs,
+    minWidth: 56,
   },
-  activeIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+  activeTab: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.navPill,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    gap: theme.spacing.sm,
+    ...Platform.select({
+      ios: {
+        shadowColor: theme.colors.primary,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
-  label: {
-    fontSize: theme.typography.fontSize.xs,
-    color: theme.colors.mutedForeground,
-    textAlign: 'center',
-    width: '100%',
-    fontWeight: theme.typography.fontWeight.medium,
-  },
-  activeLabel: {
-    color: theme.colors.primary,
+  activeLabelText: {
+    color: theme.colors.navPillText,
+    fontSize: theme.typography.fontSize.sm,
     fontWeight: theme.typography.fontWeight.semibold,
+  },
+  inactiveLabel: {
+    color: theme.colors.navInactiveText,
+    fontSize: theme.typography.fontSize.xs,
+    fontWeight: theme.typography.fontWeight.medium,
+    textAlign: 'center',
   },
 });

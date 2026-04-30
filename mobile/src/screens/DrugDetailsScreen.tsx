@@ -71,8 +71,10 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={styles.loadingText}>{t('drugDetails.loading')}</Text>
+        <View style={styles.loadingCard}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.loadingText}>{t('drugDetails.loading')}</Text>
+        </View>
       </View>
     );
   }
@@ -80,13 +82,18 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
   if (!drug) {
     return (
       <View style={styles.center}>
-        <Text style={styles.errorText}>{t('drugDetails.notFound')}</Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.buttonText}>{t('drugDetails.goBack')}</Text>
-        </TouchableOpacity>
+        <View style={styles.errorCard}>
+          <Text style={styles.errorText}>{t('drugDetails.notFound')}</Text>
+          <TouchableOpacity
+            style={styles.goBackButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.goBackButtonText}>
+              {t('drugDetails.goBack')}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -94,7 +101,11 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingTop: Math.max(insets.top, theme.spacing.base) }}
+      contentContainerStyle={{
+        paddingTop: Math.max(insets.top, theme.spacing.base),
+        paddingBottom: theme.spacing['3xl'],
+      }}
+      showsVerticalScrollIndicator={false}
     >
       <TouchableOpacity
         style={styles.backButton}
@@ -110,45 +121,60 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
 
       {drug.indications && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {t('drugDetails.indications')}
-          </Text>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionDot} />
+            <Text style={styles.sectionTitle}>
+              {t('drugDetails.indications')}
+            </Text>
+          </View>
           <Text style={styles.sectionText}>{drug.indications}</Text>
         </View>
       )}
 
       {drug.counseling && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {t('drugDetails.counselingPoints')}
-          </Text>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionDot} />
+            <Text style={styles.sectionTitle}>
+              {t('drugDetails.counselingPoints')}
+            </Text>
+          </View>
           <Text style={styles.sectionText}>{drug.counseling}</Text>
         </View>
       )}
 
       {drug.adverse_effects && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {t('drugDetails.adverseEffects')}
-          </Text>
+        <View style={[styles.section, styles.warningSection]}>
+          <View style={styles.sectionHeader}>
+            <View style={[styles.sectionDot, styles.warningDot]} />
+            <Text style={[styles.sectionTitle, styles.warningTitle]}>
+              {t('drugDetails.adverseEffects')}
+            </Text>
+          </View>
           <Text style={styles.sectionText}>{drug.adverse_effects}</Text>
         </View>
       )}
 
       {drug.precautions_pregnancy && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {t('drugDetails.precautionsPregnancy')}
-          </Text>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionDot} />
+            <Text style={styles.sectionTitle}>
+              {t('drugDetails.precautionsPregnancy')}
+            </Text>
+          </View>
           <Text style={styles.sectionText}>{drug.precautions_pregnancy}</Text>
         </View>
       )}
 
       {drug.precautions_children && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {t('drugDetails.precautionsChildren')}
-          </Text>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionDot} />
+            <Text style={styles.sectionTitle}>
+              {t('drugDetails.precautionsChildren')}
+            </Text>
+          </View>
           <Text style={styles.sectionText}>{drug.precautions_children}</Text>
         </View>
       )}
@@ -167,26 +193,56 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: theme.colors.background,
+    padding: theme.spacing.xl,
+  },
+  loadingCard: {
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius['2xl'],
+    padding: theme.spacing['3xl'],
+    alignItems: 'center',
+    gap: theme.spacing.lg,
+    ...theme.shadows.card,
   },
   loadingText: {
-    marginTop: theme.spacing.md,
     color: theme.colors.mutedForeground,
     fontSize: theme.typography.fontSize.base,
+  },
+  errorCard: {
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius['2xl'],
+    padding: theme.spacing['2xl'],
+    alignItems: 'center',
+    gap: theme.spacing.lg,
+    ...theme.shadows.card,
   },
   errorText: {
     color: theme.colors.destructive,
     fontSize: theme.typography.fontSize.lg,
-    marginBottom: theme.spacing.md,
+    fontWeight: theme.typography.fontWeight.semibold,
+  },
+  goBackButton: {
+    minHeight: 48,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing['2xl'],
+    borderRadius: theme.radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.primary,
+    ...theme.shadows.interactive,
+  },
+  goBackButtonText: {
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.primaryForeground,
   },
   backButton: {
     marginBottom: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.base,
+    paddingHorizontal: theme.spacing.lg,
     backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.xl,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderRadius: theme.radius.full,
     alignSelf: 'flex-start',
+    ...theme.shadows.surface,
   },
   backText: {
     color: theme.colors.primary,
@@ -202,38 +258,41 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: theme.spacing.base,
     padding: theme.spacing.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
     borderRadius: theme.radius.xl,
     backgroundColor: theme.colors.card,
-    ...theme.shadows.surface,
+    ...theme.shadows.card,
+  },
+  warningSection: {
+    backgroundColor: theme.colors.secondaryLight,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+  },
+  sectionDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: theme.colors.primary,
+  },
+  warningDot: {
+    backgroundColor: theme.colors.secondary,
   },
   sectionTitle: {
     fontSize: theme.typography.fontSize.lg,
     fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.primary,
-    marginBottom: theme.spacing.sm,
+  },
+  warningTitle: {
+    color: theme.colors.secondary,
   },
   sectionText: {
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.mutedForeground,
     lineHeight:
       theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
-  },
-  button: {
-    marginTop: theme.spacing.md,
-    minHeight: 48,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.xl,
-    borderRadius: theme.radius.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.primary,
-    ...theme.shadows.interactive,
-  },
-  buttonText: {
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.primaryForeground,
+    paddingLeft: theme.spacing.lg,
   },
 });

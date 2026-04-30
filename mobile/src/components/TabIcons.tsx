@@ -6,25 +6,21 @@ interface IconProps {
   active: boolean;
 }
 
-// Calendar/Schedule Icon - professional medical appointment style
+const getColor = (active: boolean) =>
+  active ? theme.colors.navPillText : theme.colors.navInactiveText;
+
+// Calendar/Schedule Icon
 export const ScheduleIcon = ({ active }: IconProps) => {
+  const color = getColor(active);
   return (
     <View style={styles.iconContainer}>
-      <View style={styles.scheduleOuter}>
-        {/* Calendar header */}
-        <View
-          style={[styles.scheduleHeader, active && styles.scheduleHeaderActive]}
-        />
-        {/* Calendar grid dots */}
+      <View style={[styles.scheduleBody, { borderColor: color }]}>
+        <View style={[styles.scheduleHeader, { backgroundColor: color }]} />
         <View style={styles.scheduleGrid}>
           {[0, 1, 2, 3].map((i) => (
             <View
               key={i}
-              style={[
-                styles.scheduleDot,
-                active && styles.scheduleDotActive,
-                i === 1 && active && styles.scheduleHighlight,
-              ]}
+              style={[styles.scheduleDot, { backgroundColor: color }]}
             />
           ))}
         </View>
@@ -33,73 +29,49 @@ export const ScheduleIcon = ({ active }: IconProps) => {
   );
 };
 
-// Camera Icon - professional pill/medication scanner style
+// Camera/Scan Icon
 export const CameraIcon = ({ active }: IconProps) => {
+  const color = getColor(active);
   return (
     <View style={styles.iconContainer}>
-      <View style={styles.cameraOuter}>
-        {/* Camera body */}
-        <View style={[styles.cameraBody, active && styles.cameraBodyActive]}>
-          {/* Lens */}
-          <View style={[styles.cameraLens, active && styles.cameraLensActive]}>
-            <View
-              style={[styles.cameraInner, active && styles.cameraInnerActive]}
-            />
-          </View>
+      <View style={[styles.cameraBody, { borderColor: color }]}>
+        <View style={[styles.cameraLens, { borderColor: color }]}>
+          <View style={[styles.cameraDot, { backgroundColor: color }]} />
         </View>
-        {/* Viewfinder corners */}
-        <View style={[styles.cornerTL, active && styles.cornerActive]} />
-        <View style={[styles.cornerTR, active && styles.cornerActive]} />
-        <View style={[styles.cornerBL, active && styles.cornerActive]} />
-        <View style={[styles.cornerBR, active && styles.cornerActive]} />
       </View>
     </View>
   );
 };
 
-// Chat Icon - professional medical consultation style
+// Chat Icon
 export const ChatIcon = ({ active }: IconProps) => {
+  const color = getColor(active);
   return (
     <View style={styles.iconContainer}>
-      <View style={styles.chatOuter}>
-        {/* Main bubble */}
-        <View style={[styles.chatBubble, active && styles.chatBubbleActive]}>
-          {/* Message lines */}
-          <View style={[styles.chatLine, active && styles.chatLineActive]} />
-          <View
-            style={[styles.chatLineShort, active && styles.chatLineActive]}
-          />
-        </View>
-        {/* Tail */}
-        <View style={[styles.chatTail, active && styles.chatTailActive]} />
-        {/* Medical plus indicator */}
-        {active && (
-          <View style={styles.chatPlus}>
-            <View style={styles.chatPlusH} />
-            <View style={styles.chatPlusV} />
-          </View>
-        )}
+      <View style={[styles.chatBubble, { borderColor: color }]}>
+        <View style={[styles.chatLine, { backgroundColor: color }]} />
+        <View
+          style={[styles.chatLineShort, { backgroundColor: color }]}
+        />
       </View>
+      <View style={[styles.chatTail, { borderTopColor: color }]} />
     </View>
   );
 };
 
-// Settings Icon - professional gear/cog style
+// Settings Icon
 export const SettingsIcon = ({ active }: IconProps) => {
+  const color = getColor(active);
   return (
     <View style={styles.iconContainer}>
       <View style={styles.settingsOuter}>
-        {/* Gear center */}
-        <View
-          style={[styles.settingsCenter, active && styles.settingsCenterActive]}
-        />
-        {/* Gear teeth */}
+        <View style={[styles.settingsCenter, { backgroundColor: color }]} />
         {[0, 1, 2, 3, 4, 5].map((i) => (
           <View
             key={i}
             style={[
               styles.settingsTooth,
-              active && styles.settingsToothActive,
+              { backgroundColor: color },
               { transform: [{ rotate: `${i * 60}deg` }] },
             ]}
           />
@@ -111,29 +83,24 @@ export const SettingsIcon = ({ active }: IconProps) => {
 
 const styles = StyleSheet.create({
   iconContainer: {
-    width: 24,
-    height: 24,
+    width: 22,
+    height: 22,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
-  // Schedule/Calendar Icon
-  scheduleOuter: {
-    width: 20,
-    height: 22,
-    borderRadius: 3,
-    borderWidth: 2,
-    borderColor: theme.colors.mutedForeground,
+  // Schedule
+  scheduleBody: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    borderWidth: 1.8,
     padding: 2,
   },
   scheduleHeader: {
-    height: 3,
-    backgroundColor: theme.colors.mutedForeground,
+    height: 2.5,
     borderRadius: 1,
-    marginBottom: 3,
-  },
-  scheduleHeaderActive: {
-    backgroundColor: theme.colors.primaryForeground,
+    marginBottom: 2,
   },
   scheduleGrid: {
     flexDirection: 'row',
@@ -141,208 +108,87 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   scheduleDot: {
-    width: 3,
-    height: 3,
-    borderRadius: 1.5,
-    backgroundColor: theme.colors.mutedForeground,
-  },
-  scheduleDotActive: {
-    backgroundColor: theme.colors.primaryForeground,
-  },
-  scheduleHighlight: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: theme.colors.primaryForeground,
+    width: 2.5,
+    height: 2.5,
+    borderRadius: 1.25,
   },
 
-  // Camera Icon
-  cameraOuter: {
-    width: 24,
-    height: 24,
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  // Camera
   cameraBody: {
     width: 18,
     height: 14,
-    borderRadius: 3,
-    borderWidth: 2,
-    borderColor: theme.colors.mutedForeground,
+    borderRadius: 4,
+    borderWidth: 1.8,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  cameraBodyActive: {
-    borderColor: theme.colors.primaryForeground,
   },
   cameraLens: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
     borderWidth: 1.5,
-    borderColor: theme.colors.mutedForeground,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  cameraLensActive: {
-    borderColor: theme.colors.primaryForeground,
-  },
-  cameraInner: {
-    width: 3,
-    height: 3,
-    borderRadius: 1.5,
-    backgroundColor: theme.colors.mutedForeground,
-  },
-  cameraInnerActive: {
-    backgroundColor: theme.colors.primaryForeground,
-  },
-  cornerTL: {
-    position: 'absolute',
-    top: 1,
-    left: 1,
-    width: 4,
-    height: 4,
-    borderTopWidth: 1.5,
-    borderLeftWidth: 1.5,
-    borderColor: theme.colors.mutedForeground,
-  },
-  cornerTR: {
-    position: 'absolute',
-    top: 1,
-    right: 1,
-    width: 4,
-    height: 4,
-    borderTopWidth: 1.5,
-    borderRightWidth: 1.5,
-    borderColor: theme.colors.mutedForeground,
-  },
-  cornerBL: {
-    position: 'absolute',
-    bottom: 1,
-    left: 1,
-    width: 4,
-    height: 4,
-    borderBottomWidth: 1.5,
-    borderLeftWidth: 1.5,
-    borderColor: theme.colors.mutedForeground,
-  },
-  cornerBR: {
-    position: 'absolute',
-    bottom: 1,
-    right: 1,
-    width: 4,
-    height: 4,
-    borderBottomWidth: 1.5,
-    borderRightWidth: 1.5,
-    borderColor: theme.colors.mutedForeground,
-  },
-  cornerActive: {
-    borderColor: theme.colors.primaryForeground,
+  cameraDot: {
+    width: 2.5,
+    height: 2.5,
+    borderRadius: 1.25,
   },
 
-  // Chat Icon
-  chatOuter: {
-    width: 22,
-    height: 22,
-    position: 'relative',
-  },
+  // Chat
   chatBubble: {
-    width: 20,
-    height: 16,
+    width: 18,
+    height: 14,
     borderRadius: 4,
-    borderWidth: 2,
-    borderColor: theme.colors.mutedForeground,
-    padding: 3,
+    borderWidth: 1.8,
+    padding: 2.5,
     justifyContent: 'center',
   },
-  chatBubbleActive: {
-    borderColor: theme.colors.primaryForeground,
-  },
   chatLine: {
-    height: 2,
-    backgroundColor: theme.colors.mutedForeground,
+    height: 1.8,
     borderRadius: 1,
     marginBottom: 2,
   },
   chatLineShort: {
-    height: 2,
-    width: '70%',
-    backgroundColor: theme.colors.mutedForeground,
+    height: 1.8,
+    width: '65%',
     borderRadius: 1,
-  },
-  chatLineActive: {
-    backgroundColor: theme.colors.primaryForeground,
   },
   chatTail: {
     position: 'absolute',
-    bottom: 0,
-    left: 2,
+    bottom: 2,
+    left: 4,
     width: 0,
     height: 0,
-    borderTopWidth: 4,
-    borderRightWidth: 4,
+    borderTopWidth: 3.5,
+    borderRightWidth: 3.5,
     borderStyle: 'solid',
-    borderTopColor: theme.colors.mutedForeground,
     borderRightColor: 'transparent',
   },
-  chatTailActive: {
-    borderTopColor: theme.colors.primaryForeground,
-  },
-  chatPlus: {
-    position: 'absolute',
-    top: -2,
-    right: -2,
-    width: 8,
-    height: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  chatPlusH: {
-    position: 'absolute',
-    width: 6,
-    height: 1.5,
-    backgroundColor: theme.colors.primaryForeground,
-    borderRadius: 1,
-  },
-  chatPlusV: {
-    position: 'absolute',
-    width: 1.5,
-    height: 6,
-    backgroundColor: theme.colors.primaryForeground,
-    borderRadius: 1,
-  },
 
-  // Settings Icon
+  // Settings
   settingsOuter: {
-    width: 20,
-    height: 20,
+    width: 18,
+    height: 18,
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
   },
   settingsCenter: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: theme.colors.mutedForeground,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     zIndex: 2,
-  },
-  settingsCenterActive: {
-    backgroundColor: theme.colors.primaryForeground,
   },
   settingsTooth: {
     position: 'absolute',
-    width: 3,
-    height: 8,
-    backgroundColor: theme.colors.mutedForeground,
-    borderRadius: 1.5,
+    width: 2.5,
+    height: 7,
+    borderRadius: 1.25,
     top: '50%',
     left: '50%',
-    marginLeft: -1.5,
-    marginTop: -4,
-  },
-  settingsToothActive: {
-    backgroundColor: theme.colors.primaryForeground,
+    marginLeft: -1.25,
+    marginTop: -3.5,
   },
 });
