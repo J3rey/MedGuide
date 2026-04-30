@@ -108,7 +108,8 @@
     "placeholder": "输入您的问题...",
     "greeting": "您好！我是您的医疗指南助手。今天我能帮您什么？",
     "defaultResponse": "我了解您对药物有疑问。请咨询您的医疗保健提供者以获取具体的医疗建议。",
-    "tellMeAbout": "告诉我关于"
+    "tellMeAbout": "告诉我关于",
+    "send": "发送"
   },
   "manualSearch": {
     "title": "手动药物搜索",

@@ -68,7 +68,7 @@ export default function ScanResultsScreen({
   if (loading) {
     return (
       <SafeAreaView style={styles.center} edges={['top']}>
-        <ActivityIndicator />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.subtleText}>{t('scanResults.scanning')}</Text>
       </SafeAreaView>
     );
@@ -77,21 +77,22 @@ export default function ScanResultsScreen({
   const hasMatches = matches.length > 0;
 
   const selectMedication = (drug: Drug) => {
-    // Setting scanned drug will trigger tab switch to chat in DarkMainApp
     setScannedDrug(drug.drug_name);
   };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <Text style={styles.title}>
-        {hasMatches
-          ? t('scanResults.possibleMatches')
-          : t('scanResults.noMatchesFound')}
-      </Text>
+      <View style={styles.headerSection}>
+        <Text style={styles.title}>
+          {hasMatches
+            ? t('scanResults.possibleMatches')
+            : t('scanResults.noMatchesFound')}
+        </Text>
 
-      {hasMatches && (
-        <Text style={styles.subtitle}>{t('scanResults.tapToLearnMore')}</Text>
-      )}
+        {hasMatches && (
+          <Text style={styles.subtitle}>{t('scanResults.tapToLearnMore')}</Text>
+        )}
+      </View>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -106,6 +107,10 @@ export default function ScanResultsScreen({
               onPress={() => selectMedication(item)}
             >
               <Text style={styles.rowTitle}>{item.drug_name}</Text>
+              <View style={styles.rowArrow}>
+                <View style={styles.arrowLine} />
+                <View style={styles.arrowHead} />
+              </View>
             </TouchableOpacity>
           )}
         />
@@ -115,17 +120,17 @@ export default function ScanResultsScreen({
 
       <View style={styles.actions}>
         <TouchableOpacity
-          style={styles.button}
+          style={styles.primaryButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.buttonText}>{t('scanResults.retryScan')}</Text>
+          <Text style={styles.primaryButtonText}>{t('scanResults.retryScan')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.button}
+          style={styles.secondaryButton}
           onPress={() => navigation.navigate('ManualSearch')}
         >
-          <Text style={styles.buttonText}>{t('scanResults.manualSearch')}</Text>
+          <Text style={styles.secondaryButtonText}>{t('scanResults.manualSearch')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -135,17 +140,19 @@ export default function ScanResultsScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: theme.spacing.base,
+    padding: theme.spacing.xl,
     backgroundColor: theme.colors.background,
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: theme.spacing.base,
+    padding: theme.spacing.xl,
     backgroundColor: theme.colors.background,
   },
-
+  headerSection: {
+    marginBottom: theme.spacing.base,
+  },
   title: {
     fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
@@ -155,44 +162,86 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: theme.typography.fontSize.sm,
     color: theme.colors.mutedForeground,
-    marginBottom: theme.spacing.md,
   },
   bodyText: {
-    fontSize: theme.typography.fontSize.sm,
+    fontSize: theme.typography.fontSize.base,
     color: theme.colors.mutedForeground,
     marginTop: theme.spacing.sm,
+    lineHeight:
+      theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
   },
   subtleText: {
     marginTop: theme.spacing.md,
     color: theme.colors.mutedForeground,
+    fontSize: theme.typography.fontSize.base,
   },
-
   error: {
     marginTop: theme.spacing.sm,
     marginBottom: theme.spacing.md,
     color: theme.colors.destructive,
+    fontSize: theme.typography.fontSize.sm,
   },
-
-  list: { paddingTop: theme.spacing.sm },
-
+  list: {
+    paddingTop: theme.spacing.sm,
+  },
   row: {
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.base,
+    paddingHorizontal: theme.spacing.lg,
     marginVertical: theme.spacing.xs,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.xl,
     backgroundColor: theme.colors.card,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    ...theme.shadows.surface,
   },
   rowTitle: {
     fontSize: theme.typography.fontSize.base,
     fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.foreground,
+    flex: 1,
   },
-
-  actions: { marginTop: theme.spacing.lg },
-  button: {
-    marginTop: theme.spacing.sm,
+  rowArrow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: theme.spacing.sm,
+  },
+  arrowLine: {
+    width: 8,
+    height: 1.5,
+    backgroundColor: theme.colors.mutedForeground,
+  },
+  arrowHead: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 4,
+    borderBottomWidth: 4,
+    borderLeftWidth: 5,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderLeftColor: theme.colors.mutedForeground,
+  },
+  actions: {
+    marginTop: theme.spacing.lg,
+    gap: theme.spacing.sm,
+  },
+  primaryButton: {
+    minHeight: 48,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.radius.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.primary,
+    ...theme.shadows.interactive,
+  },
+  primaryButtonText: {
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.primaryForeground,
+  },
+  secondaryButton: {
     minHeight: 48,
     paddingVertical: theme.spacing.md,
     borderWidth: 1,
@@ -202,7 +251,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: theme.colors.card,
   },
-  buttonText: {
+  secondaryButtonText: {
     fontSize: theme.typography.fontSize.base,
     fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.foreground,

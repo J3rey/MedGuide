@@ -108,7 +108,8 @@
     "placeholder": "Escriba su pregunta...",
     "greeting": "¡Hola! Soy su asistente de Medguide. ¿Cómo puedo ayudarle hoy?",
     "defaultResponse": "Entiendo que tiene una pregunta sobre su medicamento. Por favor consulte con su proveedor de atención médica para obtener asesoramiento médico específico.",
-    "tellMeAbout": "Cuéntame sobre"
+    "tellMeAbout": "Cuéntame sobre",
+    "send": "Enviar"
   },
   "manualSearch": {
     "title": "Búsqueda Manual de Medicamentos",

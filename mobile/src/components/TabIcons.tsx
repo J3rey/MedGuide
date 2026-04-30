@@ -1,22 +1,15 @@
 import React from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import theme from '../styles/theme';
 
 interface IconProps {
   active: boolean;
-  animatedValue?: Animated.Value;
 }
 
 // Calendar/Schedule Icon - professional medical appointment style
-export const ScheduleIcon = ({ active, animatedValue }: IconProps) => {
-  const scale =
-    animatedValue?.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, 1.1],
-    }) || 1;
-
+export const ScheduleIcon = ({ active }: IconProps) => {
   return (
-    <Animated.View style={[styles.iconContainer, { transform: [{ scale }] }]}>
+    <View style={styles.iconContainer}>
       <View style={styles.scheduleOuter}>
         {/* Calendar header */}
         <View
@@ -36,20 +29,14 @@ export const ScheduleIcon = ({ active, animatedValue }: IconProps) => {
           ))}
         </View>
       </View>
-    </Animated.View>
+    </View>
   );
 };
 
 // Camera Icon - professional pill/medication scanner style
-export const CameraIcon = ({ active, animatedValue }: IconProps) => {
-  const scale =
-    animatedValue?.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, 1.1],
-    }) || 1;
-
+export const CameraIcon = ({ active }: IconProps) => {
   return (
-    <Animated.View style={[styles.iconContainer, { transform: [{ scale }] }]}>
+    <View style={styles.iconContainer}>
       <View style={styles.cameraOuter}>
         {/* Camera body */}
         <View style={[styles.cameraBody, active && styles.cameraBodyActive]}>
@@ -66,20 +53,14 @@ export const CameraIcon = ({ active, animatedValue }: IconProps) => {
         <View style={[styles.cornerBL, active && styles.cornerActive]} />
         <View style={[styles.cornerBR, active && styles.cornerActive]} />
       </View>
-    </Animated.View>
+    </View>
   );
 };
 
 // Chat Icon - professional medical consultation style
-export const ChatIcon = ({ active, animatedValue }: IconProps) => {
-  const scale =
-    animatedValue?.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, 1.1],
-    }) || 1;
-
+export const ChatIcon = ({ active }: IconProps) => {
   return (
-    <Animated.View style={[styles.iconContainer, { transform: [{ scale }] }]}>
+    <View style={styles.iconContainer}>
       <View style={styles.chatOuter}>
         {/* Main bubble */}
         <View style={[styles.chatBubble, active && styles.chatBubbleActive]}>
@@ -99,20 +80,14 @@ export const ChatIcon = ({ active, animatedValue }: IconProps) => {
           </View>
         )}
       </View>
-    </Animated.View>
+    </View>
   );
 };
 
 // Settings Icon - professional gear/cog style
-export const SettingsIcon = ({ active, animatedValue }: IconProps) => {
-  const rotate =
-    animatedValue?.interpolate({
-      inputRange: [0, 1],
-      outputRange: ['0deg', '45deg'],
-    }) || '0deg';
-
+export const SettingsIcon = ({ active }: IconProps) => {
   return (
-    <Animated.View style={[styles.iconContainer, { transform: [{ rotate }] }]}>
+    <View style={styles.iconContainer}>
       <View style={styles.settingsOuter}>
         {/* Gear center */}
         <View
@@ -130,7 +105,7 @@ export const SettingsIcon = ({ active, animatedValue }: IconProps) => {
           />
         ))}
       </View>
-    </Animated.View>
+    </View>
   );
 };
 

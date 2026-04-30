@@ -108,7 +108,8 @@
     "placeholder": "Type your question...",
     "greeting": "Hello! I'm your Medguide assistant. How can I help you today?",
     "defaultResponse": "I understand you have a question about your medication. Please consult with your healthcare provider for specific medical advice.",
-    "tellMeAbout": "Tell me about"
+    "tellMeAbout": "Tell me about",
+    "send": "Send"
   },
   "manualSearch": {
     "title": "Manual Drug Search",

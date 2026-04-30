@@ -38,6 +38,42 @@ interface Alarm {
   last_snoozed?: string;
 }
 
+// Geometric Edit (Pencil) Icon
+function EditIcon() {
+  return (
+    <View style={iconStyles.editContainer}>
+      <View style={iconStyles.editBody} />
+      <View style={iconStyles.editTip} />
+    </View>
+  );
+}
+
+// Geometric Delete (Trash) Icon
+function DeleteIcon() {
+  return (
+    <View style={iconStyles.deleteContainer}>
+      <View style={iconStyles.deleteLid} />
+      <View style={iconStyles.deleteBody}>
+        <View style={iconStyles.deleteLine} />
+        <View style={iconStyles.deleteLine} />
+      </View>
+    </View>
+  );
+}
+
+// Geometric Clock Icon
+function ClockIcon() {
+  return (
+    <View style={iconStyles.clockContainer}>
+      <View style={iconStyles.clockFace}>
+        <View style={iconStyles.clockHandH} />
+        <View style={iconStyles.clockHandM} />
+        <View style={iconStyles.clockCenter} />
+      </View>
+    </View>
+  );
+}
+
 export default function ScheduleScreen(): React.JSX.Element {
   const { t } = useTranslation();
 
@@ -101,7 +137,7 @@ export default function ScheduleScreen(): React.JSX.Element {
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
+    hours = hours ? hours : 12;
     return `${hours}:${minutes} ${ampm}`;
   };
 
@@ -136,7 +172,6 @@ export default function ScheduleScreen(): React.JSX.Element {
 
   const fetchAlarms = async (): Promise<void> => {
     try {
-      // Check if supabase is configured
       if (!supabase) {
         setAlarms([]);
         setLoading(false);
@@ -150,14 +185,12 @@ export default function ScheduleScreen(): React.JSX.Element {
 
       if (error) {
         console.error('Supabase error:', error);
-        // Don't show alert for connection errors, just log
         setAlarms([]);
       } else {
         setAlarms(data || []);
       }
     } catch (error) {
       console.error('Error fetching alarms:', error);
-      // Set empty alarms instead of showing error
       setAlarms([]);
     } finally {
       setLoading(false);
@@ -168,16 +201,13 @@ export default function ScheduleScreen(): React.JSX.Element {
     const newEnabled = !alarm.enabled;
 
     try {
-      // Update local state immediately for better UX
       setAlarms(
         alarms.map((a) =>
           a.id === alarm.id ? { ...a, enabled: newEnabled } : a
         )
       );
 
-      // Handle notification scheduling
       if (newEnabled && alarm.notification_id) {
-        // Cancel old notification and create new one
         await cancelAlarmNotification(alarm.notification_id);
       }
 
@@ -196,7 +226,6 @@ export default function ScheduleScreen(): React.JSX.Element {
         notificationId = undefined;
       }
 
-      // Update backend
       const { error } = await supabase
         .from('alarms')
         .update({ enabled: newEnabled, notification_id: notificationId })
@@ -205,7 +234,6 @@ export default function ScheduleScreen(): React.JSX.Element {
       if (error) throw error;
     } catch (error) {
       console.error('Error toggling alarm:', error);
-      // Revert on error
       setAlarms(alarms.map((a) => (a.id === alarm.id ? alarm : a)));
       Alert.alert(
         t('schedule.errors.error'),
@@ -266,7 +294,6 @@ export default function ScheduleScreen(): React.JSX.Element {
     setEditingAlarm(alarm);
     setNewAlarmMed(alarm.medication_name);
 
-    // Parse the 24-hour time string to create a Date object
     const [hours, minutes] = alarm.time.split(':').map(Number);
     const date = new Date();
     date.setHours(hours);
@@ -287,12 +314,10 @@ export default function ScheduleScreen(): React.JSX.Element {
     }
 
     try {
-      // Cancel old notification
       if (editingAlarm.notification_id) {
         await cancelAlarmNotification(editingAlarm.notification_id);
       }
 
-      // Schedule new notification
       const timeString24 = formatTime24(newAlarmTime);
       const { hour, minute } = parseTime(timeString24);
       const notificationId = await scheduleAlarmNotification(
@@ -302,7 +327,6 @@ export default function ScheduleScreen(): React.JSX.Element {
         selectedDays
       );
 
-      // Update in database
       const { data, error } = await supabase
         .from('alarms')
         .update({
@@ -317,7 +341,6 @@ export default function ScheduleScreen(): React.JSX.Element {
 
       if (error) throw error;
 
-      // Update local state
       setAlarms(alarms.map((a) => (a.id === editingAlarm.id ? data : a)));
       setNewAlarmMed('');
       setNewAlarmTime(new Date());
@@ -343,12 +366,10 @@ export default function ScheduleScreen(): React.JSX.Element {
 
   const removeAlarm = async (alarm: Alarm): Promise<void> => {
     try {
-      // Cancel notification if exists
       if (alarm.notification_id) {
         await cancelAlarmNotification(alarm.notification_id);
       }
 
-      // Delete from backend
       const { error } = await supabase
         .from('alarms')
         .delete()
@@ -356,7 +377,6 @@ export default function ScheduleScreen(): React.JSX.Element {
 
       if (error) throw error;
 
-      // Update local state
       setAlarms(alarms.filter((a) => a.id !== alarm.id));
     } catch (error) {
       console.error('Error removing alarm:', error);
@@ -375,7 +395,7 @@ export default function ScheduleScreen(): React.JSX.Element {
     <View style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={{ paddingTop: Math.max(insets.top, 16) }}
+        contentContainerStyle={{ paddingTop: Math.max(insets.top, theme.spacing.base) }}
       >
         <View style={[styles.header, { paddingHorizontal: containerPadding }]}>
           <View style={styles.headerLeft}>
@@ -424,7 +444,7 @@ export default function ScheduleScreen(): React.JSX.Element {
                 <Text style={styles.pickerButtonText}>
                   {formatTime(newAlarmTime)}
                 </Text>
-                <Text style={styles.pickerArrow}>🕐</Text>
+                <ClockIcon />
               </TouchableOpacity>
             </View>
 
@@ -539,24 +559,26 @@ export default function ScheduleScreen(): React.JSX.Element {
                   <View style={styles.alarmActions}>
                     <TouchableOpacity
                       onPress={() => startEditAlarm(alarm)}
-                      style={styles.editButton}
+                      style={styles.actionButton}
+                      accessibilityLabel={t('common.edit')}
                     >
-                      <Text style={styles.editIcon}>✏️</Text>
+                      <EditIcon />
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => removeAlarm(alarm)}
-                      style={styles.deleteButton}
+                      style={styles.actionButton}
+                      accessibilityLabel={t('common.delete')}
                     >
-                      <Text style={styles.deleteIcon}>🗑️</Text>
+                      <DeleteIcon />
                     </TouchableOpacity>
                     <Switch
                       value={alarm.enabled}
                       onValueChange={() => toggleAlarm(alarm)}
                       trackColor={{
-                        false: theme.colors.border,
-                        true: '#3b82f6',
+                        false: theme.colors.switchBackground,
+                        true: theme.colors.primary,
                       }}
-                      thumbColor="#ffffff"
+                      thumbColor={theme.colors.card}
                     />
                   </View>
                 </View>
@@ -628,6 +650,108 @@ export default function ScheduleScreen(): React.JSX.Element {
   );
 }
 
+// Geometric icon styles
+const iconStyles = StyleSheet.create({
+  // Edit (Pencil) Icon
+  editContainer: {
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editBody: {
+    width: 12,
+    height: 3,
+    backgroundColor: theme.colors.mutedForeground,
+    borderRadius: 1,
+    transform: [{ rotate: '-45deg' }, { translateY: -2 }],
+  },
+  editTip: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 2,
+    borderRightWidth: 2,
+    borderTopWidth: 4,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: theme.colors.mutedForeground,
+    transform: [{ rotate: '-45deg' }, { translateX: -4 }, { translateY: -2 }],
+  },
+
+  // Delete (Trash) Icon
+  deleteContainer: {
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteLid: {
+    width: 14,
+    height: 2,
+    backgroundColor: theme.colors.destructive,
+    borderRadius: 1,
+    marginBottom: 1,
+  },
+  deleteBody: {
+    width: 10,
+    height: 10,
+    borderWidth: 1.5,
+    borderColor: theme.colors.destructive,
+    borderRadius: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    paddingHorizontal: 1,
+  },
+  deleteLine: {
+    width: 1.5,
+    height: 5,
+    backgroundColor: theme.colors.destructive,
+    borderRadius: 1,
+  },
+
+  // Clock Icon
+  clockContainer: {
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  clockFace: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: theme.colors.mutedForeground,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  clockHandH: {
+    position: 'absolute',
+    width: 4,
+    height: 1.5,
+    backgroundColor: theme.colors.mutedForeground,
+    borderRadius: 1,
+    right: 3,
+    top: 6.25,
+  },
+  clockHandM: {
+    position: 'absolute',
+    width: 1.5,
+    height: 4,
+    backgroundColor: theme.colors.mutedForeground,
+    borderRadius: 1,
+    top: 2,
+    left: 6.25,
+  },
+  clockCenter: {
+    width: 2,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: theme.colors.mutedForeground,
+  },
+});
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -656,15 +780,15 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: theme.colors.primary,
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 48,
+    height: 48,
+    borderRadius: theme.radius.full,
     alignItems: 'center',
     justifyContent: 'center',
     ...theme.shadows.interactive,
   },
   addButtonText: {
-    fontSize: 28,
+    fontSize: theme.typography.fontSize.xl,
     color: theme.colors.primaryForeground,
     fontWeight: theme.typography.fontWeight.bold,
   },
@@ -680,6 +804,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.base,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    ...theme.shadows.surface,
   },
   addAlarmTitle: {
     fontSize: theme.typography.fontSize.xl,
@@ -700,7 +825,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.inputBackground,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.lg,
+    borderRadius: theme.radius.xl,
     paddingHorizontal: theme.spacing.base,
     paddingVertical: theme.spacing.md,
     fontSize: theme.typography.fontSize.base,
@@ -724,7 +849,7 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     backgroundColor: theme.colors.card,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: theme.colors.border,
   },
   buttonText: {
@@ -748,6 +873,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     marginBottom: theme.spacing.sm,
+    ...theme.shadows.surface,
   },
   alarmContent: {
     flexDirection: 'row',
@@ -783,7 +909,7 @@ const styles = StyleSheet.create({
   },
   dayBadge: {
     paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 6,
+    paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.md,
   },
   dayBadgeActive: {
@@ -807,17 +933,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.sm,
   },
-  editButton: {
-    padding: theme.spacing.sm,
-  },
-  editIcon: {
-    fontSize: 20,
-  },
-  deleteButton: {
-    padding: theme.spacing.sm,
-  },
-  deleteIcon: {
-    fontSize: 20,
+  actionButton: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   emptyState: {
     alignItems: 'center',
@@ -842,7 +963,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.inputBackground,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.lg,
+    borderRadius: theme.radius.xl,
     paddingHorizontal: theme.spacing.base,
     paddingVertical: theme.spacing.md,
     flexDirection: 'row',
@@ -853,10 +974,6 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.foreground,
     fontWeight: theme.typography.fontWeight.medium,
-  },
-  pickerArrow: {
-    fontSize: theme.typography.fontSize.sm,
-    color: theme.colors.mutedForeground,
   },
   daysSelector: {
     flexDirection: 'row',

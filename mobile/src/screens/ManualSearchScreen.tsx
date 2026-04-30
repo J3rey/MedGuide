@@ -11,6 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { searchDrugs } from '../services/drugSearch';
 import { useScan } from '../contexts/ScanContext';
@@ -21,6 +22,7 @@ export default function ManualSearchScreen() {
   const navigation = useNavigation();
   const { setScannedDrug } = useScan();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<Drug[]>([]);
@@ -47,7 +49,7 @@ export default function ManualSearchScreen() {
         setSuggestions([]);
         setShowSuggestions(false);
       }
-    }, 300); // 300ms debounce
+    }, 300);
 
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
@@ -62,7 +64,6 @@ export default function ManualSearchScreen() {
   const handleAskChatbot = () => {
     if (selectedDrug) {
       setScannedDrug(selectedDrug.drug_name);
-      // Navigate back to main app, which will switch to chat tab
       navigation.goBack();
     }
   };
@@ -72,12 +73,12 @@ export default function ManualSearchScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, theme.spacing.base) + theme.spacing.sm }]}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backButtonText}>{t('drugDetails.back')}</Text>
+          <Text style={styles.backButtonText}>{t('common.back')}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{t('manualSearch.title')}</Text>
       </View>
@@ -104,7 +105,7 @@ export default function ManualSearchScreen() {
 
       <View style={styles.helperText}>
         <Text style={styles.helperTextContent}>
-          💡 {t('manualSearch.helperText')}
+          {t('manualSearch.helperText')}
         </Text>
       </View>
 
@@ -158,7 +159,7 @@ export default function ManualSearchScreen() {
             {selectedDrug.indications && (
               <View style={styles.drugSection}>
                 <Text style={styles.drugSectionTitle}>
-                  {t('drugDetails.indications')}:
+                  {t('drugDetails.indications')}
                 </Text>
                 <Text style={styles.drugSectionText}>
                   {selectedDrug.indications}
@@ -169,7 +170,7 @@ export default function ManualSearchScreen() {
             {selectedDrug.counseling && (
               <View style={styles.drugSection}>
                 <Text style={styles.drugSectionTitle}>
-                  {t('drugDetails.counseling')}:
+                  {t('drugDetails.counseling')}
                 </Text>
                 <Text style={styles.drugSectionText}>
                   {selectedDrug.counseling}
@@ -180,7 +181,7 @@ export default function ManualSearchScreen() {
             {selectedDrug.adverse_effects && (
               <View style={styles.drugSection}>
                 <Text style={styles.drugSectionTitle}>
-                  {t('drugDetails.adverseEffects')}:
+                  {t('drugDetails.adverseEffects')}
                 </Text>
                 <Text style={styles.drugSectionText}>
                   {selectedDrug.adverse_effects}
@@ -191,7 +192,7 @@ export default function ManualSearchScreen() {
             {selectedDrug.precautions_pregnancy && (
               <View style={styles.drugSection}>
                 <Text style={styles.drugSectionTitle}>
-                  {t('drugDetails.pregnancyPrecautions')}:
+                  {t('drugDetails.pregnancyPrecautions')}
                 </Text>
                 <Text style={styles.drugSectionText}>
                   {selectedDrug.precautions_pregnancy}
@@ -202,7 +203,7 @@ export default function ManualSearchScreen() {
             {selectedDrug.precautions_children && (
               <View style={styles.drugSection}>
                 <Text style={styles.drugSectionTitle}>
-                  {t('drugDetails.childrenPrecautions')}:
+                  {t('drugDetails.childrenPrecautions')}
                 </Text>
                 <Text style={styles.drugSectionText}>
                   {selectedDrug.precautions_children}
@@ -213,7 +214,7 @@ export default function ManualSearchScreen() {
             {selectedDrug.precautions_breastfeeding && (
               <View style={styles.drugSection}>
                 <Text style={styles.drugSectionTitle}>
-                  {t('drugDetails.breastfeedingPrecautions')}:
+                  {t('drugDetails.breastfeedingPrecautions')}
                 </Text>
                 <Text style={styles.drugSectionText}>
                   {selectedDrug.precautions_breastfeeding}
@@ -242,11 +243,11 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
-    paddingTop: 60,
-    paddingHorizontal: theme.spacing.base,
+    paddingHorizontal: theme.spacing.xl,
     paddingBottom: theme.spacing.base,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
+    backgroundColor: theme.colors.card,
   },
   backButton: {
     marginBottom: theme.spacing.sm,
@@ -254,6 +255,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.primary,
+    fontWeight: theme.typography.fontWeight.semibold,
   },
   title: {
     fontSize: theme.typography.fontSize['2xl'],
@@ -263,14 +265,14 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.base,
+    paddingHorizontal: theme.spacing.xl,
     paddingTop: theme.spacing.base,
   },
   searchInput: {
     flex: 1,
-    height: 50,
+    minHeight: 48,
     backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.xl,
     paddingHorizontal: theme.spacing.base,
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.foreground,
@@ -281,7 +283,7 @@ const styles = StyleSheet.create({
     marginLeft: theme.spacing.sm,
   },
   helperText: {
-    paddingHorizontal: theme.spacing.base,
+    paddingHorizontal: theme.spacing.xl,
     paddingTop: theme.spacing.sm,
   },
   helperTextContent: {
@@ -291,7 +293,7 @@ const styles = StyleSheet.create({
   },
   suggestionsContainer: {
     flex: 1,
-    paddingHorizontal: theme.spacing.base,
+    paddingHorizontal: theme.spacing.xl,
     paddingTop: theme.spacing.base,
   },
   suggestionsTitle: {
@@ -303,7 +305,7 @@ const styles = StyleSheet.create({
   suggestionItem: {
     backgroundColor: theme.colors.card,
     padding: theme.spacing.base,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.xl,
     marginBottom: theme.spacing.sm,
     borderWidth: 1,
     borderColor: theme.colors.border,
@@ -316,7 +318,7 @@ const styles = StyleSheet.create({
   suggestionSubtext: {
     fontSize: theme.typography.fontSize.xs,
     color: theme.colors.mutedForeground,
-    marginTop: 4,
+    marginTop: theme.spacing.xs,
   },
   noResultsContainer: {
     flex: 1,
@@ -337,7 +339,7 @@ const styles = StyleSheet.create({
   },
   selectedDrugContainer: {
     flex: 1,
-    paddingHorizontal: theme.spacing.base,
+    paddingHorizontal: theme.spacing.xl,
     paddingTop: theme.spacing.base,
   },
   selectedDrugTitle: {
@@ -348,11 +350,12 @@ const styles = StyleSheet.create({
   },
   drugCard: {
     backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.base,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
     marginBottom: theme.spacing.base,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    ...theme.shadows.surface,
   },
   drugName: {
     fontSize: theme.typography.fontSize.xl,
@@ -367,12 +370,13 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.sm,
     fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.primary,
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
   },
   drugSectionText: {
     fontSize: theme.typography.fontSize.sm,
     color: theme.colors.mutedForeground,
-    lineHeight: 20,
+    lineHeight:
+      theme.typography.lineHeight.relaxed * theme.typography.fontSize.sm,
   },
   chatButton: {
     backgroundColor: theme.colors.primary,

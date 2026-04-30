@@ -64,15 +64,12 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
   // Listen for scan completion event
   useEffect(() => {
     if (scannedDrug) {
-      // Switch to chat tab with the scanned drug
       setActiveTab('chat');
-      // Clear the scanned drug after a delay so chat can use it
       setTimeout(() => setScannedDrug(null), 1000);
     }
   }, [scannedDrug, setScannedDrug]);
 
   useEffect(() => {
-    // Listen for notifications when app is in foreground
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
         const data = notification.request.content.data;
@@ -85,7 +82,6 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
         }
       });
 
-    // Listen for user interactions with notifications
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener(
         async (response) => {
@@ -156,7 +152,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
             <View
               style={[
                 styles.settingsHeader,
-                { paddingTop: Math.max(insets.top, 16) },
+                { paddingTop: Math.max(insets.top, theme.spacing.base) },
               ]}
             >
               <View
@@ -165,11 +161,9 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
                   { paddingHorizontal: containerPadding },
                 ]}
               >
-                <View style={styles.headerLeft}>
-                  <Text style={styles.settingsTitle}>
-                    {t('settings.title')}
-                  </Text>
-                </View>
+                <Text style={styles.settingsTitle}>
+                  {t('settings.title')}
+                </Text>
               </View>
             </View>
             <View
@@ -178,11 +172,59 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
                 { paddingHorizontal: containerPadding },
               ]}
             >
-              <TouchableOpacity style={styles.settingsOption} onPress={onBack}>
-                <Text style={styles.settingsOptionText}>
-                  {t('settings.changeLanguage')}
+              {/* Preferences Section */}
+              <Text style={styles.sectionLabel}>Preferences</Text>
+              <View style={styles.settingsGroup}>
+                <TouchableOpacity style={styles.settingsOption} onPress={onBack}>
+                  <View style={styles.settingsOptionContent}>
+                    <View style={styles.settingsIconContainer}>
+                      <View style={styles.globeIcon}>
+                        <View style={styles.globeCircle} />
+                        <View style={styles.globeLineH} />
+                        <View style={styles.globeLineV} />
+                      </View>
+                    </View>
+                    <View style={styles.settingsTextContainer}>
+                      <Text style={styles.settingsOptionText}>
+                        {t('settings.changeLanguage')}
+                      </Text>
+                      <Text style={styles.settingsOptionSubtext}>
+                        Select your preferred language
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.chevron}>
+                    <View style={styles.chevronLine1} />
+                    <View style={styles.chevronLine2} />
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+              {/* About Section */}
+              <Text style={styles.sectionLabel}>About</Text>
+              <View style={styles.settingsGroup}>
+                <View style={styles.aboutItem}>
+                  <Text style={styles.aboutLabel}>Application</Text>
+                  <Text style={styles.aboutValue}>MedGuide</Text>
+                </View>
+                <View style={styles.aboutDivider} />
+                <View style={styles.aboutItem}>
+                  <Text style={styles.aboutLabel}>Version</Text>
+                  <Text style={styles.aboutValue}>2.0.0</Text>
+                </View>
+                <View style={styles.aboutDivider} />
+                <View style={styles.aboutItem}>
+                  <Text style={styles.aboutLabel}>Purpose</Text>
+                  <Text style={styles.aboutValue}>Medication Assistant</Text>
+                </View>
+              </View>
+
+              {/* Disclaimer */}
+              <View style={styles.disclaimerContainer}>
+                <Text style={styles.disclaimerText}>
+                  MedGuide is designed to assist with medication information. Always consult your healthcare provider for medical advice.
                 </Text>
-              </TouchableOpacity>
+              </View>
             </View>
           </View>
         );
@@ -221,22 +263,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
+  content: {
+    flex: 1,
+  },
   settingsScreen: {
     flex: 1,
+    backgroundColor: theme.colors.background,
   },
   settingsHeader: {
     paddingVertical: theme.spacing.lg,
-    marginBottom: theme.spacing.base,
+    marginBottom: theme.spacing.sm,
+    backgroundColor: theme.colors.card,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
   },
   headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
   },
   settingsTitle: {
     fontSize: theme.typography.fontSize['2xl'],
@@ -245,22 +289,137 @@ const styles = StyleSheet.create({
   },
   settingsContent: {
     flex: 1,
+    paddingTop: theme.spacing.base,
+  },
+  sectionLabel: {
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.mutedForeground,
+    marginBottom: theme.spacing.sm,
+    marginTop: theme.spacing.base,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  settingsGroup: {
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.xl,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    overflow: 'hidden',
+    ...theme.shadows.surface,
   },
   settingsOption: {
     padding: theme.spacing.lg,
-    backgroundColor: theme.colors.card,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  settingsOptionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: theme.spacing.base,
+  },
+  settingsIconContainer: {
+    width: 40,
+    height: 40,
     borderRadius: theme.radius.lg,
-    marginBottom: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.primary + '10',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingsTextContainer: {
+    flex: 1,
   },
   settingsOptionText: {
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.foreground,
+    fontWeight: theme.typography.fontWeight.semibold,
+  },
+  settingsOptionSubtext: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.mutedForeground,
+    marginTop: theme.spacing.xs,
+  },
+  chevron: {
+    width: 10,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  chevronLine1: {
+    width: 7,
+    height: 1.5,
+    backgroundColor: theme.colors.mutedForeground,
+    borderRadius: 1,
+    transform: [{ rotate: '45deg' }, { translateY: -1.5 }],
+  },
+  chevronLine2: {
+    width: 7,
+    height: 1.5,
+    backgroundColor: theme.colors.mutedForeground,
+    borderRadius: 1,
+    transform: [{ rotate: '-45deg' }, { translateY: 1.5 }],
+  },
+  aboutItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.base,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  aboutLabel: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.foreground,
     fontWeight: theme.typography.fontWeight.medium,
   },
-  content: {
-    flex: 1,
+  aboutValue: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.mutedForeground,
+  },
+  aboutDivider: {
+    height: 1,
+    backgroundColor: theme.colors.border,
+    marginHorizontal: theme.spacing.lg,
+  },
+  disclaimerContainer: {
+    marginTop: theme.spacing['2xl'],
+    paddingHorizontal: theme.spacing.base,
+  },
+  disclaimerText: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.mutedForeground,
+    textAlign: 'center',
+    lineHeight:
+      theme.typography.lineHeight.relaxed * theme.typography.fontSize.sm,
+  },
+  // Globe icon for language
+  globeIcon: {
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  globeCircle: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: theme.colors.primary,
+  },
+  globeLineH: {
+    position: 'absolute',
+    width: 16,
+    height: 1.5,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 1,
+  },
+  globeLineV: {
+    position: 'absolute',
+    width: 1.5,
+    height: 16,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 1,
   },
 });
 

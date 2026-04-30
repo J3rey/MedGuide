@@ -1,10 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
   View,
   TouchableOpacity,
+  Text,
   StyleSheet,
   Platform,
-  Animated,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
@@ -22,82 +22,36 @@ interface TabItemProps {
   label: string;
   Icon: React.ComponentType<{
     active: boolean;
-    animatedValue?: Animated.Value;
   }>;
   isActive: boolean;
   onPress: () => void;
 }
 
 function TabItem({ label, Icon, isActive, onPress }: TabItemProps) {
-  const scaleAnim = useRef(new Animated.Value(isActive ? 1 : 0)).current;
-  const bounceAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.spring(scaleAnim, {
-      toValue: isActive ? 1 : 0,
-      friction: 5,
-      tension: 100,
-      useNativeDriver: true,
-    }).start();
-  }, [isActive, scaleAnim]);
-
-  const handlePress = () => {
-    // Bounce animation on press
-    Animated.sequence([
-      Animated.timing(bounceAnim, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.spring(bounceAnim, {
-        toValue: 0,
-        friction: 3,
-        tension: 40,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    onPress();
-  };
-
-  const bounceScale = bounceAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0.85],
-  });
-
   return (
     <TouchableOpacity
       style={styles.tab}
-      onPress={handlePress}
+      onPress={onPress}
       activeOpacity={0.7}
       accessibilityRole="tab"
       accessibilityState={{ selected: isActive }}
       accessibilityLabel={label}
     >
-      <Animated.View
-        style={[
-          isActive ? styles.activeIconContainer : styles.iconContainer,
-          { transform: [{ scale: bounceScale }] },
-        ]}
+      <View
+        style={isActive ? styles.activeIconContainer : styles.iconContainer}
       >
-        <Icon active={isActive} animatedValue={scaleAnim} />
-      </Animated.View>
-      <Animated.Text
+        <Icon active={isActive} />
+      </View>
+      <Text
         style={[
           styles.label,
           isActive && styles.activeLabel,
-          {
-            opacity: scaleAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0.6, 1],
-            }),
-          },
         ]}
         numberOfLines={1}
         ellipsizeMode="tail"
       >
         {label}
-      </Animated.Text>
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -162,7 +116,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    gap: theme.spacing.xs,
     paddingVertical: theme.spacing.xs,
     maxWidth: 100,
   },

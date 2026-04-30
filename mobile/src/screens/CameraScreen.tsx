@@ -867,7 +867,10 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
                 accessibilityLabel={t('camera.accessibility.chooseGallery')}
                 accessibilityRole="button"
               >
-                <Text style={styles.galleryButtonText}>📁</Text>
+                <View style={styles.galleryIcon}>
+                  <View style={styles.galleryIconBody} />
+                  <View style={styles.galleryIconTab} />
+                </View>
               </TouchableOpacity>
 
               <View style={styles.centerColumn}>
@@ -1130,7 +1133,10 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
             accessibilityLabel={t('camera.accessibility.chooseGallery')}
             accessibilityRole="button"
           >
-            <Text style={styles.galleryButtonText}>📁</Text>
+            <View style={styles.galleryIcon}>
+              <View style={styles.galleryIconBody} />
+              <View style={styles.galleryIconTab} />
+            </View>
           </TouchableOpacity>
 
           <View style={styles.centerColumn}>
@@ -1159,7 +1165,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
+  container: { flex: 1, backgroundColor: theme.colors.cameraSurface },
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -1175,7 +1181,7 @@ const styles = StyleSheet.create({
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: theme.colors.cameraOverlay,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
@@ -1209,7 +1215,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     objectFit: 'cover',
-    backgroundColor: '#000',
+    backgroundColor: theme.colors.cameraSurface,
   },
 
   topControls: {
@@ -1235,7 +1241,7 @@ const styles = StyleSheet.create({
   controlButtonText: {
     fontSize: theme.typography.fontSize.sm,
     fontWeight: theme.typography.fontWeight.semibold,
-    color: '#FFFFFF',
+    color: theme.colors.cameraText,
   },
 
   zoomControls: {
@@ -1258,9 +1264,9 @@ const styles = StyleSheet.create({
   zoomButtonText: {
     fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
-    color: '#FFFFFF',
+    color: theme.colors.cameraText,
   },
-  zoomButtonDisabled: { color: 'rgba(255, 255, 255, 0.3)' },
+  zoomButtonDisabled: { opacity: 0.3 },
 
   zoomIndicator: {
     position: 'absolute',
@@ -1276,7 +1282,7 @@ const styles = StyleSheet.create({
   zoomText: {
     fontSize: theme.typography.fontSize.base,
     fontWeight: theme.typography.fontWeight.semibold,
-    color: '#FFFFFF',
+    color: theme.colors.cameraText,
     textAlign: 'center',
   },
 
@@ -1303,7 +1309,7 @@ const styles = StyleSheet.create({
   },
   captureText: {
     fontSize: theme.typography.fontSize.base,
-    color: '#FFFFFF',
+    color: theme.colors.cameraText,
     fontWeight: theme.typography.fontWeight.semibold,
     textAlign: 'center',
     letterSpacing: 0.5,
@@ -1339,11 +1345,33 @@ const styles = StyleSheet.create({
   galleryButtonSpacer: {
     width: 48,
   },
-  galleryButtonText: {
-    fontSize: 24,
+  galleryIcon: {
+    width: 22,
+    height: 18,
+    position: 'relative',
+    justifyContent: 'flex-end',
+  },
+  galleryIconBody: {
+    width: 22,
+    height: 14,
+    borderWidth: 1.5,
+    borderColor: theme.colors.cameraText,
+    borderRadius: 2,
+  },
+  galleryIconTab: {
+    position: 'absolute',
+    top: 0,
+    left: 2,
+    width: 8,
+    height: 4,
+    borderTopLeftRadius: 2,
+    borderTopRightRadius: 2,
+    borderWidth: 1.5,
+    borderBottomWidth: 0,
+    borderColor: theme.colors.cameraText,
   },
 
-  preview: { flex: 1, resizeMode: 'contain', backgroundColor: '#000' },
+  preview: { flex: 1, resizeMode: 'contain', backgroundColor: theme.colors.cameraSurface },
   previewActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',

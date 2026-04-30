@@ -38,6 +38,13 @@ type ColorPalette = {
   sidebarAccentForeground: string;
   sidebarBorder: string;
   sidebarRing: string;
+  botBubble: string;
+  botBubbleBorder: string;
+  alarmBackground: string;
+  alarmForeground: string;
+  cameraSurface: string;
+  cameraOverlay: string;
+  cameraText: string;
 };
 
 export const colors: ColorPalette = {
@@ -75,6 +82,13 @@ export const colors: ColorPalette = {
   sidebarAccentForeground: '#1A1D2E',
   sidebarBorder: '#E5E7EB',
   sidebarRing: '#3344FF',
+  botBubble: '#F0F2FF',
+  botBubbleBorder: '#E0E5FF',
+  alarmBackground: '#DC2626',
+  alarmForeground: '#FFFFFF',
+  cameraSurface: '#000000',
+  cameraOverlay: 'rgba(0, 0, 0, 0.7)',
+  cameraText: '#FFFFFF',
 };
 
 export const darkColors: ColorPalette = {
@@ -112,6 +126,13 @@ export const darkColors: ColorPalette = {
   sidebarAccentForeground: '#FFFFFF',
   sidebarBorder: '#374151',
   sidebarRing: '#3344FF',
+  botBubble: '#1E2140',
+  botBubbleBorder: '#2A2D4A',
+  alarmBackground: '#DC2626',
+  alarmForeground: '#FFFFFF',
+  cameraSurface: '#000000',
+  cameraOverlay: 'rgba(0, 0, 0, 0.7)',
+  cameraText: '#FFFFFF',
 };
 
 type Typography = {

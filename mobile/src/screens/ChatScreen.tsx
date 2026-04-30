@@ -133,7 +133,7 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
           styles.header,
           {
             paddingHorizontal: containerPadding,
-            paddingTop: Math.max(insets.top, 16),
+            paddingTop: Math.max(insets.top, theme.spacing.base),
           },
         ]}
       >
@@ -221,7 +221,7 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
           ]}
           disabled={!inputMessage.trim()}
         >
-          <Text style={styles.sendText}>Send</Text>
+          <Text style={styles.sendText}>{t('chat.send')}</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -238,19 +238,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.xl,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
+    backgroundColor: theme.colors.card,
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: theme.typography.fontSize.lg,
+    fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.foreground,
   },
   headerSubtitle: {
     fontSize: theme.typography.fontSize.sm,
     color: theme.colors.mutedForeground,
+    marginTop: theme.spacing.xs,
   },
   messagesContainer: {
     flex: 1,
@@ -280,21 +282,20 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md,
   },
   userMessage: {
-    backgroundColor: theme.colors.card,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.primary,
   },
   botMessage: {
-    backgroundColor: '#F0F2FF',
+    backgroundColor: theme.colors.botBubble,
     borderWidth: 1,
-    borderColor: '#E0E5FF',
+    borderColor: theme.colors.botBubbleBorder,
   },
   messageText: {
     fontSize: theme.typography.fontSize.base,
-    lineHeight: 20,
+    lineHeight:
+      theme.typography.lineHeight.normal * theme.typography.fontSize.base,
   },
   userMessageText: {
-    color: theme.colors.foreground,
+    color: theme.colors.primaryForeground,
   },
   botMessageText: {
     color: theme.colors.foreground,
@@ -303,18 +304,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     paddingHorizontal: theme.spacing.xl,
-    paddingVertical: theme.spacing.base,
+    paddingVertical: theme.spacing.md,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.card,
     gap: theme.spacing.sm,
   },
   input: {
     flex: 1,
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.inputBackground,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.lg,
+    borderRadius: theme.radius.xl,
     paddingHorizontal: theme.spacing.base,
     paddingVertical: theme.spacing.sm,
     fontSize: theme.typography.fontSize.base,
@@ -322,20 +323,22 @@ const styles = StyleSheet.create({
     maxHeight: 100,
   },
   sendButton: {
-    backgroundColor: '#3b82f6',
-    paddingHorizontal: 16,
-    height: 48,
-    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: theme.spacing.lg,
+    minHeight: 48,
+    borderRadius: theme.radius.xl,
     alignItems: 'center',
     justifyContent: 'center',
+    ...theme.shadows.interactive,
   },
   sendButtonDisabled: {
-    backgroundColor: '#6b7280',
+    backgroundColor: theme.colors.muted,
     opacity: 0.5,
+    ...theme.shadows.none,
   },
   sendText: {
-    color: '#ffffff',
+    color: theme.colors.primaryForeground,
     fontSize: theme.typography.fontSize.base,
-    fontWeight: '600',
+    fontWeight: theme.typography.fontWeight.bold,
   },
 });

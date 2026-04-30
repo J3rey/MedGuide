@@ -108,7 +108,8 @@
     "placeholder": "Ketik pertanyaan Anda...",
     "greeting": "Halo! Saya asisten Medguide Anda. Bagaimana saya bisa membantu Anda hari ini?",
     "defaultResponse": "Saya mengerti Anda memiliki pertanyaan tentang obat Anda. Silakan konsultasikan dengan penyedia layanan kesehatan Anda untuk saran medis khusus.",
-    "tellMeAbout": "Beritahu saya tentang"
+    "tellMeAbout": "Beritahu saya tentang",
+    "send": "Kirim"
   },
   "manualSearch": {
     "title": "Pencarian Obat Manual",

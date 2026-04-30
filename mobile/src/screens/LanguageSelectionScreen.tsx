@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   languageInfo: {
     flexDirection: 'column',
-    gap: 4,
+    gap: theme.spacing.xs,
   },
   languageName: {
     fontSize: theme.typography.fontSize.lg,

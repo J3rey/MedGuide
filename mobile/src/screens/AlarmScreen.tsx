@@ -33,7 +33,7 @@ export default function AlarmScreen({
       Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, {
-            toValue: 1.2,
+            toValue: 1.15,
             duration: 1000,
             useNativeDriver: true,
           }),
@@ -72,7 +72,11 @@ export default function AlarmScreen({
               { transform: [{ scale: pulseAnim }] },
             ]}
           >
-            <View style={styles.medicationIcon} />
+            <View style={styles.medicationIcon}>
+              {/* Geometric pill cross */}
+              <View style={styles.crossH} />
+              <View style={styles.crossV} />
+            </View>
           </Animated.View>
 
           <Text style={styles.title}>{t('alarm.title')}</Text>
@@ -132,7 +136,7 @@ export default function AlarmScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#d32f2f',
+    backgroundColor: theme.colors.alarmBackground,
     justifyContent: 'center',
     alignItems: 'center',
     padding: theme.spacing.xl,
@@ -148,15 +152,31 @@ const styles = StyleSheet.create({
   medicationIcon: {
     width: 80,
     height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.alarmForeground + '30',
     borderWidth: 4,
-    borderColor: '#ffffff',
+    borderColor: theme.colors.alarmForeground,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  crossH: {
+    position: 'absolute',
+    width: 28,
+    height: 6,
+    backgroundColor: theme.colors.alarmForeground,
+    borderRadius: 3,
+  },
+  crossV: {
+    position: 'absolute',
+    width: 6,
+    height: 28,
+    backgroundColor: theme.colors.alarmForeground,
+    borderRadius: 3,
   },
   title: {
     fontSize: theme.typography.fontSize['3xl'],
     fontWeight: theme.typography.fontWeight.bold,
-    color: '#ffffff',
+    color: theme.colors.alarmForeground,
     marginBottom: theme.spacing.base,
     textAlign: 'center',
     letterSpacing: 2,
@@ -164,13 +184,13 @@ const styles = StyleSheet.create({
   medicationName: {
     fontSize: theme.typography.fontSize['2xl'],
     fontWeight: theme.typography.fontWeight.semibold,
-    color: '#ffffff',
+    color: theme.colors.alarmForeground,
     marginBottom: theme.spacing.sm,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: theme.typography.fontSize.lg,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: theme.colors.alarmForeground + 'E6',
     marginBottom: theme.spacing['4xl'],
     textAlign: 'center',
   },
@@ -187,14 +207,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dismissButton: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.colors.alarmForeground,
     minHeight: 70,
     ...theme.shadows.interactive,
   },
   dismissButtonText: {
     fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
-    color: '#d32f2f',
+    color: theme.colors.alarmBackground,
   },
   snoozeContainer: {
     width: '100%',
@@ -202,7 +222,7 @@ const styles = StyleSheet.create({
   },
   snoozeLabel: {
     fontSize: theme.typography.fontSize.base,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: theme.colors.alarmForeground + 'E6',
     textAlign: 'center',
   },
   snoozeButtons: {
@@ -212,13 +232,13 @@ const styles = StyleSheet.create({
   },
   snoozeButton: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: theme.colors.alarmForeground + '33',
     borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderColor: theme.colors.alarmForeground + '80',
   },
   snoozeButtonText: {
     fontSize: theme.typography.fontSize.base,
     fontWeight: theme.typography.fontWeight.semibold,
-    color: '#ffffff',
+    color: theme.colors.alarmForeground,
   },
 });

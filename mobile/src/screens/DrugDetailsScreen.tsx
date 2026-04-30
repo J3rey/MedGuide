@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { Drug } from '../types/drug';
@@ -26,12 +27,12 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
   const [drug, setDrug] = useState<Drug | null>(null);
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     (async () => {
       try {
         console.log('[DrugDetails] Fetching drug with ID:', drugId);
-        // Import supabase client to fetch by ID
         const { createClient } = await import('@supabase/supabase-js');
         const Constants = await import('expo-constants');
 
@@ -70,7 +71,7 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>{t('drugDetails.loading')}</Text>
       </View>
     );
@@ -91,7 +92,10 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingTop: Math.max(insets.top, theme.spacing.base) }}
+    >
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => {
@@ -99,7 +103,7 @@ export default function DrugDetailsScreen({ route, navigation }: Props) {
           navigation.goBack();
         }}
       >
-        <Text style={styles.backText}>{t('drugDetails.back')}</Text>
+        <Text style={styles.backText}>{t('common.back')}</Text>
       </TouchableOpacity>
 
       <Text style={styles.brandName}>{drug.drug_name}</Text>
@@ -156,7 +160,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    padding: theme.spacing.base,
+    paddingHorizontal: theme.spacing.xl,
   },
   center: {
     flex: 1,
@@ -167,6 +171,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: theme.spacing.md,
     color: theme.colors.mutedForeground,
+    fontSize: theme.typography.fontSize.base,
   },
   errorText: {
     color: theme.colors.destructive,
@@ -176,57 +181,59 @@ const styles = StyleSheet.create({
   backButton: {
     marginBottom: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
+    paddingHorizontal: theme.spacing.base,
     backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.xl,
     borderWidth: 1,
     borderColor: theme.colors.border,
     alignSelf: 'flex-start',
   },
   backText: {
     color: theme.colors.primary,
-    fontSize: theme.typography.fontSize.lg,
-    fontWeight: theme.typography.fontWeight.bold,
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semibold,
   },
   brandName: {
-    fontSize: theme.typography.fontSize['2xl'],
+    fontSize: theme.typography.fontSize['3xl'],
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.foreground,
-    marginBottom: theme.spacing.xs,
+    marginBottom: theme.spacing.lg,
   },
   section: {
-    marginBottom: theme.spacing.lg,
-    padding: theme.spacing.md,
+    marginBottom: theme.spacing.base,
+    padding: theme.spacing.lg,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.lg,
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.card,
+    ...theme.shadows.surface,
   },
   sectionTitle: {
     fontSize: theme.typography.fontSize.lg,
     fontWeight: theme.typography.fontWeight.semibold,
-    color: theme.colors.foreground,
+    color: theme.colors.primary,
     marginBottom: theme.spacing.sm,
   },
   sectionText: {
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.mutedForeground,
-    lineHeight: 22,
+    lineHeight:
+      theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
   },
   button: {
     marginTop: theme.spacing.md,
     minHeight: 48,
     paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-    borderWidth: 1,
+    paddingHorizontal: theme.spacing.xl,
     borderRadius: theme.radius.xl,
-    borderColor: theme.colors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.primary,
+    ...theme.shadows.interactive,
   },
   buttonText: {
     fontSize: theme.typography.fontSize.base,
-    fontWeight: theme.typography.fontWeight.semibold,
-    color: theme.colors.foreground,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.primaryForeground,
   },
 });
