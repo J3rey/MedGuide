@@ -908,12 +908,9 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
         </TouchableOpacity>
       </SafeAreaView>
 
-      {/* Scan frame + hint text */}
+      {/* Hint text */}
       <View style={styles.scanFrameArea}>
         <Text style={styles.scanHintText}>{t('camera.positionLabel')}</Text>
-        <View style={styles.scanFrame}>
-          <ScanFrameCorners />
-        </View>
       </View>
 
       {/* Zoom pill */}
