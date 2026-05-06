@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Linking } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import { EmptyState } from '../components/ui/StateViews';
@@ -43,7 +44,7 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Text style={styles.backText}>← Back</Text>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Pharmacy</Text>
         <Text style={styles.headerSubtitle}>
@@ -69,16 +70,25 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
               <View key={pharmacy.id} style={styles.pharmacyCard}>
                 <View style={styles.pharmacyHeader}>
                   <View style={styles.pharmacyIcon}>
-                    <Text style={styles.pharmacyIconText}>🏥</Text>
+                    <Ionicons name="medkit" size={24} color={theme.colors.primary} />
                   </View>
                   <View style={styles.pharmacyInfo}>
                     <Text style={styles.pharmacyName}>{pharmacy.name}</Text>
                     {pharmacy.address && (
-                      <Text style={styles.pharmacyDetail}>📍 {pharmacy.address}</Text>
+                      <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
+                        <Ionicons name="location-outline" size={14} color={theme.colors.textSecondary} />
+                        <Text style={styles.pharmacyDetail}>{pharmacy.address}</Text>
+                      </View>
                     )}
-                    <Text style={styles.pharmacyDetail}>📞 {pharmacy.phone}</Text>
+                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
+                      <Ionicons name="call-outline" size={14} color={theme.colors.textSecondary} />
+                      <Text style={styles.pharmacyDetail}>{pharmacy.phone}</Text>
+                    </View>
                     {pharmacy.opening_hours && (
-                      <Text style={styles.pharmacyDetail}>🕐 {pharmacy.opening_hours}</Text>
+                      <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
+                        <Ionicons name="time-outline" size={14} color={theme.colors.textSecondary} />
+                        <Text style={styles.pharmacyDetail}>{pharmacy.opening_hours}</Text>
+                      </View>
                     )}
                   </View>
                 </View>
@@ -88,7 +98,8 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
                     onPress={() => Linking.openURL(`tel:${pharmacy.phone}`)}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.callPharmacyText}>📞 Call Pharmacy</Text>
+                    <Ionicons name="call" size={16} color="#FFFFFF" />
+                    <Text style={styles.callPharmacyText}>Call Pharmacy</Text>
                   </TouchableOpacity>
                 </View>
               </View>
