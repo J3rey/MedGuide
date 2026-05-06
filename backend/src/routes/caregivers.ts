@@ -5,8 +5,24 @@ import {
   requireProfileOwner,
   requireUserId,
 } from '../services/profileAccess';
+import { getErrorMessage } from '../types/errors';
 
 const router = Router();
+
+interface CaregiverPatientRecord {
+  profile_id: string;
+  [key: string]: unknown;
+}
+
+interface MedicationLogSummary {
+  status: string;
+  taken_at?: string | null;
+  created_at?: string | null;
+}
+
+interface EmergencyContactSummary {
+  phone?: string | null;
+}
 
 // Get caregivers for a profile
 router.get(
@@ -28,8 +44,8 @@ router.get(
 
       if (error) throw error;
       res.json({ caregivers: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -72,8 +88,8 @@ router.post(
 
       if (error) throw error;
       res.status(201).json({ caregiver: data, invite_code: inviteCode });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -111,8 +127,8 @@ router.post(
       }
 
       res.json({ caregiver: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -146,8 +162,8 @@ router.put(
 
       if (error) throw error;
       res.json({ caregiver: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -181,8 +197,8 @@ router.post('/caregivers/:id/revoke', async (req: Request, res: Response) => {
 
     if (error) throw error;
     res.json({ caregiver: data });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -214,7 +230,7 @@ router.get('/caregivers/my-patients', async (req: Request, res: Response) => {
     todayEnd.setDate(todayEnd.getDate() + 1);
 
     const patients = await Promise.all(
-      (data || []).map(async (patient: any) => {
+      ((data || []) as CaregiverPatientRecord[]).map(async (patient) => {
         const profileId = patient.profile_id;
 
         const [
@@ -247,18 +263,21 @@ router.get('/caregivers/my-patients', async (req: Request, res: Response) => {
         ]);
 
         const medicationsTaken =
-          logs?.filter((log: any) =>
+          (logs as MedicationLogSummary[] | null)?.filter((log) =>
             ['taken', 'taken_late'].includes(log.status)
           ).length || 0;
         const missedCount =
-          logs?.filter((log: any) => log.status === 'missed').length || 0;
-        const lastLog = logs
-          ?.filter((log: any) => log.taken_at || log.created_at)
-          .sort((a: any, b: any) =>
+          (logs as MedicationLogSummary[] | null)?.filter(
+            (log) => log.status === 'missed'
+          ).length || 0;
+        const lastLog = (logs as MedicationLogSummary[] | null)
+          ?.filter((log) => log.taken_at || log.created_at)
+          .sort((a, b) =>
             String(b.taken_at || b.created_at).localeCompare(
               String(a.taken_at || a.created_at)
             )
           )[0];
+        const lastCheckInTime = lastLog?.taken_at || lastLog?.created_at;
 
         return {
           ...patient,
@@ -266,21 +285,19 @@ router.get('/caregivers/my-patients', async (req: Request, res: Response) => {
             medicationsTaken,
             medicationsTotal: medicationsTotal || 0,
             missedCount,
-            lastCheckIn: lastLog
-              ? new Date(
-                  lastLog.taken_at || lastLog.created_at
-                ).toLocaleString()
+            lastCheckIn: lastCheckInTime
+              ? new Date(lastCheckInTime).toLocaleString()
               : 'No logs today',
             hasEmergencyAlert: (activeEmergencyCount || 0) > 0,
-            phone: contacts?.[0]?.phone,
+            phone: (contacts as EmergencyContactSummary[] | null)?.[0]?.phone,
           },
         };
       })
     );
 
     res.json({ patients });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 

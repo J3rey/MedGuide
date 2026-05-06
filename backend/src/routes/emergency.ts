@@ -5,6 +5,7 @@ import {
   requireProfileOwner,
   requireUserId,
 } from '../services/profileAccess';
+import { getErrorMessage } from '../types/errors';
 
 const router = Router();
 
@@ -29,8 +30,8 @@ router.get(
 
       if (error) throw error;
       res.json({ contacts: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -71,8 +72,8 @@ router.post(
 
       if (error) throw error;
       res.status(201).json({ contact: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -104,8 +105,8 @@ router.delete(
 
       if (error) throw error;
       res.status(204).send();
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -143,8 +144,8 @@ router.post(
       // TODO: Send push notifications to caregivers and emergency contacts
 
       res.status(201).json({ event: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -179,8 +180,8 @@ router.post(
 
       if (error) throw error;
       res.json({ event: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -205,8 +206,8 @@ router.get(
 
       if (error) throw error;
       res.json({ events: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -232,8 +233,8 @@ router.get(
 
       if (error) throw error;
       res.json({ pharmacies: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -266,8 +267,8 @@ router.post(
 
       if (error) throw error;
       res.status(201).json({ pharmacy: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -288,8 +289,8 @@ router.delete('/pharmacies/:id', async (req: Request, res: Response) => {
 
     if (error) throw error;
     res.status(204).send();
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 

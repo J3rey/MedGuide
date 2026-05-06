@@ -368,11 +368,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
   },
-  backText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.primary,
-    fontWeight: theme.typography.fontWeight.medium,
-  },
   headerTitle: {
     fontSize: theme.typography.fontSize['2xl'],
     fontWeight: theme.typography.fontWeight.bold,
@@ -531,18 +526,6 @@ const styles = StyleSheet.create({
   permItem: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  permCheck: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.success,
-    width: 24,
-    fontWeight: theme.typography.fontWeight.bold,
-  },
-  permCross: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.textSecondary,
-    width: 24,
-    fontWeight: theme.typography.fontWeight.bold,
   },
   permText: {
     fontSize: theme.typography.fontSize.base,

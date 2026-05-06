@@ -237,11 +237,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
   },
-  backText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.primary,
-    fontWeight: theme.typography.fontWeight.medium,
-  },
   headerTitle: {
     fontSize: theme.typography.fontSize['2xl'],
     fontWeight: theme.typography.fontWeight.bold,
@@ -294,11 +289,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingVertical: theme.spacing.md,
-  },
-  infoIcon: {
-    fontSize: 20,
-    marginRight: theme.spacing.md,
-    marginTop: 2,
   },
   infoText: {
     flex: 1,

@@ -237,7 +237,8 @@ export default function VisualScheduleScreen() {
         key={item.id}
         style={[
           styles.scheduleCard,
-          { borderLeftColor: borderColor, borderLeftWidth: 4 },
+          styles.statusBorder,
+          { borderLeftColor: borderColor },
           isDueNow && styles.dueNowCard,
         ]}
       >
@@ -514,6 +515,9 @@ const styles = StyleSheet.create({
     padding: theme.spacing.base,
     marginBottom: theme.spacing.md,
     ...theme.shadows.card,
+  },
+  statusBorder: {
+    borderLeftWidth: 4,
   },
   dueNowCard: {
     backgroundColor: '#FFFBEB',

@@ -279,14 +279,14 @@ export default function EmergencyContactsScreen({
                   setShowAddForm(false);
                 }}
                 variant="outline"
-                style={{ flex: 1 }}
+                style={styles.formActionButton}
               />
               <LargeActionButton
                 title={t('emergencyContacts.saveContact')}
                 onPress={handleAddContact}
                 variant="primary"
                 disabled={!newName || !newPhone || isSaving}
-                style={{ flex: 1 }}
+                style={styles.formActionButton}
               />
             </View>
           </View>
@@ -329,11 +329,6 @@ const styles = StyleSheet.create({
   backButton: {
     marginBottom: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
-  },
-  backText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.primary,
-    fontWeight: theme.typography.fontWeight.medium,
   },
   headerTitle: {
     fontSize: theme.typography.fontSize['2xl'],
@@ -442,9 +437,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  deleteBtnText: {
-    fontSize: 18,
-  },
   addForm: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.xl,
@@ -481,5 +473,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: theme.spacing.md,
     marginTop: theme.spacing.md,
+  },
+  formActionButton: {
+    flex: 1,
   },
 });

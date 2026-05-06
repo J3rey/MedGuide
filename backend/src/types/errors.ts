@@ -31,3 +31,6 @@ export class ApiError extends Error {
     Object.setPrototypeOf(this, ApiError.prototype);
   }
 }
+
+export const getErrorMessage = (error: unknown): string =>
+  error instanceof Error ? error.message : 'Unexpected server error';

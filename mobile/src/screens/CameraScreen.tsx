@@ -104,80 +104,6 @@ function GalleryIcon() {
 
 // ─── Scan Frame Corner Component ────────────────────────────
 
-function ScanFrameCorners() {
-  const cornerSize = 24;
-  const borderW = 3;
-  const color = theme.colors.primary;
-  const cornerRadius = 8;
-
-  const cornerBase = {
-    position: 'absolute' as const,
-    width: cornerSize,
-    height: cornerSize,
-  };
-
-  return (
-    <View style={scanFrameStyles.container}>
-      {/* Top-left */}
-      <View
-        style={[
-          cornerBase,
-          {
-            top: 0,
-            left: 0,
-            borderTopWidth: borderW,
-            borderLeftWidth: borderW,
-            borderColor: color,
-            borderTopLeftRadius: cornerRadius,
-          },
-        ]}
-      />
-      {/* Top-right */}
-      <View
-        style={[
-          cornerBase,
-          {
-            top: 0,
-            right: 0,
-            borderTopWidth: borderW,
-            borderRightWidth: borderW,
-            borderColor: color,
-            borderTopRightRadius: cornerRadius,
-          },
-        ]}
-      />
-      {/* Bottom-left */}
-      <View
-        style={[
-          cornerBase,
-          {
-            bottom: 0,
-            left: 0,
-            borderBottomWidth: borderW,
-            borderLeftWidth: borderW,
-            borderColor: color,
-            borderBottomLeftRadius: cornerRadius,
-          },
-        ]}
-      />
-      {/* Bottom-right */}
-      <View
-        style={[
-          cornerBase,
-          {
-            bottom: 0,
-            right: 0,
-            borderBottomWidth: borderW,
-            borderRightWidth: borderW,
-            borderColor: color,
-            borderBottomRightRadius: cornerRadius,
-          },
-        ]}
-      />
-    </View>
-  );
-}
-
 // ─── Main Component ─────────────────────────────────────────
 
 export default function CameraScreen({ navigation }: CameraScreenProps) {
@@ -1148,15 +1074,6 @@ const iconStyles = StyleSheet.create({
 
 // ─── Scan Frame Styles ──────────────────────────────────────
 
-const scanFrameStyles = StyleSheet.create({
-  container: {
-    width: '70%',
-    aspectRatio: 4 / 3,
-    maxWidth: 320,
-    position: 'relative',
-  },
-});
-
 // ─── Main Styles ────────────────────────────────────────────
 
 const styles = StyleSheet.create({
@@ -1310,13 +1227,6 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
   },
-  scanFrame: {
-    width: '70%',
-    aspectRatio: 4 / 3,
-    maxWidth: 320,
-    position: 'relative',
-  },
-
   // ─── Zoom Pill ───
   zoomPillRow: {
     position: 'absolute',

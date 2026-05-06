@@ -145,11 +145,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     marginLeft: theme.spacing.sm,
   },
-  chevron: {
-    fontSize: theme.typography.fontSize.sm,
-    color: theme.colors.textSecondary,
-    marginLeft: theme.spacing.xs,
-  },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
@@ -228,10 +223,5 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  checkmarkText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: theme.typography.fontWeight.bold,
   },
 });

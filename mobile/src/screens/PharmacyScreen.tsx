@@ -276,14 +276,14 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
                   setShowAddForm(false);
                 }}
                 variant="outline"
-                style={{ flex: 1 }}
+                style={styles.formActionButton}
               />
               <LargeActionButton
                 title={t('common.save')}
                 onPress={handleAdd}
                 variant="primary"
                 disabled={!newName || !newPhone || isSaving}
-                style={{ flex: 1 }}
+                style={styles.formActionButton}
               />
             </View>
           </View>
@@ -316,11 +316,6 @@ const styles = StyleSheet.create({
   backButton: {
     marginBottom: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
-  },
-  backText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.primary,
-    fontWeight: theme.typography.fontWeight.medium,
   },
   headerTitle: {
     fontSize: theme.typography.fontSize['2xl'],
@@ -357,9 +352,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.successLight,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  pharmacyIconText: {
-    fontSize: 22,
   },
   pharmacyInfo: {
     flex: 1,
@@ -444,5 +436,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: theme.spacing.md,
     marginTop: theme.spacing.md,
+  },
+  formActionButton: {
+    flex: 1,
   },
 });

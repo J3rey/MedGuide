@@ -53,20 +53,16 @@ export default function LargeActionButton({
   fullWidth = false,
 }: LargeActionButtonProps) {
   const config = variantStyles[variant];
+  const buttonStyle: ViewStyle = {
+    backgroundColor: config.bg,
+    borderColor: config.border || 'transparent',
+    borderWidth: config.border ? 1.5 : 0,
+    opacity: disabled ? 0.5 : 1,
+  };
 
   return (
     <TouchableOpacity
-      style={[
-        styles.button,
-        {
-          backgroundColor: config.bg,
-          borderColor: config.border || 'transparent',
-          borderWidth: config.border ? 1.5 : 0,
-          opacity: disabled ? 0.5 : 1,
-        },
-        fullWidth && styles.fullWidth,
-        style,
-      ]}
+      style={[styles.button, buttonStyle, fullWidth && styles.fullWidth, style]}
       onPress={onPress}
       disabled={disabled || loading}
       activeOpacity={0.7}

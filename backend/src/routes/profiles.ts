@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../services/supabase';
 import { requireUserId } from '../services/profileAccess';
+import { getErrorMessage } from '../types/errors';
 
 const router = Router();
 
@@ -18,8 +19,8 @@ router.get('/profiles', async (req: Request, res: Response) => {
 
     if (error) throw error;
     res.json({ profiles: data });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -60,8 +61,8 @@ router.post('/profiles', async (req: Request, res: Response) => {
 
     if (error) throw error;
     res.status(201).json({ profile: data });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -87,8 +88,8 @@ router.put('/profiles/:id', async (req: Request, res: Response) => {
 
     if (error) throw error;
     res.json({ profile: data });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -107,8 +108,8 @@ router.delete('/profiles/:id', async (req: Request, res: Response) => {
 
     if (error) throw error;
     res.status(204).send();
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 

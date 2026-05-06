@@ -14,11 +14,7 @@ import theme from '../styles/theme';
 import { useProfiles } from '../contexts/ProfileContext';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import ConfirmActionModal from '../components/ui/ConfirmActionModal';
-import {
-  Profile,
-  Relationship,
-  defaultAccessibilitySettings,
-} from '../types/models';
+import { Relationship, defaultAccessibilitySettings } from '../types/models';
 
 interface ManageProfilesScreenProps {
   onBack?: () => void;
@@ -267,14 +263,14 @@ export default function ManageProfilesScreen({
                 title="Cancel"
                 onPress={() => setShowAddForm(false)}
                 variant="outline"
-                style={{ flex: 1 }}
+                style={styles.formActionButton}
               />
               <LargeActionButton
                 title="Add Profile"
                 onPress={handleAdd}
                 variant="primary"
                 disabled={!newName}
-                style={{ flex: 1 }}
+                style={styles.formActionButton}
               />
             </View>
           </View>
@@ -315,11 +311,6 @@ const styles = StyleSheet.create({
   backButton: {
     marginBottom: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
-  },
-  backText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.primary,
-    fontWeight: theme.typography.fontWeight.medium,
   },
   headerTitle: {
     fontSize: theme.typography.fontSize['2xl'],
@@ -508,13 +499,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
-  colorCheck: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: theme.typography.fontWeight.bold,
-  },
   formActions: {
     flexDirection: 'row',
     gap: theme.spacing.md,
+  },
+  formActionButton: {
+    flex: 1,
   },
 });

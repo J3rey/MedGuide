@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Switch,
   Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -63,8 +62,6 @@ export default function CulturalNotesScreen({
       activeProfile?.family_involvement_preference || 'full'
     );
 
-  const [hasChanges, setHasChanges] = useState(false);
-
   const handleSave = async () => {
     if (activeProfile) {
       try {
@@ -89,7 +86,6 @@ export default function CulturalNotesScreen({
   const handleFieldChange =
     (setter: (v: string) => void) => (value: string) => {
       setter(value);
-      setHasChanges(true);
     };
 
   return (
@@ -228,11 +224,6 @@ const styles = StyleSheet.create({
   backButton: {
     marginBottom: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
-  },
-  backText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.primary,
-    fontWeight: theme.typography.fontWeight.medium,
   },
   headerTitle: {
     fontSize: theme.typography.fontSize['2xl'],

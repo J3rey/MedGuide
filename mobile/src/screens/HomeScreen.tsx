@@ -256,7 +256,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             activeOpacity={0.7}
           >
             <View
-              style={[styles.quickActionIcon, { backgroundColor: '#F0FDF4' }]}
+              style={[styles.quickActionIcon, styles.pharmacyQuickActionIcon]}
             >
               <Ionicons name="medkit" size={24} color="#16A34A" />
             </View>
@@ -453,6 +453,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: theme.spacing.sm,
+  },
+  pharmacyQuickActionIcon: {
+    backgroundColor: '#F0FDF4',
   },
   quickActionLabel: {
     fontSize: theme.typography.fontSize.sm,

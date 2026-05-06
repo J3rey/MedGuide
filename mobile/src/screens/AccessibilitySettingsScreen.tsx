@@ -37,6 +37,32 @@ export default function AccessibilitySettingsScreen({
     { label: 'Extra Large', value: 'extraLarge' },
   ];
 
+  const getOptionTextStyle = (value: TextSizeScale) => ({
+    fontSize:
+      value === 'small'
+        ? 13
+        : value === 'large'
+          ? 18
+          : value === 'extraLarge'
+            ? 22
+            : 15,
+  });
+
+  const getPreviewTextStyle = (value: TextSizeScale) => ({
+    fontSize:
+      value === 'small'
+        ? 13
+        : value === 'large'
+          ? 20
+          : value === 'extraLarge'
+            ? 24
+            : 16,
+  });
+
+  const getButtonSizeStyle = (value: ButtonSizeScale) => ({
+    minHeight: value === 'large' ? 56 : value === 'extraLarge' ? 64 : 48,
+  });
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
@@ -148,16 +174,7 @@ export default function AccessibilitySettingsScreen({
                     styles.optionButtonText,
                     settings.text_size === option.value &&
                       styles.optionButtonTextActive,
-                    {
-                      fontSize:
-                        option.value === 'small'
-                          ? 13
-                          : option.value === 'large'
-                            ? 18
-                            : option.value === 'extraLarge'
-                              ? 22
-                              : 15,
-                    },
+                    getOptionTextStyle(option.value),
                   ]}
                 >
                   {option.label}
@@ -169,16 +186,7 @@ export default function AccessibilitySettingsScreen({
             <Text
               style={[
                 styles.previewText,
-                {
-                  fontSize:
-                    settings.text_size === 'small'
-                      ? 13
-                      : settings.text_size === 'large'
-                        ? 20
-                        : settings.text_size === 'extraLarge'
-                          ? 24
-                          : 16,
-                },
+                getPreviewTextStyle(settings.text_size),
               ]}
             >
               This is how text will appear in the app
@@ -200,14 +208,7 @@ export default function AccessibilitySettingsScreen({
                   styles.buttonSizeOption,
                   settings.button_size === option.value &&
                     styles.optionButtonActive,
-                  {
-                    minHeight:
-                      option.value === 'large'
-                        ? 56
-                        : option.value === 'extraLarge'
-                          ? 64
-                          : 48,
-                  },
+                  getButtonSizeStyle(option.value),
                 ]}
                 onPress={() => updateSettings({ button_size: option.value })}
                 activeOpacity={0.7}
@@ -266,11 +267,6 @@ const styles = StyleSheet.create({
   backButton: {
     marginBottom: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
-  },
-  backText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.primary,
-    fontWeight: theme.typography.fontWeight.medium,
   },
   headerTitle: {
     fontSize: theme.typography.fontSize['2xl'],

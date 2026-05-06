@@ -53,7 +53,6 @@ function CaregiverStatusCard({
   medicationsTaken,
   medicationsTotal,
   missedCount,
-  lastCheckIn,
   hasEmergencyAlert,
   phone,
   labels,

@@ -1,7 +1,19 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../services/supabase';
+import { getErrorMessage } from '../types/errors';
 
 const router = Router();
+
+interface MedicationLogInsert {
+  medication_id: string;
+  profile_id: string;
+  scheduled_instance_time: string;
+  status: string;
+  logged_by_user_id?: string;
+  taken_at?: string;
+  skipped_reason?: string;
+  notes?: string;
+}
 
 // ============ Medications ============
 
@@ -25,8 +37,8 @@ router.get(
 
       if (error) throw error;
       res.json({ medications: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -57,8 +69,8 @@ router.post(
 
       if (error) throw error;
       res.status(201).json({ medication: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -81,8 +93,8 @@ router.put('/medications/:id', async (req: Request, res: Response) => {
 
     if (error) throw error;
     res.json({ medication: data });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -95,8 +107,8 @@ router.delete('/medications/:id', async (req: Request, res: Response) => {
 
     if (error) throw error;
     res.status(204).send();
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -133,8 +145,8 @@ router.post(
 
       if (error) throw error;
       res.status(201).json({ schedule: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -151,8 +163,8 @@ router.delete('/schedules/:id', async (req: Request, res: Response) => {
 
     if (error) throw error;
     res.status(204).send();
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -171,7 +183,7 @@ router.post('/medication-logs', async (req: Request, res: Response) => {
       notes,
     } = req.body;
 
-    const logData: any = {
+    const logData: MedicationLogInsert = {
       medication_id,
       profile_id,
       scheduled_instance_time,
@@ -193,8 +205,8 @@ router.post('/medication-logs', async (req: Request, res: Response) => {
 
     if (error) throw error;
     res.status(201).json({ log: data });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -224,8 +236,8 @@ router.get(
 
       if (error) throw error;
       res.json({ logs: data });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
