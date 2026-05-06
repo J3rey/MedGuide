@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Linking } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import ConfirmActionModal from '../components/ui/ConfirmActionModal';
@@ -59,7 +60,7 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Text style={styles.backText}>← Back</Text>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Emergency Contacts</Text>
         <Text style={styles.headerSubtitle}>
@@ -102,14 +103,16 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
                     onPress={() => Linking.openURL(`tel:${contact.phone}`)}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.callBtnText}>📞 Call</Text>
+                    <Ionicons name="call" size={14} color="#FFFFFF" />
+                    <Text style={styles.callBtnText}>Call</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.messageBtn}
                     onPress={() => Linking.openURL(`sms:${contact.phone}`)}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.messageBtnText}>💬 Message</Text>
+                    <Ionicons name="chatbubble" size={14} color={theme.colors.primary} />
+                    <Text style={styles.messageBtnText}>Message</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.deleteBtn}
@@ -119,7 +122,7 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
                     }}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.deleteBtnText}>🗑️</Text>
+                    <Ionicons name="trash" size={18} color={theme.colors.danger} />
                   </TouchableOpacity>
                 </View>
               </View>
