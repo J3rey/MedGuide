@@ -2,24 +2,37 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import { uriToBase64 } from '../utils/uriToBase64';
 
-// Get backend URL from config with platform-specific defaults
-const getBackendUrl = () => {
-  if (Constants.expoConfig?.extra?.backendUrl) {
-    return Constants.expoConfig.extra.backendUrl;
-  }
+const RENDER_BACKEND_URL = 'https://medguide-p132.onrender.com';
 
-  // Default URLs for different platforms (development fallbacks)
+const getPrimaryBackendUrl = () =>
+  Constants.expoConfig?.extra?.backendUrl || RENDER_BACKEND_URL;
+
+const getLocalBackendUrl = () => {
+  if (Constants.expoConfig?.extra?.localBackendUrl) {
+    return Constants.expoConfig.extra.localBackendUrl;
+  }
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:3000'; // Android emulator
   }
   if (Platform.OS === 'ios') {
     return 'http://localhost:3000'; // iOS simulator
   }
-  // For web, we need the production URL - localhost won't work
-  return 'https://medguide-p132.onrender.com';
+  return 'http://localhost:3000';
 };
 
-const API_URL = getBackendUrl();
+const PRIMARY_API_URL = getPrimaryBackendUrl();
+const LOCAL_API_URL = getLocalBackendUrl();
+
+const shouldRetryLocally = (response: Response) => response.status >= 500;
+
+const postOcrRequest = async (baseUrl: string, image: string) =>
+  fetch(`${baseUrl}/api/ocr/extract`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ image }),
+  });
 
 export async function extractTextFromImage(uri: string): Promise<string> {
   try {
@@ -31,16 +44,16 @@ export async function extractTextFromImage(uri: string): Promise<string> {
     console.log('[OCR] Image read, base64 length:', base64.length);
     console.log('[OCR] Sending to backend API...');
 
-    // Send to backend API
-    const response = await fetch(`${API_URL}/api/ocr/extract`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        image: base64,
-      }),
-    });
+    let response: Response;
+    try {
+      response = await postOcrRequest(PRIMARY_API_URL, base64);
+      if (shouldRetryLocally(response)) {
+        response = await postOcrRequest(LOCAL_API_URL, base64);
+      }
+    } catch (error) {
+      console.warn('[OCR] Primary backend failed, retrying local:', error);
+      response = await postOcrRequest(LOCAL_API_URL, base64);
+    }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
