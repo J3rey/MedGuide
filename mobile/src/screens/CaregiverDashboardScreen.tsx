@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
-import SectionCard from '../components/ui/SectionCard';
 import { EmptyState } from '../components/ui/StateViews';
 
 interface CaregiverDashboardScreenProps {
@@ -37,7 +37,8 @@ function CaregiverStatusCard({
     <View style={[styles.statusCard, hasEmergencyAlert && styles.emergencyCard]}>
       {hasEmergencyAlert && (
         <View style={styles.emergencyBanner}>
-          <Text style={styles.emergencyBannerText}>⚠️ Emergency Alert Active</Text>
+          <Ionicons name="warning" size={16} color={theme.colors.emergency} />
+          <Text style={styles.emergencyBannerText}>Emergency Alert Active</Text>
         </View>
       )}
 
@@ -57,7 +58,7 @@ function CaregiverStatusCard({
           <View style={[styles.completionFill, { width: `${completionPercent}%` }]} />
         </View>
         <Text style={styles.completionText}>
-          {medicationsTaken}/{medicationsTotal} taken today
+          {medicationsTaken}/{medicationsTotal} taken today ({completionPercent}%)
         </Text>
       </View>
 
@@ -65,7 +66,8 @@ function CaregiverStatusCard({
       <View style={styles.statsRow}>
         {missedCount > 0 && (
           <View style={styles.statBadge}>
-            <Text style={styles.statBadgeText}>🔴 {missedCount} missed</Text>
+            <Ionicons name="close-circle" size={14} color={theme.colors.danger} />
+            <Text style={styles.statBadgeText}>{missedCount} missed</Text>
           </View>
         )}
         <Text style={styles.lastCheckIn}>Last check-in: {lastCheckIn}</Text>
@@ -78,7 +80,7 @@ function CaregiverStatusCard({
           onPress={() => phone && Linking.openURL(`tel:${phone}`)}
           activeOpacity={0.7}
         >
-          <Text style={styles.quickActionIcon}>📞</Text>
+          <Ionicons name="call" size={20} color={theme.colors.primary} />
           <Text style={styles.quickActionLabel}>Call</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -86,11 +88,11 @@ function CaregiverStatusCard({
           onPress={() => phone && Linking.openURL(`sms:${phone}`)}
           activeOpacity={0.7}
         >
-          <Text style={styles.quickActionIcon}>💬</Text>
+          <Ionicons name="chatbubble" size={20} color={theme.colors.primary} />
           <Text style={styles.quickActionLabel}>Message</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.quickActionBtn} activeOpacity={0.7}>
-          <Text style={styles.quickActionIcon}>📋</Text>
+          <Ionicons name="document-text" size={20} color={theme.colors.primary} />
           <Text style={styles.quickActionLabel}>Details</Text>
         </TouchableOpacity>
       </View>
@@ -122,12 +124,14 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Text style={styles.backText}>← Back</Text>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Caregiver Dashboard</Text>
-        <Text style={styles.headerSubtitle}>
-          Monitor medication status for people you care for
-        </Text>
+        <View>
+          <Text style={styles.headerTitle}>Caregiver Dashboard</Text>
+          <Text style={styles.headerSubtitle}>
+            Monitor medication status for people you care for
+          </Text>
+        </View>
       </View>
 
       <ScrollView
@@ -146,6 +150,7 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
               onPress={() => onNavigate?.('CaregiverPermissions')}
               activeOpacity={0.7}
             >
+              <Ionicons name="settings" size={18} color={theme.colors.primary} />
               <Text style={styles.manageButtonText}>Manage Permissions</Text>
             </TouchableOpacity>
           </>
@@ -168,18 +173,18 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: theme.spacing.xl,
     paddingTop: theme.spacing.sm,
     paddingBottom: theme.spacing.lg,
   },
   backButton: {
-    marginBottom: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
-  },
-  backText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.primary,
-    fontWeight: theme.typography.fontWeight.medium,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: theme.spacing.sm,
   },
   headerTitle: {
     fontSize: theme.typography.fontSize['2xl'],
@@ -187,9 +192,9 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
   },
   headerSubtitle: {
-    fontSize: theme.typography.fontSize.base,
+    fontSize: theme.typography.fontSize.sm,
     color: theme.colors.textSecondary,
-    marginTop: theme.spacing.xs,
+    marginTop: 2,
   },
   scroll: {
     flex: 1,
@@ -210,17 +215,20 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.emergency,
   },
   emergencyBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: theme.colors.emergencyLight,
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.md,
     borderRadius: theme.radius.md,
     marginBottom: theme.spacing.md,
+    gap: theme.spacing.sm,
   },
   emergencyBannerText: {
     color: theme.colors.emergency,
     fontSize: theme.typography.fontSize.sm,
     fontWeight: theme.typography.fontWeight.semibold,
-    textAlign: 'center',
   },
   statusHeader: {
     flexDirection: 'row',
@@ -277,10 +285,13 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
   },
   statBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: theme.colors.dangerLight,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.full,
+    gap: theme.spacing.xs,
   },
   statBadgeText: {
     fontSize: theme.typography.fontSize.sm,
@@ -304,10 +315,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md,
     backgroundColor: theme.colors.surfaceMuted,
     borderRadius: theme.radius.lg,
-  },
-  quickActionIcon: {
-    fontSize: 20,
-    marginBottom: theme.spacing.xs,
+    gap: theme.spacing.xs,
   },
   quickActionLabel: {
     fontSize: theme.typography.fontSize.sm,
@@ -315,11 +323,14 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
   },
   manageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: theme.colors.primaryLight,
     paddingVertical: theme.spacing.base,
     borderRadius: theme.radius.lg,
-    alignItems: 'center',
     marginTop: theme.spacing.md,
+    gap: theme.spacing.sm,
   },
   manageButtonText: {
     color: theme.colors.primary,
