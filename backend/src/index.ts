@@ -12,7 +12,7 @@ import medicationRoutes from './routes/medications';
 import { apiLimiter } from './middleware/rateLimiter';
 
 const app: Application = express();
-const PORT = parseInt(process.env.PORT || '10000', 10);
+const PORT = parseInt(process.env.PORT || '3000', 10);
 
 console.log('🔧 Starting MedGuide API...');
 console.log(`📊 PORT from env: ${process.env.PORT}, using: ${PORT}`);

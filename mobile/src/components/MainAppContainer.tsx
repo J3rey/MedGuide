@@ -67,13 +67,19 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
   const [subScreen, setSubScreen] = useState<SubScreen>(null);
   const [showAlarm, setShowAlarm] = useState(false);
   const [currentAlarm, setCurrentAlarm] = useState<AlarmData | null>(null);
+  const [chatDrugName, setChatDrugName] = useState<string | null>(null);
   const { scannedDrug, setScannedDrug } = useScan();
-  const notificationListener = useRef<Notifications.Subscription | undefined>(undefined);
-  const responseListener = useRef<Notifications.Subscription | undefined>(undefined);
+  const notificationListener = useRef<Notifications.Subscription | undefined>(
+    undefined
+  );
+  const responseListener = useRef<Notifications.Subscription | undefined>(
+    undefined
+  );
 
   // Listen for scan completion
   useEffect(() => {
     if (scannedDrug) {
+      setChatDrugName(scannedDrug);
       setActiveTab('chat');
       setTimeout(() => setScannedDrug(null), 1000);
     }
@@ -81,31 +87,38 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
 
   // Notification listeners
   useEffect(() => {
-    notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
-      const data = notification.request.content.data;
-      if (data.isAlarm) {
-        setCurrentAlarm({
-          medicationName: data.medicationName as string,
-          notificationId: notification.request.identifier,
-        });
-        setShowAlarm(true);
-      }
-    });
-
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(async (response) => {
-      const data = response.notification.request.content.data;
-      const actionId = response.actionIdentifier;
-
-      if (data.isAlarm) {
-        if (actionId === 'SNOOZE_5') {
-          await handleSnooze(data.medicationName as string, 5);
-        } else if (actionId === 'SNOOZE_10') {
-          await handleSnooze(data.medicationName as string, 10);
-        } else if (actionId === 'DISMISS' || actionId === Notifications.DEFAULT_ACTION_IDENTIFIER) {
-          await dismissAlarm(response.notification.request.identifier);
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        const data = notification.request.content.data;
+        if (data.isAlarm) {
+          setCurrentAlarm({
+            medicationName: data.medicationName as string,
+            notificationId: notification.request.identifier,
+          });
+          setShowAlarm(true);
         }
-      }
-    });
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener(
+        async (response) => {
+          const data = response.notification.request.content.data;
+          const actionId = response.actionIdentifier;
+
+          if (data.isAlarm) {
+            if (actionId === 'SNOOZE_5') {
+              await handleSnooze(data.medicationName as string, 5);
+            } else if (actionId === 'SNOOZE_10') {
+              await handleSnooze(data.medicationName as string, 10);
+            } else if (
+              actionId === 'DISMISS' ||
+              actionId === Notifications.DEFAULT_ACTION_IDENTIFIER
+            ) {
+              await dismissAlarm(response.notification.request.identifier);
+            }
+          }
+        }
+      );
 
     return () => {
       notificationListener.current?.remove();
@@ -164,7 +177,12 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
         case 'SecuritySettings':
           return <SecuritySettingsScreen onBack={handleSubScreenBack} />;
         case 'CaregiverDashboard':
-          return <CaregiverDashboardScreen onBack={handleSubScreenBack} onNavigate={handleNavigate} />;
+          return (
+            <CaregiverDashboardScreen
+              onBack={handleSubScreenBack}
+              onNavigate={handleNavigate}
+            />
+          );
         case 'CaregiverInvite':
           return <CaregiverInviteScreen onBack={handleSubScreenBack} />;
         case 'EmergencyProtocol':
@@ -195,7 +213,7 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
           </NavigationContainer>
         );
       case 'chat':
-        return <ChatScreen initialDrugName={scannedDrug || undefined} />;
+        return <ChatScreen initialDrugName={chatDrugName || undefined} />;
       case 'profile':
         return <ProfileScreen onNavigate={handleNavigate} onBack={onBack} />;
       default:
@@ -212,14 +230,21 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
     <View style={styles.container}>
       <View style={styles.content}>{renderContent()}</View>
 
-      {!subScreen && <BottomTabNavigation activeTab={activeTab} onTabChange={handleTabChange} />}
+      {!subScreen && (
+        <BottomTabNavigation
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+        />
+      )}
 
       {currentAlarm && (
         <AlarmScreen
           visible={showAlarm}
           medicationName={currentAlarm.medicationName}
           onDismiss={handleDismiss}
-          onSnooze={(minutes) => handleSnooze(currentAlarm.medicationName, minutes)}
+          onSnooze={(minutes) =>
+            handleSnooze(currentAlarm.medicationName, minutes)
+          }
         />
       )}
     </View>

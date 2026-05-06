@@ -16,8 +16,7 @@ const getBackendUrl = () => {
   if (Platform.OS === 'ios') {
     return 'http://localhost:3000'; // iOS simulator
   }
-  // For web, we need the production URL - localhost won't work
-  return 'https://medguide-p132.onrender.com';
+  return 'http://localhost:3000';
 };
 
 const API_URL = getBackendUrl();
@@ -73,11 +72,13 @@ export const medicationApi = {
 
   sendChatMessage: async (
     message: string,
-    language?: string
+    language?: string,
+    medications?: string[]
   ): Promise<ChatResponse> => {
     const response = await api.post('/chat', {
       message,
       language: language || i18n.language,
+      medications,
     });
     // Backend returns { response: string, language: string, timestamp: string }
     return {

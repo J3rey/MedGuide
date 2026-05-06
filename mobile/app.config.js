@@ -1,3 +1,9 @@
+const backendUrl =
+  process.env.EXPO_PUBLIC_BACKEND_URL ||
+  (process.env.NODE_ENV === 'production'
+    ? 'https://medguide-p132.onrender.com'
+    : undefined);
+
 export default {
   expo: {
     name: 'MedGuide',
@@ -38,9 +44,7 @@ export default {
       eas: {
         projectId: '39383a77-2c35-4319-8692-41d25a0cbe44',
       },
-      backendUrl:
-        process.env.EXPO_PUBLIC_BACKEND_URL ||
-        'https://medguide-p132.onrender.com',
+      ...(backendUrl ? { backendUrl } : {}),
       supabaseUrl:
         process.env.SUPABASE_URL || 'https://kzqqeodwdpqlsgvydqyb.supabase.co',
       supabaseAnonKey:
