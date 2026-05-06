@@ -9,8 +9,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import LanguageSelectionScreen from './src/screens/LanguageSelectionScreen';
-import DarkMainApp from './src/components/DarkMainApp';
+import MainAppContainer from './src/components/MainAppContainer';
 import { ScanProvider } from './src/contexts/ScanContext';
+import { ProfileProvider } from './src/contexts/ProfileContext';
+import { AccessibilityProvider } from './src/contexts/AccessibilityContext';
 
 export type RootStackParamList = {
   Language: undefined;
@@ -29,21 +31,25 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <ScanProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName="Language"
-            screenOptions={{ headerShown: false }}
-          >
-            <Stack.Screen name="Language" component={LanguageSelectionScreen} />
-            <Stack.Screen name="Main">
-              {({ navigation }) => (
-                <DarkMainApp onBack={() => navigation.navigate('Language')} />
-              )}
-            </Stack.Screen>
-          </Stack.Navigator>
-        </NavigationContainer>
-      </ScanProvider>
+      <AccessibilityProvider>
+        <ProfileProvider>
+          <ScanProvider>
+            <NavigationContainer>
+              <Stack.Navigator
+                initialRouteName="Language"
+                screenOptions={{ headerShown: false }}
+              >
+                <Stack.Screen name="Language" component={LanguageSelectionScreen} />
+                <Stack.Screen name="Main">
+                  {({ navigation }) => (
+                    <MainAppContainer onBack={() => navigation.navigate('Language')} />
+                  )}
+                </Stack.Screen>
+              </Stack.Navigator>
+            </NavigationContainer>
+          </ScanProvider>
+        </ProfileProvider>
+      </AccessibilityProvider>
     </SafeAreaProvider>
   );
 }
