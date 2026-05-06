@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import SectionCard from '../components/ui/SectionCard';
 
@@ -44,7 +45,7 @@ export default function SecuritySettingsScreen({ onBack }: SecuritySettingsScree
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Text style={styles.backText}>← Back</Text>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Security</Text>
         <Text style={styles.headerSubtitle}>
@@ -133,21 +134,21 @@ export default function SecuritySettingsScreen({ onBack }: SecuritySettingsScree
         {/* Security Info */}
         <SectionCard title="Security Information">
           <View style={styles.infoRow}>
-            <Text style={styles.infoIcon}>🔐</Text>
+            <Ionicons name="lock-closed" size={20} color={theme.colors.primary} />
             <Text style={styles.infoText}>
               Biometric data is never stored by MedGuide. We only store a secure token on your device.
             </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.infoRow}>
-            <Text style={styles.infoIcon}>📱</Text>
+            <Ionicons name="phone-portrait" size={20} color={theme.colors.primary} />
             <Text style={styles.infoText}>
               If biometrics are unavailable, you can always use your device PIN or password.
             </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.infoRow}>
-            <Text style={styles.infoIcon}>⚡</Text>
+            <Ionicons name="flash" size={20} color={theme.colors.warning} />
             <Text style={styles.infoText}>
               Emergency features are always accessible, even when biometrics are enabled.
             </Text>
