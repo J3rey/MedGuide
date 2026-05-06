@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import theme from '../../styles/theme';
 import LargeActionButton from './LargeActionButton';
 
@@ -9,14 +10,14 @@ interface EmptyStateProps {
   message: string;
   actionLabel?: string;
   onAction?: () => void;
-  icon?: string;
+  icon?: keyof typeof Ionicons.glyphMap;
 }
 
-export function EmptyState({ title, message, actionLabel, onAction }: EmptyStateProps) {
+export function EmptyState({ title, message, actionLabel, onAction, icon }: EmptyStateProps) {
   return (
     <View style={styles.container}>
       <View style={styles.iconCircle}>
-        <Text style={styles.iconText}>📋</Text>
+        <Ionicons name={icon || 'documents-outline'} size={32} color={theme.colors.primary} />
       </View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
@@ -63,7 +64,7 @@ export function ErrorState({
   return (
     <View style={styles.container}>
       <View style={[styles.iconCircle, { backgroundColor: theme.colors.dangerLight }]}>
-        <Text style={styles.iconText}>⚠️</Text>
+        <Ionicons name="alert-circle" size={32} color={theme.colors.danger} />
       </View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
@@ -95,9 +96,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: theme.spacing.lg,
-  },
-  iconText: {
-    fontSize: 32,
   },
   title: {
     fontSize: theme.typography.fontSize.xl,

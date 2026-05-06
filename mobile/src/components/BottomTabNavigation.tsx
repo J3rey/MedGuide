@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 
 export type Tab = 'home' | 'schedule' | 'scan' | 'chat' | 'profile';
@@ -13,16 +14,16 @@ interface BottomTabNavigationProps {
 interface TabConfig {
   key: Tab;
   label: string;
-  icon: string;
-  activeIcon: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  activeIcon: keyof typeof Ionicons.glyphMap;
 }
 
 const tabs: TabConfig[] = [
-  { key: 'home', label: 'Home', icon: '🏠', activeIcon: '🏠' },
-  { key: 'schedule', label: 'Schedule', icon: '📅', activeIcon: '📅' },
-  { key: 'scan', label: 'Scan', icon: '📷', activeIcon: '📷' },
-  { key: 'chat', label: 'Chat', icon: '💬', activeIcon: '💬' },
-  { key: 'profile', label: 'Profile', icon: '👤', activeIcon: '👤' },
+  { key: 'home', label: 'Home', icon: 'home-outline', activeIcon: 'home' },
+  { key: 'schedule', label: 'Schedule', icon: 'calendar-outline', activeIcon: 'calendar' },
+  { key: 'scan', label: 'Scan', icon: 'scan-outline', activeIcon: 'scan' },
+  { key: 'chat', label: 'Chat', icon: 'chatbubble-ellipses-outline', activeIcon: 'chatbubble-ellipses' },
+  { key: 'profile', label: 'Profile', icon: 'person-outline', activeIcon: 'person' },
 ];
 
 export default function BottomTabNavigation({ activeTab, onTabChange }: BottomTabNavigationProps) {
@@ -44,7 +45,11 @@ export default function BottomTabNavigation({ activeTab, onTabChange }: BottomTa
               accessibilityLabel={tab.label}
             >
               <View style={[styles.iconContainer, isActive && styles.iconContainerActive]}>
-                <Text style={styles.icon}>{isActive ? tab.activeIcon : tab.icon}</Text>
+                <Ionicons
+                  name={isActive ? tab.activeIcon : tab.icon}
+                  size={22}
+                  color={isActive ? theme.colors.navActive : theme.colors.navInactiveText}
+                />
               </View>
               <Text style={[styles.label, isActive && styles.labelActive]}>
                 {tab.label}
@@ -88,9 +93,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.navActiveBackground,
     width: 52,
     borderRadius: 16,
-  },
-  icon: {
-    fontSize: 20,
   },
   label: {
     fontSize: 11,
