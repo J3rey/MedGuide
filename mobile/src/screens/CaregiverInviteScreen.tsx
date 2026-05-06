@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Share, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import SectionCard from '../components/ui/SectionCard';
@@ -18,6 +19,7 @@ interface CaregiverInviteScreenProps {
 
 export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenProps) {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { activeProfile } = useProfiles();
   const [inviteMethod, setInviteMethod] = useState<'email' | 'phone' | 'code'>('email');
   const [email, setEmail] = useState('');
@@ -26,15 +28,15 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
   const [inviteCode, setInviteCode] = useState('');
   const [isSending, setIsSending] = useState(false);
 
-  const roles: { value: CaregiverRole; label: string; description: string }[] = [
-    { value: 'caregiver', label: 'Caregiver', description: 'Can view status and receive alerts' },
-    { value: 'family_member', label: 'Family Member', description: 'Can view status only' },
-    { value: 'emergency_contact', label: 'Emergency Contact', description: 'Receives emergency alerts' },
+  const roles: { value: CaregiverRole; labelKey: string; descriptionKey: string }[] = [
+    { value: 'caregiver', labelKey: 'caregiverInvite.roleCaregiver', descriptionKey: 'caregiverInvite.roleCaregiverDesc' },
+    { value: 'family_member', labelKey: 'caregiverInvite.roleFamily', descriptionKey: 'caregiverInvite.roleFamilyDesc' },
+    { value: 'emergency_contact', labelKey: 'caregiverInvite.roleEmergency', descriptionKey: 'caregiverInvite.roleEmergencyDesc' },
   ];
 
   const createInvite = async () => {
     if (!activeProfile) {
-      Alert.alert('No active profile', 'Select a profile before inviting a caregiver.');
+      Alert.alert(t('caregiverInvite.noActiveProfileTitle'), t('caregiverInvite.noActiveProfile'));
       return null;
     }
 
@@ -52,7 +54,7 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
       return response.invite_code;
     } catch (error) {
       console.warn('Failed to create caregiver invite:', error);
-      Alert.alert('Could not create invite', 'Please try again.');
+      Alert.alert(t('caregiverInvite.createErrorTitle'), t('common.tryAgain'));
       return null;
     } finally {
       setIsSending(false);
@@ -62,7 +64,10 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
   const shareInviteCode = async (code: string) => {
     try {
       await Share.share({
-        message: `Join me on MedGuide as my ${role.replace('_', ' ')}. Use invite code: ${code}`,
+        message: t('caregiverInvite.shareMessage', {
+          role: t(`caregiverInvite.roleValue.${role}`),
+          code,
+        }),
       });
     } catch (error) {
       console.warn('Failed to share invite:', error);
@@ -81,8 +86,12 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
     if (!code) return;
 
     Alert.alert(
-      'Invitation Created',
-      `Share invite code ${code} with ${target}. They can accept it in MedGuide as a ${role.replace('_', ' ')}.`,
+      t('caregiverInvite.createdTitle'),
+      t('caregiverInvite.createdMessage', {
+        code,
+        target,
+        role: t(`caregiverInvite.roleValue.${role}`),
+      }),
       [{ text: 'OK', onPress: () => onBack?.() }]
     );
   };
@@ -94,9 +103,9 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
         <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
           <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Invite Caregiver</Text>
+        <Text style={styles.headerTitle}>{t('caregiverInvite.title')}</Text>
         <Text style={styles.headerSubtitle}>
-          Add someone to help monitor your medications
+          {t('caregiverInvite.subtitle')}
         </Text>
       </View>
 
@@ -106,7 +115,7 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
         showsVerticalScrollIndicator={false}
       >
         {/* Role Selection */}
-        <SectionCard title="Choose Role">
+        <SectionCard title={t('caregiverInvite.chooseRole')}>
           {roles.map((r) => (
             <TouchableOpacity
               key={r.value}
@@ -119,16 +128,16 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
               </View>
               <View style={styles.roleInfo}>
                 <Text style={[styles.roleLabel, role === r.value && styles.roleLabelActive]}>
-                  {r.label}
+                  {t(r.labelKey)}
                 </Text>
-                <Text style={styles.roleDescription}>{r.description}</Text>
+                <Text style={styles.roleDescription}>{t(r.descriptionKey)}</Text>
               </View>
             </TouchableOpacity>
           ))}
         </SectionCard>
 
         {/* Invite Method */}
-        <SectionCard title="How to Invite">
+        <SectionCard title={t('caregiverInvite.howToInvite')}>
           <View style={styles.methodTabs}>
             {(['email', 'phone', 'code'] as const).map((method) => (
               <TouchableOpacity
@@ -138,7 +147,7 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
                 activeOpacity={0.7}
               >
                 <Text style={[styles.methodTabText, inviteMethod === method && styles.methodTabTextActive]}>
-                  {method === 'code' ? 'Invite Code' : method.charAt(0).toUpperCase() + method.slice(1)}
+                  {t(`caregiverInvite.method.${method}`)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -146,7 +155,7 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
 
           {inviteMethod === 'email' && (
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Email Address</Text>
+              <Text style={styles.inputLabel}>{t('caregiverInvite.email')}</Text>
               <TextInput
                 style={styles.input}
                 placeholder="caregiver@example.com"
@@ -161,7 +170,7 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
 
           {inviteMethod === 'phone' && (
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Phone Number</Text>
+              <Text style={styles.inputLabel}>{t('caregiverInvite.phone')}</Text>
               <TextInput
                 style={styles.input}
                 placeholder="+61 400 000 000"
@@ -175,16 +184,16 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
 
           {inviteMethod === 'code' && (
             <View style={styles.codeSection}>
-              <Text style={styles.codeLabel}>Share this invite code:</Text>
+              <Text style={styles.codeLabel}>{t('caregiverInvite.shareCodeLabel')}</Text>
               <View style={styles.codeBox}>
                 <Text style={styles.codeText}>
-                  {inviteCode || 'Generate'}
+                  {inviteCode || t('caregiverInvite.generate')}
                 </Text>
               </View>
               <TouchableOpacity style={styles.shareButton} onPress={handleShareCode} activeOpacity={0.7}>
                 <Ionicons name="share-outline" size={18} color="#FFFFFF" />
               <Text style={styles.shareButtonText}>
-                {isSending ? ' Creating...' : ' Share Code'}
+                {isSending ? t('caregiverInvite.creating') : t('caregiverInvite.shareCode')}
               </Text>
               </TouchableOpacity>
             </View>
@@ -192,30 +201,30 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
         </SectionCard>
 
         {/* Permissions Preview */}
-        <SectionCard title="Default Permissions">
+        <SectionCard title={t('caregiverInvite.defaultPermissions')}>
           <Text style={styles.permNote}>
-            You can change these after the invite is accepted.
+            {t('caregiverInvite.permissionsNote')}
           </Text>
           <View style={styles.permList}>
             <View style={styles.permItem}>
               <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />
-              <Text style={styles.permText}>View medication status</Text>
+              <Text style={styles.permText}>{t('caregiverInvite.permViewStatus')}</Text>
             </View>
             <View style={styles.permItem}>
               <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />
-              <Text style={styles.permText}>Receive missed-dose alerts</Text>
+              <Text style={styles.permText}>{t('caregiverInvite.permMissedAlerts')}</Text>
             </View>
             <View style={styles.permItem}>
               <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />
-              <Text style={styles.permText}>View visual schedule</Text>
+              <Text style={styles.permText}>{t('caregiverInvite.permVisualSchedule')}</Text>
             </View>
             <View style={styles.permItem}>
               <Ionicons name="close-circle" size={18} color={theme.colors.textSecondary} />
-              <Text style={styles.permText}>Manage medications</Text>
+              <Text style={styles.permText}>{t('caregiverInvite.permManageMedications')}</Text>
             </View>
             <View style={styles.permItem}>
               <Ionicons name="close-circle" size={18} color={theme.colors.textSecondary} />
-              <Text style={styles.permText}>Manage emergency contacts</Text>
+              <Text style={styles.permText}>{t('caregiverInvite.permManageContacts')}</Text>
             </View>
           </View>
         </SectionCard>
@@ -223,7 +232,11 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
         {/* Send Button */}
         {inviteMethod !== 'code' && (
           <LargeActionButton
-            title={isSending ? 'Creating Invitation...' : 'Create Invitation'}
+            title={
+              isSending
+                ? t('caregiverInvite.creatingInvitation')
+                : t('caregiverInvite.createInvitation')
+            }
             onPress={handleSendInvitation}
             variant="primary"
             fullWidth

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, TextInput, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/StateViews';
 import SectionCard from '../components/ui/SectionCard';
@@ -22,6 +23,15 @@ interface CaregiverStatusCardProps {
   lastCheckIn: string;
   hasEmergencyAlert: boolean;
   phone?: string;
+  labels: {
+    emergencyActive: string;
+    takenToday: string;
+    missed: string;
+    lastCheckIn: string;
+    call: string;
+    message: string;
+    details: string;
+  };
 }
 
 function CaregiverStatusCard({
@@ -33,6 +43,7 @@ function CaregiverStatusCard({
   lastCheckIn,
   hasEmergencyAlert,
   phone,
+  labels,
 }: CaregiverStatusCardProps) {
   const completionPercent = medicationsTotal > 0 ? Math.round((medicationsTaken / medicationsTotal) * 100) : 0;
 
@@ -41,7 +52,7 @@ function CaregiverStatusCard({
       {hasEmergencyAlert && (
         <View style={styles.emergencyBanner}>
           <Ionicons name="warning" size={16} color={theme.colors.emergency} />
-          <Text style={styles.emergencyBannerText}>Emergency Alert Active</Text>
+          <Text style={styles.emergencyBannerText}>{labels.emergencyActive}</Text>
         </View>
       )}
 
@@ -61,7 +72,7 @@ function CaregiverStatusCard({
           <View style={[styles.completionFill, { width: `${completionPercent}%` }]} />
         </View>
         <Text style={styles.completionText}>
-          {medicationsTaken}/{medicationsTotal} taken today ({completionPercent}%)
+          {labels.takenToday}
         </Text>
       </View>
 
@@ -70,10 +81,10 @@ function CaregiverStatusCard({
         {missedCount > 0 && (
           <View style={styles.statBadge}>
             <Ionicons name="close-circle" size={14} color={theme.colors.danger} />
-            <Text style={styles.statBadgeText}>{missedCount} missed</Text>
+            <Text style={styles.statBadgeText}>{labels.missed}</Text>
           </View>
         )}
-        <Text style={styles.lastCheckIn}>Last check-in: {lastCheckIn}</Text>
+        <Text style={styles.lastCheckIn}>{labels.lastCheckIn}</Text>
       </View>
 
       {/* Quick Actions */}
@@ -84,7 +95,7 @@ function CaregiverStatusCard({
           activeOpacity={0.7}
         >
           <Ionicons name="call" size={20} color={theme.colors.primary} />
-          <Text style={styles.quickActionLabel}>Call</Text>
+          <Text style={styles.quickActionLabel}>{labels.call}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.quickActionBtn}
@@ -92,11 +103,11 @@ function CaregiverStatusCard({
           activeOpacity={0.7}
         >
           <Ionicons name="chatbubble" size={20} color={theme.colors.primary} />
-          <Text style={styles.quickActionLabel}>Message</Text>
+          <Text style={styles.quickActionLabel}>{labels.message}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.quickActionBtn} activeOpacity={0.7}>
           <Ionicons name="document-text" size={20} color={theme.colors.primary} />
-          <Text style={styles.quickActionLabel}>Details</Text>
+          <Text style={styles.quickActionLabel}>{labels.details}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -105,6 +116,7 @@ function CaregiverStatusCard({
 
 export default function CaregiverDashboardScreen({ onBack, onNavigate }: CaregiverDashboardScreenProps) {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const [patients, setPatients] = useState<CaregiverPatient[]>([]);
   const [inviteCode, setInviteCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -120,7 +132,7 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
       setPatients(nextPatients);
     } catch (error) {
       console.warn('Failed to load caregiver patients:', error);
-      setLoadError('Could not load caregiver dashboard.');
+      setLoadError(t('caregiverDashboard.loadError'));
     } finally {
       setIsLoading(false);
     }
@@ -139,10 +151,10 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
       await caregiverApi.acceptInvite(inviteCode.trim().toUpperCase());
       setInviteCode('');
       await loadPatients();
-      Alert.alert('Invite accepted', 'This profile is now visible in your caregiver dashboard.');
+      Alert.alert(t('caregiverDashboard.inviteAcceptedTitle'), t('caregiverDashboard.inviteAcceptedMessage'));
     } catch (error) {
       console.warn('Failed to accept caregiver invite:', error);
-      Alert.alert('Could not accept invite', 'Check the invite code and try again.');
+      Alert.alert(t('caregiverDashboard.acceptErrorTitle'), t('caregiverDashboard.acceptErrorMessage'));
     } finally {
       setIsAcceptingInvite(false);
     }
@@ -158,9 +170,9 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
           <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
         </TouchableOpacity>
         <View>
-          <Text style={styles.headerTitle}>Caregiver Dashboard</Text>
+          <Text style={styles.headerTitle}>{t('caregiverDashboard.title')}</Text>
           <Text style={styles.headerSubtitle}>
-            Monitor medication status for people you care for
+            {t('caregiverDashboard.subtitle')}
           </Text>
         </View>
       </View>
@@ -171,7 +183,7 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
         showsVerticalScrollIndicator={false}
       >
         {isLoading ? (
-          <LoadingState message="Loading caregiver dashboard..." />
+          <LoadingState message={t('caregiverDashboard.loading')} />
         ) : loadError ? (
           <ErrorState message={loadError} onRetry={loadPatients} />
         ) : hasCaregiverAccess ? (
@@ -184,13 +196,39 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
                 medicationsTaken={patient.status?.medicationsTaken || 0}
                 medicationsTotal={patient.status?.medicationsTotal || 0}
                 missedCount={patient.status?.missedCount || 0}
-                lastCheckIn={patient.status?.lastCheckIn || 'No logs today'}
+                lastCheckIn={patient.status?.lastCheckIn || t('caregiverDashboard.noLogsToday')}
                 hasEmergencyAlert={patient.status?.hasEmergencyAlert || false}
                 phone={patient.status?.phone}
+                labels={{
+                  emergencyActive: t('caregiverDashboard.emergencyActive'),
+                  takenToday: t('caregiverDashboard.takenToday', {
+                    taken: patient.status?.medicationsTaken || 0,
+                    total: patient.status?.medicationsTotal || 0,
+                    percent:
+                      patient.status?.medicationsTotal
+                        ? Math.round(
+                            ((patient.status?.medicationsTaken || 0) /
+                              patient.status.medicationsTotal) *
+                              100
+                          )
+                        : 0,
+                  }),
+                  missed: t('caregiverDashboard.missed', {
+                    count: patient.status?.missedCount || 0,
+                  }),
+                  lastCheckIn: t('caregiverDashboard.lastCheckIn', {
+                    value:
+                      patient.status?.lastCheckIn ||
+                      t('caregiverDashboard.noLogsToday'),
+                  }),
+                  call: t('caregiverDashboard.call'),
+                  message: t('caregiverDashboard.message'),
+                  details: t('caregiverDashboard.details'),
+                }}
               />
             ))}
 
-            <SectionCard title="Accept Another Invite">
+            <SectionCard title={t('caregiverDashboard.acceptAnother')}>
               <TextInput
                 style={styles.input}
                 placeholder="MG-ABC123"
@@ -200,7 +238,11 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
                 autoCapitalize="characters"
               />
               <LargeActionButton
-                title={isAcceptingInvite ? 'Accepting...' : 'Accept Invite'}
+                title={
+                  isAcceptingInvite
+                    ? t('caregiverDashboard.accepting')
+                    : t('caregiverDashboard.acceptInvite')
+                }
                 onPress={handleAcceptInvite}
                 variant="primary"
                 fullWidth
@@ -215,16 +257,16 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
               activeOpacity={0.7}
             >
               <Ionicons name="settings" size={18} color={theme.colors.primary} />
-              <Text style={styles.manageButtonText}>Manage Permissions</Text>
+              <Text style={styles.manageButtonText}>{t('caregiverDashboard.managePermissions')}</Text>
             </TouchableOpacity>
           </>
         ) : (
           <>
             <EmptyState
-              title="No Caregiver Access"
-              message="Ask a family member to invite you, then enter the invite code below."
+              title={t('caregiverDashboard.emptyTitle')}
+              message={t('caregiverDashboard.emptyMessage')}
             />
-            <SectionCard title="Accept Invite Code">
+            <SectionCard title={t('caregiverDashboard.acceptInviteCode')}>
               <TextInput
                 style={styles.input}
                 placeholder="MG-ABC123"
@@ -234,7 +276,11 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
                 autoCapitalize="characters"
               />
               <LargeActionButton
-                title={isAcceptingInvite ? 'Accepting...' : 'Accept Invite'}
+                title={
+                  isAcceptingInvite
+                    ? t('caregiverDashboard.accepting')
+                    : t('caregiverDashboard.acceptInvite')
+                }
                 onPress={handleAcceptInvite}
                 variant="primary"
                 fullWidth

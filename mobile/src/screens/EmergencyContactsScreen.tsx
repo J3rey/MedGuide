@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Linking, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import ConfirmActionModal from '../components/ui/ConfirmActionModal';
@@ -16,6 +17,7 @@ interface EmergencyContactsScreenProps {
 
 export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScreenProps) {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { activeProfile } = useProfiles();
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +43,7 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
       setContacts(nextContacts);
     } catch (error) {
       console.warn('Failed to load emergency contacts:', error);
-      setLoadError('Could not load emergency contacts for this profile.');
+      setLoadError(t('emergencyContacts.loadError'));
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +69,7 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
         activeProfile.id,
         {
           name: newName,
-          relationship: newRelationship || 'Emergency contact',
+          relationship: newRelationship || t('emergencyContacts.defaultRelationship'),
           phone: newPhone,
           priority_order: contacts.length + 1,
         }
@@ -77,7 +79,7 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
       setShowAddForm(false);
     } catch (error) {
       console.warn('Failed to save emergency contact:', error);
-      Alert.alert('Could not save contact', 'Please try again.');
+      Alert.alert(t('emergencyContacts.saveErrorTitle'), t('common.tryAgain'));
     } finally {
       setIsSaving(false);
     }
@@ -93,7 +95,7 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
       setDeleteTargetId('');
     } catch (error) {
       console.warn('Failed to delete emergency contact:', error);
-      Alert.alert('Could not remove contact', 'Please try again.');
+      Alert.alert(t('emergencyContacts.removeErrorTitle'), t('common.tryAgain'));
     }
   };
 
@@ -104,9 +106,9 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
         <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
           <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Emergency Contacts</Text>
+        <Text style={styles.headerTitle}>{t('emergencyContacts.title')}</Text>
         <Text style={styles.headerSubtitle}>
-          People to contact in an emergency
+          {t('emergencyContacts.subtitle')}
         </Text>
       </View>
 
@@ -117,18 +119,18 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
       >
         {!activeProfile ? (
           <EmptyState
-            title="No Active Profile"
-            message="Select a profile before adding emergency contacts."
+            title={t('emergencyContacts.noActiveProfileTitle')}
+            message={t('emergencyContacts.noActiveProfile')}
           />
         ) : isLoading ? (
-          <LoadingState message="Loading emergency contacts..." />
+          <LoadingState message={t('emergencyContacts.loading')} />
         ) : loadError ? (
           <ErrorState message={loadError} onRetry={loadContacts} />
         ) : contacts.length === 0 && !showAddForm ? (
           <EmptyState
-            title="No Emergency Contacts"
-            message="Add people who should be contacted in an emergency"
-            actionLabel="Add Contact"
+            title={t('emergencyContacts.emptyTitle')}
+            message={t('emergencyContacts.emptyMessage')}
+            actionLabel={t('emergencyContacts.addContact')}
             onAction={() => setShowAddForm(true)}
           />
         ) : (
@@ -155,7 +157,7 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
                     activeOpacity={0.7}
                   >
                     <Ionicons name="call" size={14} color="#FFFFFF" />
-                    <Text style={styles.callBtnText}>Call</Text>
+                    <Text style={styles.callBtnText}>{t('emergencyContacts.call')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.messageBtn}
@@ -163,7 +165,7 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
                     activeOpacity={0.7}
                   >
                     <Ionicons name="chatbubble" size={14} color={theme.colors.primary} />
-                    <Text style={styles.messageBtnText}>Message</Text>
+                    <Text style={styles.messageBtnText}>{t('emergencyContacts.message')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.deleteBtn}
@@ -184,19 +186,19 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
         {/* Add Form */}
         {showAddForm && (
           <View style={styles.addForm}>
-            <Text style={styles.addFormTitle}>Add Emergency Contact</Text>
+            <Text style={styles.addFormTitle}>{t('emergencyContacts.addContact')}</Text>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Name</Text>
+              <Text style={styles.inputLabel}>{t('emergencyContacts.name')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Contact name"
+                placeholder={t('emergencyContacts.namePlaceholder')}
                 placeholderTextColor={theme.colors.textSecondary}
                 value={newName}
                 onChangeText={setNewName}
               />
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Phone Number</Text>
+              <Text style={styles.inputLabel}>{t('emergencyContacts.phone')}</Text>
               <TextInput
                 style={styles.input}
                 placeholder="+61 400 000 000"
@@ -207,10 +209,10 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
               />
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Relationship</Text>
+              <Text style={styles.inputLabel}>{t('emergencyContacts.relationship')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="e.g. Doctor, Family, Neighbour"
+                placeholder={t('emergencyContacts.relationshipPlaceholder')}
                 placeholderTextColor={theme.colors.textSecondary}
                 value={newRelationship}
                 onChangeText={setNewRelationship}
@@ -218,7 +220,7 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
             </View>
             <View style={styles.formActions}>
               <LargeActionButton
-                title="Cancel"
+                title={t('common.cancel')}
                 onPress={() => {
                   resetForm();
                   setShowAddForm(false);
@@ -227,7 +229,7 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
                 style={{ flex: 1 }}
               />
               <LargeActionButton
-                title="Save Contact"
+                title={t('emergencyContacts.saveContact')}
                 onPress={handleAddContact}
                 variant="primary"
                 disabled={!newName || !newPhone || isSaving}
@@ -239,7 +241,7 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
 
         {!showAddForm && contacts.length > 0 && (
           <LargeActionButton
-            title="+ Add Emergency Contact"
+            title={t('emergencyContacts.addAnother')}
             onPress={() => setShowAddForm(true)}
             variant="outline"
             fullWidth
@@ -250,9 +252,9 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
 
       <ConfirmActionModal
         visible={showDeleteConfirm}
-        title="Remove Contact?"
-        message="This person will no longer be listed as an emergency contact."
-        confirmLabel="Remove"
+        title={t('emergencyContacts.removeTitle')}
+        message={t('emergencyContacts.removeMessage')}
+        confirmLabel={t('emergencyContacts.remove')}
         variant="danger"
         onConfirm={handleDelete}
         onCancel={() => setShowDeleteConfirm(false)}

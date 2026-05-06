@@ -13,6 +13,7 @@ import MainAppContainer from './src/components/MainAppContainer';
 import { ScanProvider } from './src/contexts/ScanContext';
 import { ProfileProvider } from './src/contexts/ProfileContext';
 import { AccessibilityProvider } from './src/contexts/AccessibilityContext';
+import { LanguageProvider } from './src/contexts/LanguageContext';
 
 export type RootStackParamList = {
   Language: undefined;
@@ -31,25 +32,32 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <AccessibilityProvider>
-        <ProfileProvider>
-          <ScanProvider>
-            <NavigationContainer>
-              <Stack.Navigator
-                initialRouteName="Language"
-                screenOptions={{ headerShown: false }}
-              >
-                <Stack.Screen name="Language" component={LanguageSelectionScreen} />
-                <Stack.Screen name="Main">
-                  {({ navigation }) => (
-                    <MainAppContainer onBack={() => navigation.navigate('Language')} />
-                  )}
-                </Stack.Screen>
-              </Stack.Navigator>
-            </NavigationContainer>
-          </ScanProvider>
-        </ProfileProvider>
-      </AccessibilityProvider>
+      <LanguageProvider>
+        <AccessibilityProvider>
+          <ProfileProvider>
+            <ScanProvider>
+              <NavigationContainer>
+                <Stack.Navigator
+                  initialRouteName="Language"
+                  screenOptions={{ headerShown: false }}
+                >
+                  <Stack.Screen
+                    name="Language"
+                    component={LanguageSelectionScreen}
+                  />
+                  <Stack.Screen name="Main">
+                    {({ navigation }) => (
+                      <MainAppContainer
+                        onBack={() => navigation.navigate('Language')}
+                      />
+                    )}
+                  </Stack.Screen>
+                </Stack.Navigator>
+              </NavigationContainer>
+            </ScanProvider>
+          </ProfileProvider>
+        </AccessibilityProvider>
+      </LanguageProvider>
     </SafeAreaProvider>
   );
 }

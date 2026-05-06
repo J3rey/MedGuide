@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import { useProfiles } from '../contexts/ProfileContext';
 import SectionCard from '../components/ui/SectionCard';
@@ -47,6 +48,7 @@ function SettingsRow({ icon, iconColor, title, subtitle, onPress, danger }: Sett
 
 export default function ProfileScreen({ onNavigate, onBack }: ProfileScreenProps) {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { activeProfile } = useProfiles();
 
   const getInitial = (name: string) => name.charAt(0).toUpperCase();
@@ -55,7 +57,7 @@ export default function ProfileScreen({ onNavigate, onBack }: ProfileScreenProps
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Profile & Settings</Text>
+        <Text style={styles.headerTitle}>{t('profile.title')}</Text>
       </View>
 
       <ScrollView
@@ -70,120 +72,122 @@ export default function ProfileScreen({ onNavigate, onBack }: ProfileScreenProps
               {activeProfile ? getInitial(activeProfile.name) : '?'}
             </Text>
           </View>
-          <Text style={styles.profileName}>{activeProfile?.name || 'No Profile'}</Text>
+          <Text style={styles.profileName}>
+            {activeProfile?.name || t('profile.noProfile')}
+          </Text>
           <Text style={styles.profileEmail}>user@example.com</Text>
           <TouchableOpacity
             style={styles.editProfileBtn}
             onPress={() => onNavigate?.('ManageProfiles')}
             activeOpacity={0.7}
           >
-            <Text style={styles.editProfileText}>Manage Profiles</Text>
+            <Text style={styles.editProfileText}>{t('profile.manageProfiles')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* People & Access */}
-        <Text style={styles.sectionLabel}>People & Access</Text>
+        <Text style={styles.sectionLabel}>{t('profile.peopleAccess')}</Text>
         <SectionCard>
           <SettingsRow
             icon="people"
-            title="Manage Profiles"
-            subtitle="Add or switch between profiles"
+            title={t('profile.manageProfiles')}
+            subtitle={t('profile.manageProfilesSubtitle')}
             onPress={() => onNavigate?.('ManageProfiles')}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="heart"
             iconColor="#E11D48"
-            title="Caregiver Access"
-            subtitle="Manage caregivers and permissions"
+            title={t('profile.caregiverAccess')}
+            subtitle={t('profile.caregiverAccessSubtitle')}
             onPress={() => onNavigate?.('CaregiverDashboard')}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="person-add"
-            title="Invite Caregiver"
-            subtitle="Share medication status with family"
+            title={t('profile.inviteCaregiver')}
+            subtitle={t('profile.inviteCaregiverSubtitle')}
             onPress={() => onNavigate?.('CaregiverInvite')}
           />
         </SectionCard>
 
         {/* Health & Safety */}
-        <Text style={styles.sectionLabel}>Health & Safety</Text>
+        <Text style={styles.sectionLabel}>{t('profile.healthSafety')}</Text>
         <SectionCard>
           <SettingsRow
             icon="medkit"
             iconColor="#16A34A"
-            title="My Pharmacy"
-            subtitle="Store pharmacy details"
+            title={t('profile.myPharmacy')}
+            subtitle={t('profile.myPharmacySubtitle')}
             onPress={() => onNavigate?.('PharmacyList')}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="call"
             iconColor="#DC2626"
-            title="Emergency Contacts"
-            subtitle="People to contact in emergencies"
+            title={t('profile.emergencyContacts')}
+            subtitle={t('profile.emergencyContactsSubtitle')}
             onPress={() => onNavigate?.('EmergencyContacts')}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="shield-checkmark"
             iconColor="#B91C1C"
-            title="Emergency Protocol"
-            subtitle="What to do in an emergency"
+            title={t('profile.emergencyProtocol')}
+            subtitle={t('profile.emergencyProtocolSubtitle')}
             danger
             onPress={() => onNavigate?.('EmergencyProtocol')}
           />
         </SectionCard>
 
         {/* Preferences */}
-        <Text style={styles.sectionLabel}>Preferences</Text>
+        <Text style={styles.sectionLabel}>{t('profile.preferences')}</Text>
         <SectionCard>
           <SettingsRow
             icon="accessibility"
             iconColor="#7C3AED"
-            title="Accessibility"
-            subtitle="Text size, contrast, button size"
+            title={t('profile.accessibility')}
+            subtitle={t('profile.accessibilitySubtitle')}
             onPress={() => onNavigate?.('AccessibilitySettings')}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="lock-closed"
             iconColor="#1D4ED8"
-            title="Security"
-            subtitle="Biometric login, PIN"
+            title={t('profile.security')}
+            subtitle={t('profile.securitySubtitle')}
             onPress={() => onNavigate?.('SecuritySettings')}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="globe"
             iconColor="#0891B2"
-            title="Language"
-            subtitle={activeProfile?.preferred_language || 'English'}
+            title={t('profile.language')}
+            subtitle={activeProfile?.preferred_language || t('profile.english')}
             onPress={() => onBack?.()}
           />
           <View style={styles.divider} />
           <SettingsRow
             icon="leaf"
             iconColor="#059669"
-            title="Cultural Notes"
-            subtitle="Dietary and cultural preferences"
+            title={t('profile.culturalNotes')}
+            subtitle={t('profile.culturalNotesSubtitle')}
             onPress={() => onNavigate?.('CulturalNotes')}
           />
         </SectionCard>
 
         {/* About */}
-        <Text style={styles.sectionLabel}>About</Text>
+        <Text style={styles.sectionLabel}>{t('profile.about')}</Text>
         <SectionCard>
           <SettingsRow
             icon="document-text"
             iconColor="#6B7280"
-            title="Terms & Conditions"
+            title={t('profile.terms')}
             onPress={() => onNavigate?.('TermsAndConditions')}
           />
           <View style={styles.divider} />
           <View style={styles.aboutRow}>
-            <Text style={styles.aboutLabel}>Version</Text>
+            <Text style={styles.aboutLabel}>{t('profile.version')}</Text>
             <Text style={styles.aboutValue}>3.0.0</Text>
           </View>
         </SectionCard>
@@ -191,8 +195,7 @@ export default function ProfileScreen({ onNavigate, onBack }: ProfileScreenProps
         {/* Disclaimer */}
         <View style={styles.disclaimer}>
           <Text style={styles.disclaimerText}>
-            MedGuide is designed to assist with medication information.
-            Always consult your healthcare provider for medical advice.
+            {t('profile.disclaimer')}
           </Text>
         </View>
       </ScrollView>

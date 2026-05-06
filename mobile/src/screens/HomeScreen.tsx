@@ -2,9 +2,9 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import ProfileSwitcher from '../components/ProfileSwitcher';
-import { useProfiles } from '../contexts/ProfileContext';
 import StatusChip from '../components/ui/StatusChip';
 import SectionCard from '../components/ui/SectionCard';
 
@@ -12,16 +12,16 @@ interface HomeScreenProps {
   onNavigate?: (screen: string) => void;
 }
 
-function getGreeting(): string {
+function getGreetingKey(): string {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return 'home.goodMorning';
+  if (hour < 17) return 'home.goodAfternoon';
+  return 'home.goodEvening';
 }
 
 export default function HomeScreen({ onNavigate }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
-  const { activeProfile } = useProfiles();
+  const { t } = useTranslation();
 
   // Demo data - in production this would come from API/context
   const [todayProgress, setTodayProgress] = useState({
@@ -43,12 +43,12 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
 
   const handleTakeNow = useCallback((medId: string, medName: string) => {
     Alert.alert(
-      'Confirm',
-      `Mark "${medName}" as taken now?`,
+      t('home.confirmTitle'),
+      t('home.markTakenConfirm', { medication: medName }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Yes, Taken',
+          text: t('home.yesTaken'),
           onPress: () => {
             setMissedMedications((prev) => prev.filter((m) => m.id !== medId));
             setTodayProgress((prev) => ({
@@ -60,7 +60,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
         },
       ]
     );
-  }, []);
+  }, [t]);
 
   const progressPercent = todayProgress.total > 0
     ? Math.round((todayProgress.taken / todayProgress.total) * 100)
@@ -71,15 +71,15 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>{getGreeting()}</Text>
+          <Text style={styles.greeting}>{t(getGreetingKey())}</Text>
           <ProfileSwitcher />
         </View>
         <TouchableOpacity
           style={styles.emergencyButton}
           onPress={() => onNavigate?.('EmergencyProtocol')}
           activeOpacity={0.7}
-          accessibilityLabel="Emergency"
-          accessibilityHint="Opens emergency protocols"
+          accessibilityLabel={t('home.emergency')}
+          accessibilityHint={t('home.emergencyHint')}
         >
           <Ionicons name="warning" size={20} color={theme.colors.danger} />
         </TouchableOpacity>
@@ -91,7 +91,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
         showsVerticalScrollIndicator={false}
       >
         {/* Today's Progress */}
-        <SectionCard title="Today's Medications">
+        <SectionCard title={t('home.todaysMedications')}>
           <View style={styles.progressRow}>
             <View style={styles.progressCircle}>
               <Text style={styles.progressNumber}>
@@ -102,15 +102,21 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             <View style={styles.progressStats}>
               <View style={styles.statRow}>
                 <Ionicons name="checkmark-circle" size={16} color={theme.colors.success} />
-                <Text style={styles.statText}>{todayProgress.taken} taken</Text>
+                <Text style={styles.statText}>
+                  {t('home.takenCount', { count: todayProgress.taken })}
+                </Text>
               </View>
               <View style={styles.statRow}>
                 <Ionicons name="close-circle" size={16} color={theme.colors.danger} />
-                <Text style={styles.statText}>{todayProgress.missed} missed</Text>
+                <Text style={styles.statText}>
+                  {t('home.missedCount', { count: todayProgress.missed })}
+                </Text>
               </View>
               <View style={styles.statRow}>
                 <Ionicons name="time" size={16} color={theme.colors.primary} />
-                <Text style={styles.statText}>{todayProgress.upcoming} upcoming</Text>
+                <Text style={styles.statText}>
+                  {t('home.upcomingCount', { count: todayProgress.upcoming })}
+                </Text>
               </View>
             </View>
           </View>
@@ -121,20 +127,22 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
           <View style={styles.warningCard}>
             <View style={styles.warningHeader}>
               <Ionicons name="alert-circle" size={20} color={theme.colors.danger} />
-              <Text style={styles.warningTitle}>Missed Medication</Text>
+              <Text style={styles.warningTitle}>{t('home.missedMedication')}</Text>
             </View>
             {missedMedications.map((med) => (
               <View key={med.id} style={styles.missedItem}>
                 <View>
                   <Text style={styles.missedName}>{med.name}</Text>
-                  <Text style={styles.missedTime}>Scheduled at {med.time}</Text>
+                  <Text style={styles.missedTime}>
+                    {t('home.scheduledAt', { time: med.time })}
+                  </Text>
                 </View>
                 <TouchableOpacity
                   style={styles.takeNowButton}
                   activeOpacity={0.7}
                   onPress={() => handleTakeNow(med.id, med.name)}
                 >
-                  <Text style={styles.takeNowText}>Take Now</Text>
+                  <Text style={styles.takeNowText}>{t('home.takeNow')}</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -142,7 +150,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
         )}
 
         {/* Next Medication */}
-        <SectionCard title="Coming Up Next">
+        <SectionCard title={t('home.comingUpNext')}>
           <View style={styles.nextMedRow}>
             <View style={styles.nextMedInfo}>
               <Text style={styles.nextMedName}>{nextMedication.name}</Text>
@@ -153,7 +161,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
         </SectionCard>
 
         {/* Quick Actions */}
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
+        <Text style={styles.sectionTitle}>{t('home.quickActions')}</Text>
         <View style={styles.quickActions}>
           <TouchableOpacity
             style={styles.quickAction}
@@ -163,7 +171,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             <View style={[styles.quickActionIcon, { backgroundColor: theme.colors.primaryLight }]}>
               <Ionicons name="scan" size={24} color={theme.colors.primary} />
             </View>
-            <Text style={styles.quickActionLabel}>Scan Prescription</Text>
+            <Text style={styles.quickActionLabel}>{t('home.scanPrescription')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -174,7 +182,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             <View style={[styles.quickActionIcon, { backgroundColor: theme.colors.successLight }]}>
               <Ionicons name="calendar" size={24} color={theme.colors.success} />
             </View>
-            <Text style={styles.quickActionLabel}>View Schedule</Text>
+            <Text style={styles.quickActionLabel}>{t('home.viewSchedule')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -185,7 +193,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             <View style={[styles.quickActionIcon, { backgroundColor: theme.colors.warningLight }]}>
               <Ionicons name="chatbubble-ellipses" size={24} color={theme.colors.warning} />
             </View>
-            <Text style={styles.quickActionLabel}>Ask MedGuide</Text>
+            <Text style={styles.quickActionLabel}>{t('home.askMedGuide')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -196,17 +204,17 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             <View style={[styles.quickActionIcon, { backgroundColor: '#F0FDF4' }]}>
               <Ionicons name="medkit" size={24} color="#16A34A" />
             </View>
-            <Text style={styles.quickActionLabel}>My Pharmacy</Text>
+            <Text style={styles.quickActionLabel}>{t('home.myPharmacy')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Caregiver Status */}
-        <SectionCard title="Caregiver Access">
+        <SectionCard title={t('home.caregiverAccess')}>
           <View style={styles.caregiverRow}>
             <View style={styles.caregiverInfo}>
-              <Text style={styles.caregiverName}>No caregivers added</Text>
+              <Text style={styles.caregiverName}>{t('home.noCaregivers')}</Text>
               <Text style={styles.caregiverSubtext}>
-                Add a caregiver to share your medication status
+                {t('home.addCaregiverHelp')}
               </Text>
             </View>
             <TouchableOpacity
@@ -215,7 +223,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
               activeOpacity={0.7}
             >
               <Ionicons name="person-add" size={16} color={theme.colors.primary} />
-              <Text style={styles.addButtonText}> Add</Text>
+              <Text style={styles.addButtonText}> {t('common.add')}</Text>
             </TouchableOpacity>
           </View>
         </SectionCard>

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Linking, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/StateViews';
@@ -15,6 +16,7 @@ interface PharmacyScreenProps {
 
 export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { activeProfile } = useProfiles();
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +39,7 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
       setPharmacies(nextPharmacies);
     } catch (error) {
       console.warn('Failed to load pharmacies:', error);
-      setLoadError('Could not load pharmacies for this profile.');
+      setLoadError(t('pharmacy.loadError'));
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +73,7 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
       setShowAddForm(false);
     } catch (error) {
       console.warn('Failed to save pharmacy:', error);
-      Alert.alert('Could not save pharmacy', 'Please try again.');
+      Alert.alert(t('pharmacy.saveErrorTitle'), t('common.tryAgain'));
     } finally {
       setIsSaving(false);
     }
@@ -85,7 +87,7 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
       );
     } catch (error) {
       console.warn('Failed to delete pharmacy:', error);
-      Alert.alert('Could not remove pharmacy', 'Please try again.');
+      Alert.alert(t('pharmacy.removeErrorTitle'), t('common.tryAgain'));
     }
   };
 
@@ -96,9 +98,9 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
         <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
           <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>My Pharmacy</Text>
+        <Text style={styles.headerTitle}>{t('pharmacy.title')}</Text>
         <Text style={styles.headerSubtitle}>
-          Store your pharmacy details for quick access
+          {t('pharmacy.subtitle')}
         </Text>
       </View>
 
@@ -110,17 +112,17 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
         {!activeProfile ? (
           <EmptyState
             title="No Active Profile"
-            message="Select a profile before adding pharmacy details."
+            message={t('pharmacy.noActiveProfile')}
           />
         ) : isLoading ? (
-          <LoadingState message="Loading pharmacies..." />
+          <LoadingState message={t('pharmacy.loading')} />
         ) : loadError ? (
           <ErrorState message={loadError} onRetry={loadPharmacies} />
         ) : pharmacies.length === 0 && !showAddForm ? (
           <EmptyState
-            title="No Pharmacy Added"
-            message="Add your pharmacy so you can quickly call for refills or questions"
-            actionLabel="Add Pharmacy"
+            title={t('pharmacy.emptyTitle')}
+            message={t('pharmacy.emptyMessage')}
+            actionLabel={t('pharmacy.addPharmacy')}
             onAction={() => setShowAddForm(true)}
           />
         ) : (
@@ -158,7 +160,9 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
                     activeOpacity={0.7}
                   >
                     <Ionicons name="call" size={16} color="#FFFFFF" />
-                    <Text style={styles.callPharmacyText}>Call Pharmacy</Text>
+                    <Text style={styles.callPharmacyText}>
+                      {t('pharmacy.callPharmacy')}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.deletePharmacyBtn}
@@ -175,19 +179,19 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
 
         {showAddForm && (
           <View style={styles.addForm}>
-            <Text style={styles.addFormTitle}>Add Pharmacy</Text>
+            <Text style={styles.addFormTitle}>{t('pharmacy.addPharmacy')}</Text>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Pharmacy Name *</Text>
+              <Text style={styles.inputLabel}>{t('pharmacy.nameLabel')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="e.g. Priceline Pharmacy"
+                placeholder={t('pharmacy.namePlaceholder')}
                 placeholderTextColor={theme.colors.textSecondary}
                 value={newName}
                 onChangeText={setNewName}
               />
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Phone Number *</Text>
+              <Text style={styles.inputLabel}>{t('pharmacy.phoneLabel')}</Text>
               <TextInput
                 style={styles.input}
                 placeholder="+61 2 0000 0000"
@@ -198,7 +202,7 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
               />
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Address (optional)</Text>
+              <Text style={styles.inputLabel}>{t('pharmacy.addressLabel')}</Text>
               <TextInput
                 style={styles.input}
                 placeholder="123 Main Street"
@@ -208,7 +212,7 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
               />
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Opening Hours (optional)</Text>
+              <Text style={styles.inputLabel}>{t('pharmacy.hoursLabel')}</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Mon-Fri 8am-6pm, Sat 9am-1pm"
@@ -219,7 +223,7 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
             </View>
             <View style={styles.formActions}>
               <LargeActionButton
-                title="Cancel"
+                title={t('common.cancel')}
                 onPress={() => {
                   resetForm();
                   setShowAddForm(false);
@@ -228,7 +232,7 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
                 style={{ flex: 1 }}
               />
               <LargeActionButton
-                title="Save"
+                title={t('common.save')}
                 onPress={handleAdd}
                 variant="primary"
                 disabled={!newName || !newPhone || isSaving}
@@ -240,7 +244,7 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
 
         {!showAddForm && pharmacies.length > 0 && (
           <LargeActionButton
-            title="+ Add Another Pharmacy"
+            title={t('pharmacy.addAnother')}
             onPress={() => setShowAddForm(true)}
             variant="outline"
             fullWidth

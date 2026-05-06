@@ -11,6 +11,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import theme from '../styles/theme';
 import { RootStackParamList } from '../../App';
 import Logo from '../components/Logo';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface Language {
   code: string;
@@ -20,12 +21,12 @@ interface Language {
 
 const languages: Language[] = [
   { code: 'en', name: 'English', nativeName: 'English' },
-  { code: 'zh', name: 'Chinese', nativeName: '中文' },
-  { code: 'ko', name: 'Korean', nativeName: '한국어' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español' },
+  { code: 'zh', name: 'Chinese', nativeName: '\u4e2d\u6587' },
+  { code: 'ko', name: 'Korean', nativeName: '\ud55c\uad6d\uc5b4' },
+  { code: 'es', name: 'Spanish', nativeName: 'Espa\u00f1ol' },
   { code: 'it', name: 'Italian', nativeName: 'Italiano' },
   { code: 'id', name: 'Indonesian', nativeName: 'Bahasa Indonesia' },
-  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी' },
+  { code: 'hi', name: 'Hindi', nativeName: '\u0939\u093f\u0928\u094d\u0926\u0940' },
 ];
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Language'>;
@@ -33,10 +34,11 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Language'>;
 export default function LanguageSelectionScreen({
   navigation,
 }: Props): React.JSX.Element {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { changeLanguage } = useLanguage();
 
   const handleLanguageSelect = async (code: string) => {
-    await i18n.changeLanguage(code);
+    await changeLanguage(code);
     navigation.navigate('Main');
   };
 

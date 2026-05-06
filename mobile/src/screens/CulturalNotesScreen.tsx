@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import SectionCard from '../components/ui/SectionCard';
 import LargeActionButton from '../components/ui/LargeActionButton';
@@ -24,22 +25,31 @@ type FamilyInvolvementPreference = 'full' | 'limited' | 'none';
 
 const familyInvolvementOptions: Array<{
   value: FamilyInvolvementPreference;
-  label: string;
-  desc: string;
+  labelKey: string;
+  descKey: string;
 }> = [
   {
     value: 'full',
-    label: 'Full Involvement',
-    desc: 'Family can see all details',
+    labelKey: 'culturalNotes.familyFull',
+    descKey: 'culturalNotes.familyFullDesc',
   },
-  { value: 'limited', label: 'Limited', desc: 'Basic status only' },
-  { value: 'none', label: 'Minimal', desc: 'Emergency only' },
+  {
+    value: 'limited',
+    labelKey: 'culturalNotes.familyLimited',
+    descKey: 'culturalNotes.familyLimitedDesc',
+  },
+  {
+    value: 'none',
+    labelKey: 'culturalNotes.familyNone',
+    descKey: 'culturalNotes.familyNoneDesc',
+  },
 ];
 
 export default function CulturalNotesScreen({
   onBack,
 }: CulturalNotesScreenProps) {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { activeProfile, updateProfile } = useProfiles();
 
   const [culturalNotes, setCulturalNotes] = useState(
@@ -65,13 +75,13 @@ export default function CulturalNotesScreen({
         });
       } catch (error) {
         console.warn('Failed to save cultural notes:', error);
-        Alert.alert('Could not save notes', 'Please try again.');
+        Alert.alert(t('culturalNotes.saveErrorTitle'), t('common.tryAgain'));
         return;
       }
     }
     Alert.alert(
-      'Saved',
-      'Your cultural and care preferences have been saved.',
+      t('culturalNotes.savedTitle'),
+      t('culturalNotes.savedMessage'),
       [{ text: 'OK', onPress: () => onBack?.() }]
     );
   };
@@ -97,9 +107,9 @@ export default function CulturalNotesScreen({
             color={theme.colors.textPrimary}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Cultural & Care Notes</Text>
+        <Text style={styles.headerTitle}>{t('culturalNotes.title')}</Text>
         <Text style={styles.headerSubtitle}>
-          Add preferences to help caregivers understand your needs
+          {t('culturalNotes.subtitle')}
         </Text>
       </View>
 
@@ -109,14 +119,13 @@ export default function CulturalNotesScreen({
         showsVerticalScrollIndicator={false}
       >
         {/* Cultural Notes */}
-        <SectionCard title="Cultural Preferences">
+        <SectionCard title={t('culturalNotes.culturalPreferences')}>
           <Text style={styles.fieldDescription}>
-            Add any cultural considerations that may affect medication timing or
-            care (e.g., fasting periods, prayer times, cultural practices)
+            {t('culturalNotes.culturalDescription')}
           </Text>
           <TextInput
             style={styles.textArea}
-            placeholder="e.g., Fasting during Ramadan - medication timing may need adjustment"
+            placeholder={t('culturalNotes.culturalPlaceholder')}
             placeholderTextColor={theme.colors.textSecondary}
             value={culturalNotes}
             onChangeText={handleFieldChange(setCulturalNotes)}
@@ -127,14 +136,13 @@ export default function CulturalNotesScreen({
         </SectionCard>
 
         {/* Dietary Notes */}
-        <SectionCard title="Dietary & Religious Considerations">
+        <SectionCard title={t('culturalNotes.dietaryTitle')}>
           <Text style={styles.fieldDescription}>
-            Note any dietary restrictions that may affect medication choices
-            (e.g., gelatin-free capsules, halal, kosher, vegetarian)
+            {t('culturalNotes.dietaryDescription')}
           </Text>
           <TextInput
             style={styles.textArea}
-            placeholder="e.g., Requires gelatin-free medication capsules"
+            placeholder={t('culturalNotes.dietaryPlaceholder')}
             placeholderTextColor={theme.colors.textSecondary}
             value={dietaryNotes}
             onChangeText={handleFieldChange(setDietaryNotes)}
@@ -145,9 +153,9 @@ export default function CulturalNotesScreen({
         </SectionCard>
 
         {/* Family Involvement */}
-        <SectionCard title="Family Involvement Preference">
+        <SectionCard title={t('culturalNotes.familyTitle')}>
           <Text style={styles.fieldDescription}>
-            How much should family members be involved in your care?
+            {t('culturalNotes.familyDescription')}
           </Text>
           <View style={styles.optionGrid}>
             {familyInvolvementOptions.map((option) => (
@@ -178,9 +186,9 @@ export default function CulturalNotesScreen({
                         styles.optionLabelActive,
                     ]}
                   >
-                    {option.label}
+                    {t(option.labelKey)}
                   </Text>
-                  <Text style={styles.optionDesc}>{option.desc}</Text>
+                  <Text style={styles.optionDesc}>{t(option.descKey)}</Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -189,17 +197,14 @@ export default function CulturalNotesScreen({
 
         {/* Disclaimer */}
         <View style={styles.disclaimer}>
-          <Text style={styles.disclaimerTitle}>Important</Text>
+          <Text style={styles.disclaimerTitle}>{t('culturalNotes.important')}</Text>
           <Text style={styles.disclaimerText}>
-            These notes are for informational purposes only. Always confirm
-            medication decisions with your pharmacist or doctor. MedGuide does
-            not make medical or cultural assumptions based on language or
-            background.
+            {t('culturalNotes.disclaimer')}
           </Text>
         </View>
 
         <LargeActionButton
-          title="Save Changes"
+          title={t('culturalNotes.saveChanges')}
           onPress={handleSave}
           variant="primary"
           fullWidth
