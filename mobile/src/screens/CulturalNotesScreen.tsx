@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Switch, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Switch,
+  Alert,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
@@ -11,15 +20,38 @@ interface CulturalNotesScreenProps {
   onBack?: () => void;
 }
 
-export default function CulturalNotesScreen({ onBack }: CulturalNotesScreenProps) {
+type FamilyInvolvementPreference = 'full' | 'limited' | 'none';
+
+const familyInvolvementOptions: Array<{
+  value: FamilyInvolvementPreference;
+  label: string;
+  desc: string;
+}> = [
+  {
+    value: 'full',
+    label: 'Full Involvement',
+    desc: 'Family can see all details',
+  },
+  { value: 'limited', label: 'Limited', desc: 'Basic status only' },
+  { value: 'none', label: 'Minimal', desc: 'Emergency only' },
+];
+
+export default function CulturalNotesScreen({
+  onBack,
+}: CulturalNotesScreenProps) {
   const insets = useSafeAreaInsets();
   const { activeProfile, updateProfile } = useProfiles();
 
-  const [culturalNotes, setCulturalNotes] = useState(activeProfile?.cultural_notes || '');
-  const [dietaryNotes, setDietaryNotes] = useState(activeProfile?.dietary_notes || '');
-  const [familyInvolvement, setFamilyInvolvement] = useState(
-    activeProfile?.family_involvement_preference || 'full'
+  const [culturalNotes, setCulturalNotes] = useState(
+    activeProfile?.cultural_notes || ''
   );
+  const [dietaryNotes, setDietaryNotes] = useState(
+    activeProfile?.dietary_notes || ''
+  );
+  const [familyInvolvement, setFamilyInvolvement] =
+    useState<FamilyInvolvementPreference>(
+      activeProfile?.family_involvement_preference || 'full'
+    );
 
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -28,25 +60,36 @@ export default function CulturalNotesScreen({ onBack }: CulturalNotesScreenProps
       updateProfile(activeProfile.id, {
         cultural_notes: culturalNotes || undefined,
         dietary_notes: dietaryNotes || undefined,
-        family_involvement_preference: familyInvolvement as any,
+        family_involvement_preference: familyInvolvement,
       });
     }
-    Alert.alert('Saved', 'Your cultural and care preferences have been saved.', [
-      { text: 'OK', onPress: () => onBack?.() },
-    ]);
+    Alert.alert(
+      'Saved',
+      'Your cultural and care preferences have been saved.',
+      [{ text: 'OK', onPress: () => onBack?.() }]
+    );
   };
 
-  const handleFieldChange = (setter: (v: string) => void) => (value: string) => {
-    setter(value);
-    setHasChanges(true);
-  };
+  const handleFieldChange =
+    (setter: (v: string) => void) => (value: string) => {
+      setter(value);
+      setHasChanges(true);
+    };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
+        <TouchableOpacity
+          onPress={onBack}
+          style={styles.backButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={theme.colors.textPrimary}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Cultural & Care Notes</Text>
         <Text style={styles.headerSubtitle}>
@@ -62,8 +105,8 @@ export default function CulturalNotesScreen({ onBack }: CulturalNotesScreenProps
         {/* Cultural Notes */}
         <SectionCard title="Cultural Preferences">
           <Text style={styles.fieldDescription}>
-            Add any cultural considerations that may affect medication timing or care
-            (e.g., fasting periods, prayer times, cultural practices)
+            Add any cultural considerations that may affect medication timing or
+            care (e.g., fasting periods, prayer times, cultural practices)
           </Text>
           <TextInput
             style={styles.textArea}
@@ -101,11 +144,7 @@ export default function CulturalNotesScreen({ onBack }: CulturalNotesScreenProps
             How much should family members be involved in your care?
           </Text>
           <View style={styles.optionGrid}>
-            {[
-              { value: 'full', label: 'Full Involvement', desc: 'Family can see all details' },
-              { value: 'limited', label: 'Limited', desc: 'Basic status only' },
-              { value: 'none', label: 'Minimal', desc: 'Emergency only' },
-            ].map((option) => (
+            {familyInvolvementOptions.map((option) => (
               <TouchableOpacity
                 key={option.value}
                 style={[
@@ -115,11 +154,24 @@ export default function CulturalNotesScreen({ onBack }: CulturalNotesScreenProps
                 onPress={() => setFamilyInvolvement(option.value)}
                 activeOpacity={0.7}
               >
-                <View style={[styles.radio, familyInvolvement === option.value && styles.radioActive]}>
-                  {familyInvolvement === option.value && <View style={styles.radioInner} />}
+                <View
+                  style={[
+                    styles.radio,
+                    familyInvolvement === option.value && styles.radioActive,
+                  ]}
+                >
+                  {familyInvolvement === option.value && (
+                    <View style={styles.radioInner} />
+                  )}
                 </View>
                 <View style={styles.optionInfo}>
-                  <Text style={[styles.optionLabel, familyInvolvement === option.value && styles.optionLabelActive]}>
+                  <Text
+                    style={[
+                      styles.optionLabel,
+                      familyInvolvement === option.value &&
+                        styles.optionLabelActive,
+                    ]}
+                  >
                     {option.label}
                   </Text>
                   <Text style={styles.optionDesc}>{option.desc}</Text>
@@ -133,9 +185,10 @@ export default function CulturalNotesScreen({ onBack }: CulturalNotesScreenProps
         <View style={styles.disclaimer}>
           <Text style={styles.disclaimerTitle}>Important</Text>
           <Text style={styles.disclaimerText}>
-            These notes are for informational purposes only. Always confirm medication
-            decisions with your pharmacist or doctor. MedGuide does not make medical
-            or cultural assumptions based on language or background.
+            These notes are for informational purposes only. Always confirm
+            medication decisions with your pharmacist or doctor. MedGuide does
+            not make medical or cultural assumptions based on language or
+            background.
           </Text>
         </View>
 

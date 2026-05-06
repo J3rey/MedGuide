@@ -47,6 +47,7 @@ async function searchDrugsInDatabase(query: string): Promise<Drug[]> {
       'drug',
       'medication',
       'medicine',
+      'it',
 
       // Chinese
       '告诉',
@@ -183,18 +184,179 @@ BREASTFEEDING PRECAUTIONS: ${drug.precautions_breastfeeding || 'Not available'}
     .join('\n');
 }
 
+type DrugInfoType =
+  | 'indications'
+  | 'counseling'
+  | 'adverse_effects'
+  | 'pregnancy'
+  | 'children'
+  | 'breastfeeding';
+
+const infoTypeMatchers: Array<{
+  type: DrugInfoType;
+  patterns: RegExp[];
+}> = [
+  {
+    type: 'adverse_effects',
+    patterns: [
+      /\bside\s+effects?\b/i,
+      /\badverse\s+(effects?|reactions?)\b/i,
+      /\bbad\s+(effects?|reactions?)\b/i,
+      /\bnegative\s+(effects?|reactions?)\b/i,
+      /\bunwanted\s+(effects?|reactions?)\b/i,
+      /\bcommon\s+(effects?|reactions?)\b/i,
+      /\bwhat\s+can\s+happen\b/i,
+      /\bmake\s+me\s+(feel\s+)?(sick|dizzy|nauseous|tired)\b/i,
+      /\bnausea|vomiting|rash|dizziness|headache|diarrhea|constipation\b/i,
+    ],
+  },
+  {
+    type: 'counseling',
+    patterns: [
+      /\bhow\s+(do|should|can)\s+i\s+(take|use)\b/i,
+      /\bhow\s+to\s+(take|use)\b/i,
+      /\bwhen\s+(do|should|can)\s+i\s+(take|use)\b/i,
+      /\bwith\s+(food|meals?|milk|water)\b/i,
+      /\bwithout\s+(food|meals?)\b/i,
+      /\bdos(e|age)\b/i,
+      /\binstructions?\b/i,
+      /\bdirections?\b/i,
+      /\bhow\s+often\b/i,
+      /\bhow\s+many\b/i,
+      /\balcohol\b/i,
+      /\bavoid\b/i,
+      /\bstorage|store\b/i,
+      /\bcounsel(l)?ing\b/i,
+      /\bwhat\s+should\s+i\s+know\b/i,
+    ],
+  },
+  {
+    type: 'pregnancy',
+    patterns: [
+      /\bpregnan(cy|t)\b/i,
+      /\bunborn\s+baby\b/i,
+      /\bthird\s+trimester\b/i,
+      /\bfirst\s+trimester\b/i,
+      /\bsecond\s+trimester\b/i,
+      /\bplanning\s+pregnancy\b/i,
+      /\btrying\s+to\s+conceive\b/i,
+    ],
+  },
+  {
+    type: 'children',
+    patterns: [
+      /\bchildren\b/i,
+      /\bchild\b/i,
+      /\bkids?\b/i,
+      /\binfants?\b/i,
+      /\bbabies\b/i,
+      /\bbaby\b/i,
+      /\bteenagers?\b/i,
+      /\bp(a)?ediatric\b/i,
+      /\bunder\s+\d+\b/i,
+      /\b\d+\s*(year|month)s?\s+old\b/i,
+    ],
+  },
+  {
+    type: 'breastfeeding',
+    patterns: [
+      /\bbreast\s*feeding\b/i,
+      /\bbreastfeeding\b/i,
+      /\bnursing\b/i,
+      /\blactation\b/i,
+      /\bbreast\s+milk\b/i,
+      /\bnursing\s+infant\b/i,
+    ],
+  },
+  {
+    type: 'indications',
+    patterns: [
+      /\bwhat\s+is\s+(it|this)\s+for\b/i,
+      /\bwhat\s+is\s+(it|this)\s+used\s+for\b/i,
+      /\bused\s+to\s+(treat|help|reduce)\b/i,
+      /\bwhat\s+does\s+(it|this)\s+(treat|do)\b/i,
+      /\bwhy\s+(do|would|should)\s+i\s+(take|use)\b/i,
+      /\bindications?\b/i,
+      /\buses?\b/i,
+      /\btreats?\b/i,
+      /\bhelps?\s+with\b/i,
+    ],
+  },
+];
+
+function detectRequestedInfoType(message: string): DrugInfoType | null {
+  for (const matcher of infoTypeMatchers) {
+    if (matcher.patterns.some((pattern) => pattern.test(message))) {
+      return matcher.type;
+    }
+  }
+
+  return null;
+}
+
+function getDrugFieldValue(drug: Drug, infoType: DrugInfoType): string | null {
+  switch (infoType) {
+    case 'indications':
+      return drug.indications;
+    case 'counseling':
+      return drug.counseling;
+    case 'adverse_effects':
+      return drug.adverse_effects;
+    case 'pregnancy':
+      return drug.precautions_pregnancy;
+    case 'children':
+      return drug.precautions_children;
+    case 'breastfeeding':
+      return drug.precautions_breastfeeding;
+    default:
+      return null;
+  }
+}
+
+function getDrugInfoLabel(infoType: DrugInfoType): string {
+  switch (infoType) {
+    case 'indications':
+      return 'Uses';
+    case 'counseling':
+      return 'How to take it';
+    case 'adverse_effects':
+      return 'Side effects';
+    case 'pregnancy':
+      return 'Pregnancy safety';
+    case 'children':
+      return 'Children safety';
+    case 'breastfeeding':
+      return 'Breastfeeding safety';
+    default:
+      return 'Medication information';
+  }
+}
+
+function formatDirectDatabaseAnswer(
+  drug: Drug,
+  infoType: DrugInfoType
+): string {
+  const label = getDrugInfoLabel(infoType);
+  const value = getDrugFieldValue(drug, infoType);
+
+  if (!value) {
+    return `${label} information for ${drug.drug_name} is not available in our database. Please consult your pharmacist or healthcare provider for accurate information.`;
+  }
+
+  return `${label} for ${drug.drug_name}:\n\n${value}\n\nThis information is from our database and is for informational purposes only. Please consult your pharmacist or healthcare provider for personalized medical advice.`;
+}
+
 /**
  * Chat with constrained database context
  */
 export const chat = async (
   message: string,
-  language: string = 'en'
+  language: string = 'en',
+  medications: string[] = []
 ): Promise<string> => {
   console.log('[Gemini Chat] User message:', message);
   console.log('[Gemini Chat] Language:', language);
-
-  const genAI = getGeminiAI();
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  console.log('[Gemini Chat] Medication context:', medications);
 
   // Define multilingual "Tell me about" phrases
   const tellMeAboutPhrases = [
@@ -221,6 +383,10 @@ export const chat = async (
     'counseling',
     'counsel',
     'how to take',
+    'indication',
+    'indications',
+    'used for',
+    'what is it for',
     'dosage',
     'dose',
     'adverse effects',
@@ -334,8 +500,16 @@ export const chat = async (
     messageLower.includes(keyword.toLowerCase())
   );
 
-  // Search for relevant drugs in the database
-  const drugs = await searchDrugsInDatabase(message);
+  const medicationContext = medications
+    .map((medication) => medication.trim())
+    .filter(Boolean)
+    .join(' ');
+  const hasMedicationContext = medicationContext.length > 0;
+
+  // Search for relevant drugs in the database. Follow-up questions may omit
+  // the drug name, so include the scanned/manual medication context.
+  const searchQuery = medicationContext || message;
+  const drugs = await searchDrugsInDatabase(searchQuery);
 
   console.log('[Gemini Chat] Database search returned', drugs.length, 'drugs');
 
@@ -344,8 +518,15 @@ export const chat = async (
     return "I don't have information about that medication in my database. Please consult your pharmacist or healthcare provider for accurate information.";
   }
 
+  const requestedInfoType = detectRequestedInfoType(message);
+  if (requestedInfoType) {
+    return formatDirectDatabaseAnswer(drugs[0], requestedInfoType);
+  }
+
   // For initial queries, only show indications
   if (isInitialQuery) {
+    const genAI = getGeminiAI();
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const drugData = formatDrugData(drugs, 'indications');
 
     // Define keyword list for different languages
@@ -391,12 +572,14 @@ CRITICAL RULES:
     return response.text();
   }
 
-  // For follow-up queries, check if they used valid keywords
-  if (!hasValidKeyword) {
+  // For follow-up queries without scanned medication context, ask for a
+  // medication-specific question. With context, allow Gemini to interpret the
+  // question against the database row below.
+  if (!hasValidKeyword && !hasMedicationContext) {
     // Return multilingual error message based on language
     const keywordMessages: Record<string, string> = {
       English:
-        "I can only provide specific information about medications in the database when you ask about:\n\n• How to take the medication\n• Side effects\n• Safety for pregnancy\n• Safety for children\n• Safety for breastfeeding\n\nFor example, you can ask: 'What are the side effects of [medication name]?' or 'Is [medication name] safe during pregnancy?'",
+        "I can only provide specific information about medications in the database when you ask about:\n\n• What the medication is used for\n• How to take the medication\n• Side effects\n• Safety for pregnancy\n• Safety for children\n• Safety for breastfeeding\n\nFor example, you can ask: 'What are the side effects?' or 'Is it safe during pregnancy?'",
 
       Chinese:
         "当您询问以下内容时，我只能提供数据库中药物的具体信息：\n\n• 如何服用药物\n• 副作用\n• 怀孕期间的安全性\n• 儿童的安全性\n• 哺乳期间的安全性\n\n例如，您可以问：'[药物名称]的副作用是什么？'或'[药物名称]在怀孕期间安全吗？'",
@@ -430,7 +613,7 @@ CRITICAL RULES:
 2. If any requested field shows "Not available", you MUST state: "This information is not available in our database. Please consult your pharmacist for details."
 3. Do NOT make up, infer, or add ANY information that is not explicitly written in the database
 4. Do NOT provide medical advice, suggestions, or recommendations beyond what is in the database
-5. Focus on the specific aspect the user asked about (counseling, adverse effects, pregnancy precautions, children precautions, or breastfeeding precautions)
+5. Focus on the specific aspect the user asked about (indications, counseling, adverse effects, pregnancy precautions, children precautions, or breastfeeding precautions)
 6. Be concise and clear
 7. Always end with: "This information is from our database and is for informational purposes only. Please consult your pharmacist or healthcare provider for personalized medical advice."
 
@@ -443,6 +626,8 @@ USER QUESTION: ${message}
 
 Remember: If the specific information requested is "Not available" in the database, you must tell the user to consult their pharmacist instead of trying to provide general information.`;
 
+  const genAI = getGeminiAI();
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   const result = await model.generateContent(prompt);
   const response = await result.response;
   const text = response.text();

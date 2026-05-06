@@ -52,6 +52,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
   const [activeTab, setActiveTab] = useState<Tab>('camera');
   const [showAlarm, setShowAlarm] = useState(false);
   const [currentAlarm, setCurrentAlarm] = useState<AlarmData | null>(null);
+  const [chatDrugName, setChatDrugName] = useState<string | null>(null);
   const { scannedDrug, setScannedDrug } = useScan();
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
@@ -65,6 +66,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
   // Listen for scan completion event
   useEffect(() => {
     if (scannedDrug) {
+      setChatDrugName(scannedDrug);
       setActiveTab('chat');
       setTimeout(() => setScannedDrug(null), 1000);
     }
@@ -145,7 +147,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
           </NavigationContainer>
         );
       case 'chat':
-        return <ChatScreen initialDrugName={scannedDrug || undefined} />;
+        return <ChatScreen initialDrugName={chatDrugName || undefined} />;
       case 'settings': {
         const containerPadding = screenWidth > 768 ? 48 : 24;
         return (
@@ -154,10 +156,18 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
             <View
               style={[
                 styles.settingsHeader,
-                { paddingTop: Math.max(insets.top, theme.spacing.base) + theme.spacing.sm },
+                {
+                  paddingTop:
+                    Math.max(insets.top, theme.spacing.base) + theme.spacing.sm,
+                },
               ]}
             >
-              <View style={[styles.headerInner, { paddingHorizontal: containerPadding }]}>
+              <View
+                style={[
+                  styles.headerInner,
+                  { paddingHorizontal: containerPadding },
+                ]}
+              >
                 <Text style={styles.settingsTitle}>{t('settings.title')}</Text>
               </View>
             </View>
@@ -220,7 +230,8 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
               {/* Disclaimer */}
               <View style={styles.disclaimerCard}>
                 <Text style={styles.disclaimerText}>
-                  MedGuide is designed to assist with medication information. Always consult your healthcare provider for medical advice.
+                  MedGuide is designed to assist with medication information.
+                  Always consult your healthcare provider for medical advice.
                 </Text>
               </View>
             </ScrollView>

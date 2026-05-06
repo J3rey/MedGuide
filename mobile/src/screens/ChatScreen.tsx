@@ -40,7 +40,10 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
   ]);
 
   const [inputMessage, setInputMessage] = useState('');
-  const [hasInitialized, setHasInitialized] = useState(false);
+  const [activeDrugName, setActiveDrugName] = useState<string | null>(
+    initialDrugName || null
+  );
+  const lastInitialDrugNameRef = useRef<string | null>(null);
 
   const scrollViewRef = useRef<ScrollView>(null);
   const { width: screenWidth } = useWindowDimensions();
@@ -50,15 +53,10 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
-  useEffect(() => {
-    if (initialDrugName && !hasInitialized) {
-      setHasInitialized(true);
-      const query = `${t('chat.tellMeAbout')} ${initialDrugName}`;
-      sendMessage(query);
-    }
-  }, [initialDrugName, hasInitialized, t]);
-
-  const sendMessage = async (customMessage?: string) => {
+  const sendMessage = async (
+    customMessage?: string,
+    medicationContextOverride?: string | null
+  ) => {
     const messageText = customMessage || inputMessage;
     if (!messageText.trim()) return;
 
@@ -75,7 +73,12 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
     }
 
     try {
-      const response = await medicationApi.sendChatMessage(messageText);
+      const medicationContext = medicationContextOverride ?? activeDrugName;
+      const response = await medicationApi.sendChatMessage(
+        messageText,
+        undefined,
+        medicationContext ? [medicationContext] : undefined
+      );
 
       const botMessage: ChatMessage = {
         id: Date.now() + 1,
@@ -119,6 +122,15 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
     }
   };
 
+  useEffect(() => {
+    if (initialDrugName && initialDrugName !== lastInitialDrugNameRef.current) {
+      lastInitialDrugNameRef.current = initialDrugName;
+      setActiveDrugName(initialDrugName);
+      const query = `${t('chat.tellMeAbout')} ${initialDrugName}`;
+      sendMessage(query, initialDrugName);
+    }
+  }, [initialDrugName, t]);
+
   const containerPadding = screenWidth > 768 ? 48 : 24;
   const maxContentWidth = screenWidth > 768 ? 800 : screenWidth;
 
@@ -142,7 +154,8 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
           styles.header,
           {
             paddingHorizontal: containerPadding,
-            paddingTop: Math.max(insets.top, theme.spacing.base) + theme.spacing.sm,
+            paddingTop:
+              Math.max(insets.top, theme.spacing.base) + theme.spacing.sm,
           },
         ]}
       >

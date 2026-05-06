@@ -16,9 +16,9 @@ router.post(
   validate(chatMessageSchema),
   async (req: Request, res: Response): Promise<void> => {
     try {
-      const { message, language = 'en' } = req.body;
+      const { message, language = 'en', medications = [] } = req.body;
 
-      const response = await chat(message, language);
+      const response = await chat(message, language, medications);
 
       res.json({
         response,
