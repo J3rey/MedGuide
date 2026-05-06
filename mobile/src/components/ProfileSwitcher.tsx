@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, FlatList } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import { useProfiles } from '../contexts/ProfileContext';
 import { Profile } from '../types/models';
@@ -36,7 +37,7 @@ export default function ProfileSwitcher() {
             </Text>
           )}
         </View>
-        {isActive && <View style={styles.checkmark}><Text style={styles.checkmarkText}>✓</Text></View>}
+        {isActive && <View style={styles.checkmark}><Ionicons name="checkmark" size={14} color="#FFFFFF" /></View>}
       </TouchableOpacity>
     );
   };
@@ -48,7 +49,7 @@ export default function ProfileSwitcher() {
           <Text style={styles.miniAvatarText}>{getInitial(activeProfile.name)}</Text>
         </View>
         <Text style={styles.switcherName}>{activeProfile.name}</Text>
-        <Text style={styles.chevron}>▾</Text>
+        <Ionicons name="chevron-down" size={14} color={theme.colors.textSecondary} style={{marginLeft: theme.spacing.xs}} />
       </TouchableOpacity>
 
       <Modal visible={showPicker} transparent animationType="slide" onRequestClose={() => setShowPicker(false)}>
