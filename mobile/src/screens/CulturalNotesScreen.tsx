@@ -55,13 +55,19 @@ export default function CulturalNotesScreen({
 
   const [hasChanges, setHasChanges] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (activeProfile) {
-      updateProfile(activeProfile.id, {
-        cultural_notes: culturalNotes || undefined,
-        dietary_notes: dietaryNotes || undefined,
-        family_involvement_preference: familyInvolvement,
-      });
+      try {
+        await updateProfile(activeProfile.id, {
+          cultural_notes: culturalNotes || undefined,
+          dietary_notes: dietaryNotes || undefined,
+          family_involvement_preference: familyInvolvement,
+        });
+      } catch (error) {
+        console.warn('Failed to save cultural notes:', error);
+        Alert.alert('Could not save notes', 'Please try again.');
+        return;
+      }
     }
     Alert.alert(
       'Saved',

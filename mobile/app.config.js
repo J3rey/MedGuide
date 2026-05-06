@@ -42,6 +42,9 @@ export default {
         process.env.EXPO_PUBLIC_BACKEND_URL ||
         'https://medguide-p132.onrender.com',
       localBackendUrl: process.env.EXPO_PUBLIC_LOCAL_BACKEND_URL,
+      userId:
+        process.env.EXPO_PUBLIC_MEDGUIDE_USER_ID ||
+        '00000000-0000-0000-0000-000000000001',
       supabaseUrl:
         process.env.SUPABASE_URL || 'https://kzqqeodwdpqlsgvydqyb.supabase.co',
       supabaseAnonKey:

@@ -2,6 +2,13 @@ import axios from 'axios';
 import i18n from '../i18n/config';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+import {
+  CaregiverPermissions,
+  CaregiverRole,
+  EmergencyContact,
+  Pharmacy,
+  Profile,
+} from '../types/models';
 
 const RENDER_BACKEND_URL = 'https://medguide-p132.onrender.com';
 
@@ -23,6 +30,10 @@ const getLocalBackendUrl = () => {
 
 const PRIMARY_API_URL = getPrimaryBackendUrl();
 const LOCAL_API_URL = getLocalBackendUrl();
+const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
+
+export const getAppUserId = () =>
+  Constants.expoConfig?.extra?.userId || DEFAULT_USER_ID;
 
 const createApiClient = (baseUrl: string) =>
   axios.create({
@@ -38,6 +49,7 @@ const localApi = createApiClient(LOCAL_API_URL);
 const attachLanguageHeader = (client: typeof api) => {
   client.interceptors.request.use((config) => {
     config.headers['Accept-Language'] = i18n.language;
+    config.headers['x-user-id'] = getAppUserId();
     return config;
   });
 };
@@ -103,6 +115,50 @@ const getWithFallback = async (
   }
 };
 
+const postWithFallback = async (
+  path: string,
+  data?: unknown,
+  config?: Parameters<typeof api.post>[2]
+) => {
+  try {
+    return await api.post(path, data, config);
+  } catch (error) {
+    if (shouldRetryLocally(error)) {
+      return localApi.post(path, data, config);
+    }
+    throw error;
+  }
+};
+
+const putWithFallback = async (
+  path: string,
+  data?: unknown,
+  config?: Parameters<typeof api.put>[2]
+) => {
+  try {
+    return await api.put(path, data, config);
+  } catch (error) {
+    if (shouldRetryLocally(error)) {
+      return localApi.put(path, data, config);
+    }
+    throw error;
+  }
+};
+
+const deleteWithFallback = async (
+  path: string,
+  config?: Parameters<typeof api.delete>[1]
+) => {
+  try {
+    return await api.delete(path, config);
+  } catch (error) {
+    if (shouldRetryLocally(error)) {
+      return localApi.delete(path, config);
+    }
+    throw error;
+  }
+};
+
 export interface MedicationInfo {
   id: string;
   name: string;
@@ -155,6 +211,127 @@ export const medicationApi = {
       message: response.data.response || response.data.message,
       suggestions: response.data.suggestions,
     };
+  },
+};
+
+export const profileApi = {
+  listProfiles: async (): Promise<Profile[]> => {
+    const response = await getWithFallback('/profiles');
+    return response.data.profiles || [];
+  },
+
+  createProfile: async (
+    profile: Omit<Profile, 'id' | 'owner_user_id' | 'created_at'>
+  ): Promise<Profile> => {
+    const response = await postWithFallback('/profiles', profile);
+    return response.data.profile;
+  },
+
+  updateProfile: async (
+    id: string,
+    updates: Partial<Profile>
+  ): Promise<Profile> => {
+    const response = await putWithFallback(`/profiles/${id}`, updates);
+    return response.data.profile;
+  },
+
+  deleteProfile: async (id: string): Promise<void> => {
+    await deleteWithFallback(`/profiles/${id}`);
+  },
+};
+
+export const pharmacyApi = {
+  listPharmacies: async (profileId: string): Promise<Pharmacy[]> => {
+    const response = await getWithFallback(`/profiles/${profileId}/pharmacies`);
+    return response.data.pharmacies || [];
+  },
+
+  createPharmacy: async (
+    profileId: string,
+    pharmacy: Omit<Pharmacy, 'id' | 'profile_id' | 'created_at'>
+  ): Promise<Pharmacy> => {
+    const response = await postWithFallback(
+      `/profiles/${profileId}/pharmacies`,
+      pharmacy
+    );
+    return response.data.pharmacy;
+  },
+
+  deletePharmacy: async (id: string): Promise<void> => {
+    await deleteWithFallback(`/pharmacies/${id}`);
+  },
+};
+
+export const emergencyContactApi = {
+  listContacts: async (profileId: string): Promise<EmergencyContact[]> => {
+    const response = await getWithFallback(
+      `/profiles/${profileId}/emergency-contacts`
+    );
+    return response.data.contacts || [];
+  },
+
+  createContact: async (
+    profileId: string,
+    contact: Omit<EmergencyContact, 'id' | 'profile_id' | 'created_at'>
+  ): Promise<EmergencyContact> => {
+    const response = await postWithFallback(
+      `/profiles/${profileId}/emergency-contacts`,
+      contact
+    );
+    return response.data.contact;
+  },
+
+  deleteContact: async (id: string): Promise<void> => {
+    await deleteWithFallback(`/emergency-contacts/${id}`);
+  },
+};
+
+export interface CaregiverInviteResponse {
+  invite_code: string;
+}
+
+export interface CaregiverPatient {
+  id: string;
+  profile_id: string;
+  role: CaregiverRole;
+  permissions: CaregiverPermissions;
+  profiles: Pick<Profile, 'id' | 'name' | 'relationship' | 'avatar_color'>;
+  status?: {
+    medicationsTaken: number;
+    medicationsTotal: number;
+    missedCount: number;
+    lastCheckIn: string;
+    hasEmergencyAlert: boolean;
+    phone?: string;
+  };
+}
+
+export const caregiverApi = {
+  inviteCaregiver: async (
+    profileId: string,
+    invite: {
+      role: CaregiverRole;
+      email?: string;
+      permissions?: CaregiverPermissions;
+    }
+  ): Promise<CaregiverInviteResponse> => {
+    const response = await postWithFallback(
+      `/profiles/${profileId}/caregivers/invite`,
+      invite
+    );
+    return { invite_code: response.data.invite_code };
+  },
+
+  acceptInvite: async (inviteCode: string) => {
+    const response = await postWithFallback('/caregivers/accept-invite', {
+      invite_code: inviteCode,
+    });
+    return response.data.caregiver;
+  },
+
+  listMyPatients: async (): Promise<CaregiverPatient[]> => {
+    const response = await getWithFallback('/caregivers/my-patients');
+    return response.data.patients || [];
   },
 };
 

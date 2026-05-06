@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
@@ -26,7 +26,7 @@ const avatarColors = ['#364EFF', '#16A34A', '#F59E0B', '#DC2626', '#8B5CF6', '#E
 
 export default function ManageProfilesScreen({ onBack }: ManageProfilesScreenProps) {
   const insets = useSafeAreaInsets();
-  const { profiles, activeProfile, setActiveProfile, addProfile, deleteProfile } = useProfiles();
+  const { profiles, activeProfile, setActiveProfile, addProfile, deleteProfile, isLoading, error, refreshProfiles } = useProfiles();
   const [showAddForm, setShowAddForm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState('');
@@ -36,23 +36,33 @@ export default function ManageProfilesScreen({ onBack }: ManageProfilesScreenPro
   const [newRelationship, setNewRelationship] = useState<Relationship>('parent');
   const [newColor, setNewColor] = useState(avatarColors[1]);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!newName) return;
-    addProfile({
-      name: newName,
-      relationship: newRelationship,
-      preferred_language: 'en',
-      accessibility_settings: defaultAccessibilitySettings,
-      avatar_color: newColor,
-    });
-    setNewName('');
-    setNewRelationship('parent');
-    setShowAddForm(false);
+    try {
+      await addProfile({
+        name: newName,
+        relationship: newRelationship,
+        preferred_language: 'en',
+        accessibility_settings: defaultAccessibilitySettings,
+        avatar_color: newColor,
+      });
+      setNewName('');
+      setNewRelationship('parent');
+      setShowAddForm(false);
+    } catch (addError) {
+      console.warn('Failed to add profile:', addError);
+      Alert.alert('Could not add profile', 'Please try again.');
+    }
   };
 
-  const handleDelete = () => {
-    deleteProfile(deleteTargetId);
-    setShowDeleteConfirm(false);
+  const handleDelete = async () => {
+    try {
+      await deleteProfile(deleteTargetId);
+      setShowDeleteConfirm(false);
+    } catch (deleteError) {
+      console.warn('Failed to delete profile:', deleteError);
+      Alert.alert('Could not remove profile', 'Please try again.');
+    }
   };
 
   return (
@@ -73,6 +83,15 @@ export default function ManageProfilesScreen({ onBack }: ManageProfilesScreenPro
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {isLoading && (
+          <Text style={styles.statusText}>Loading profiles...</Text>
+        )}
+        {error && (
+          <TouchableOpacity onPress={refreshProfiles} activeOpacity={0.7}>
+            <Text style={styles.errorText}>{error}</Text>
+          </TouchableOpacity>
+        )}
+
         {/* Existing Profiles */}
         {profiles.map((profile) => (
           <View key={profile.id} style={[styles.profileCard, activeProfile?.id === profile.id && styles.activeCard]}>
@@ -255,6 +274,14 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: theme.spacing.xl,
     paddingBottom: theme.spacing['3xl'],
+  },
+  statusText: {
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.md,
+  },
+  errorText: {
+    color: theme.colors.warning,
+    marginBottom: theme.spacing.md,
   },
   profileCard: {
     backgroundColor: theme.colors.surface,
