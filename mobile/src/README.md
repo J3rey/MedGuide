@@ -1,79 +1,78 @@
-# MedGuide Mobile Structure
+# MedGuide Mobile — Source Structure
 
-## Directory Organization
+## `/screens/`
 
-### `/src/screens/`
+Full-page views navigated via React Navigation.
 
-Screen-level components that represent full pages/views in the app.
+- **`CameraScreen.tsx`** — Prescription scanning with camera and gallery, flash/zoom controls
+- **`ScanResultsScreen.tsx`** — Displays OCR results with fuzzy-matched drug names
+- **`ChatScreen.tsx`** — AI-powered medication Q&A (Gemini API)
+- **`ManualSearchScreen.tsx`** — Text-based drug name search with autocomplete
+- **`DrugDetailsScreen.tsx`** — Full drug information (dosage, indications, adverse effects)
+- **`ScheduleScreen.tsx`** — Medication reminder setup with time picker
+- **`AlarmScreen.tsx`** — Active alarm modal with snooze and dismiss actions
+- **`LanguageSelectionScreen.tsx`** — Language picker (EN, ZH, ES, HI, ID, IT, KO)
 
-- **`LoginScreen.tsx`** - Login/authentication screen
-- **`HomeScreen.tsx`** - Home dashboard screen
-- **`ScanScreen.tsx`** - Prescription scanning screen
-- **`HistoryScreen.tsx`** - Scan history list screen
-- **`ProfileScreen.tsx`** - User profile and settings screen
+## `/components/`
 
-### `/src/components/`
+Reusable UI components shared across screens.
 
-Reusable UI components used across multiple screens.
+- **`DarkMainApp.tsx`** — Main app container with tab navigation logic
+- **`DarkBottomNavigation.tsx`** — Bottom tab bar (Schedule, Camera, Chat, Settings)
+- **`TabIcons.tsx`** — Custom geometric icons for each tab
+- **`Logo.tsx`** — MedGuide logo component
 
-- **`MainApp.tsx`** - Main app container with tab navigation logic
-- **`BottomNavigation.tsx`** - Bottom tab navigation bar component
+## `/services/`
 
-### `/src/services/`
+API clients and business logic for backend/external integrations.
 
-API clients and service layer for backend communication.
+- **`api.ts`** — Axios HTTP client configured for the backend URL
+- **`ocr.ts`** — Sends images to backend OCR endpoint and parses results
+- **`matchDrugsFromImage.ts`** — Fuzzy-matches OCR text against the drug database
+- **`drugSearch.ts`** — Queries the drug search API
+- **`match.ts`** — Core fuzzy string matching utility
+- **`medicationService.ts`** — CRUD operations for medications via Supabase
+- **`notificationService.ts`** — Sets up and manages Expo push notifications
+- **`supabase.ts`** — Supabase client initialization
 
-- **`api.ts`** - Axios API client configuration
+## `/contexts/`
 
-### `/src/utils/`
+React context providers for shared app state.
 
-Utility functions and helpers.
+- **`LanguageContext.tsx`** — Selected language, exposes `useLanguage()` hook
+- **`ScanContext.tsx`** — Scan results shared between CameraScreen and ScanResultsScreen
 
-### `/src/i18n/`
+## `/i18n/`
 
-Internationalization configuration and translation files.
+Internationalization setup using `react-i18next`.
 
-- **`config.ts`** - i18n setup
-- **`locales/en.json`** - English translations
-- **`locales/zh.json`** - Chinese translations
+- **`config.ts`** — i18next initialization
+- **`locales/`** — Translation JSON files: `en`, `zh`, `es`, `hi`, `id`, `it`, `ko`
 
-### `/src/styles/`
+## `/styles/`
 
-Global styles and theme configuration.
+- **`theme.ts`** — Shared colors, spacing, typography, and semantic tokens
 
-## File Naming Conventions
+## `/types/`
 
-- Screens: `ScreenName.tsx` (PascalCase)
-- Components: `ComponentName.tsx` (PascalCase)
-- Services: `serviceName.ts` (camelCase)
-- Utils: `utilName.ts` (camelCase)
+TypeScript type definitions.
 
-## Import Path Examples
+- **`drug.ts`** — Drug data model
+- **`navigation.ts`** — React Navigation param list types
 
-```tsx
-// Import screens
-import HomeScreen from "../screens/HomeScreen";
-import LoginScreen from "../screens/LoginScreen";
+## `/utils/`
 
-// Import components
-import BottomNavigation from "../components/BottomNavigation";
+Standalone helper functions.
 
-// Import services
-import api from "../services/api";
-```
+- **`fuzzyMatch.ts`** — Fuzzy string matching algorithm
+- **`cameraConstants.ts`** — Camera configuration constants
+- **`uriToBase64.ts`** — Converts a URI to a base64 string for API upload
 
-## Component vs Screen
+## Conventions
 
-**Screens:**
-
-- Full-page views
-- Contain business logic for that view
-- Can use multiple components
-- Navigate between each other
-
-**Components:**
-
-- Reusable UI pieces
-- Can be used in multiple screens
-- Focus on presentation
-- Minimal business logic
+| Category   | Naming          | Example                    |
+|------------|-----------------|----------------------------|
+| Screens    | `PascalCase.tsx`| `DrugDetailsScreen.tsx`    |
+| Components | `PascalCase.tsx`| `DarkBottomNavigation.tsx` |
+| Services   | `camelCase.ts`  | `notificationService.ts`   |
+| Utils      | `camelCase.ts`  | `fuzzyMatch.ts`            |

@@ -184,31 +184,6 @@ cd MedGuide
 # 4. 003_sample_drugs_data.sql  (optional: seed sample data)
 ```
 
-);
-
--- Create scans table
-CREATE TABLE scans (
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-user_id UUID REFERENCES users(id),
-medication_name TEXT NOT NULL,
-dosage TEXT,
-scan_date TIMESTAMP DEFAULT NOW(),
-image_url TEXT
-);
-
--- Create reminders table (Phase 2)
-CREATE TABLE reminders (
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-user_id UUID REFERENCES users(id),
-medication_name TEXT NOT NULL,
-time TIME NOT NULL,
-frequency TEXT NOT NULL,
-active BOOLEAN DEFAULT true,
-created_at TIMESTAMP DEFAULT NOW()
-);
-
-````
-
 ### 3. Setup Backend
 
 ```bash
