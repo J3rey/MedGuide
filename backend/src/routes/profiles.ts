@@ -1,15 +1,14 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../services/supabase';
+import { requireUserId } from '../services/profileAccess';
 
 const router = Router();
 
 // Get all profiles for the current user
 router.get('/profiles', async (req: Request, res: Response) => {
   try {
-    const userId = req.headers['x-user-id'] as string;
-    if (!userId) {
-      return res.status(401).json({ error: 'User ID required' });
-    }
+    const userId = requireUserId(req, res);
+    if (!userId) return;
 
     const { data, error } = await supabase
       .from('profiles')
@@ -27,12 +26,20 @@ router.get('/profiles', async (req: Request, res: Response) => {
 // Create a new profile
 router.post('/profiles', async (req: Request, res: Response) => {
   try {
-    const userId = req.headers['x-user-id'] as string;
-    if (!userId) {
-      return res.status(401).json({ error: 'User ID required' });
-    }
+    const userId = requireUserId(req, res);
+    if (!userId) return;
 
-    const { name, relationship, date_of_birth, preferred_language, avatar_color } = req.body;
+    const {
+      name,
+      relationship,
+      date_of_birth,
+      preferred_language,
+      cultural_notes,
+      dietary_notes,
+      family_involvement_preference,
+      accessibility_settings,
+      avatar_color,
+    } = req.body;
 
     const { data, error } = await supabase
       .from('profiles')
@@ -42,6 +49,10 @@ router.post('/profiles', async (req: Request, res: Response) => {
         relationship: relationship || 'self',
         date_of_birth,
         preferred_language: preferred_language || 'en',
+        cultural_notes,
+        dietary_notes,
+        family_involvement_preference,
+        accessibility_settings,
         avatar_color: avatar_color || '#364EFF',
       })
       .select()
@@ -57,7 +68,8 @@ router.post('/profiles', async (req: Request, res: Response) => {
 // Update a profile
 router.put('/profiles/:id', async (req: Request, res: Response) => {
   try {
-    const userId = req.headers['x-user-id'] as string;
+    const userId = requireUserId(req, res);
+    if (!userId) return;
     const { id } = req.params;
 
     const updates = req.body;
@@ -83,7 +95,8 @@ router.put('/profiles/:id', async (req: Request, res: Response) => {
 // Delete a profile
 router.delete('/profiles/:id', async (req: Request, res: Response) => {
   try {
-    const userId = req.headers['x-user-id'] as string;
+    const userId = requireUserId(req, res);
+    if (!userId) return;
     const { id } = req.params;
 
     const { error } = await supabase

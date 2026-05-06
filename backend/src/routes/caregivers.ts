@@ -1,12 +1,21 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../services/supabase';
+import {
+  getOwnedRecordProfileId,
+  requireProfileOwner,
+  requireUserId,
+} from '../services/profileAccess';
 
 const router = Router();
 
 // Get caregivers for a profile
 router.get('/profiles/:profileId/caregivers', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { profileId } = req.params;
+    if (!(await requireProfileOwner(profileId, userId, res))) return;
 
     const { data, error } = await supabase
       .from('profile_caregivers')
@@ -25,8 +34,13 @@ router.get('/profiles/:profileId/caregivers', async (req: Request, res: Response
 // Invite a caregiver
 router.post('/profiles/:profileId/caregivers/invite', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { profileId } = req.params;
-    const { role, email, phone, permissions } = req.body;
+    if (!(await requireProfileOwner(profileId, userId, res))) return;
+
+    const { role, email, permissions } = req.body;
 
     const inviteCode = 'MG-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
@@ -60,7 +74,9 @@ router.post('/profiles/:profileId/caregivers/invite', async (req: Request, res: 
 // Accept caregiver invite
 router.post('/caregivers/accept-invite', async (req: Request, res: Response) => {
   try {
-    const userId = req.headers['x-user-id'] as string;
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { invite_code } = req.body;
 
     if (!invite_code) {
@@ -92,8 +108,20 @@ router.post('/caregivers/accept-invite', async (req: Request, res: Response) => 
 // Update caregiver permissions
 router.put('/caregivers/:id/permissions', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { id } = req.params;
     const { permissions } = req.body;
+
+    const profileId = await getOwnedRecordProfileId(
+      'profile_caregivers',
+      id,
+      userId
+    );
+    if (!profileId) {
+      return res.status(403).json({ error: 'Caregiver access denied' });
+    }
 
     const { data, error } = await supabase
       .from('profile_caregivers')
@@ -112,7 +140,19 @@ router.put('/caregivers/:id/permissions', async (req: Request, res: Response) =>
 // Revoke caregiver access
 router.post('/caregivers/:id/revoke', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { id } = req.params;
+
+    const profileId = await getOwnedRecordProfileId(
+      'profile_caregivers',
+      id,
+      userId
+    );
+    if (!profileId) {
+      return res.status(403).json({ error: 'Caregiver access denied' });
+    }
 
     const { data, error } = await supabase
       .from('profile_caregivers')
@@ -134,7 +174,8 @@ router.post('/caregivers/:id/revoke', async (req: Request, res: Response) => {
 // Get profiles where user is a caregiver (caregiver dashboard)
 router.get('/caregivers/my-patients', async (req: Request, res: Response) => {
   try {
-    const userId = req.headers['x-user-id'] as string;
+    const userId = requireUserId(req, res);
+    if (!userId) return;
 
     const { data, error } = await supabase
       .from('profile_caregivers')
@@ -149,7 +190,72 @@ router.get('/caregivers/my-patients', async (req: Request, res: Response) => {
       .is('revoked_at', null);
 
     if (error) throw error;
-    res.json({ patients: data });
+
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(todayStart);
+    todayEnd.setDate(todayEnd.getDate() + 1);
+
+    const patients = await Promise.all(
+      (data || []).map(async (patient: any) => {
+        const profileId = patient.profile_id;
+
+        const [{ count: medicationsTotal }, { data: logs }, { count: activeEmergencyCount }, { data: contacts }] =
+          await Promise.all([
+            supabase
+              .from('medications')
+              .select('id', { count: 'exact', head: true })
+              .eq('profile_id', profileId),
+            supabase
+              .from('medication_logs')
+              .select('status, taken_at, created_at')
+              .eq('profile_id', profileId)
+              .gte('scheduled_instance_time', todayStart.toISOString())
+              .lt('scheduled_instance_time', todayEnd.toISOString()),
+            supabase
+              .from('emergency_events')
+              .select('id', { count: 'exact', head: true })
+              .eq('profile_id', profileId)
+              .eq('status', 'active'),
+            supabase
+              .from('emergency_contacts')
+              .select('phone')
+              .eq('profile_id', profileId)
+              .order('priority_order', { ascending: true })
+              .limit(1),
+          ]);
+
+        const medicationsTaken =
+          logs?.filter((log: any) =>
+            ['taken', 'taken_late'].includes(log.status)
+          ).length || 0;
+        const missedCount =
+          logs?.filter((log: any) => log.status === 'missed').length || 0;
+        const lastLog = logs
+          ?.filter((log: any) => log.taken_at || log.created_at)
+          .sort((a: any, b: any) =>
+            String(b.taken_at || b.created_at).localeCompare(
+              String(a.taken_at || a.created_at)
+            )
+          )[0];
+
+        return {
+          ...patient,
+          status: {
+            medicationsTaken,
+            medicationsTotal: medicationsTotal || 0,
+            missedCount,
+            lastCheckIn: lastLog
+              ? new Date(lastLog.taken_at || lastLog.created_at).toLocaleString()
+              : 'No logs today',
+            hasEmergencyAlert: (activeEmergencyCount || 0) > 0,
+            phone: contacts?.[0]?.phone,
+          },
+        };
+      })
+    );
+
+    res.json({ patients });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

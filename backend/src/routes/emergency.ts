@@ -1,5 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../services/supabase';
+import {
+  getOwnedRecordProfileId,
+  requireProfileOwner,
+  requireUserId,
+} from '../services/profileAccess';
 
 const router = Router();
 
@@ -8,7 +13,11 @@ const router = Router();
 // Get emergency contacts for a profile
 router.get('/profiles/:profileId/emergency-contacts', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { profileId } = req.params;
+    if (!(await requireProfileOwner(profileId, userId, res))) return;
 
     const { data, error } = await supabase
       .from('emergency_contacts')
@@ -26,7 +35,12 @@ router.get('/profiles/:profileId/emergency-contacts', async (req: Request, res: 
 // Add emergency contact
 router.post('/profiles/:profileId/emergency-contacts', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { profileId } = req.params;
+    if (!(await requireProfileOwner(profileId, userId, res))) return;
+
     const { name, relationship, phone, email, preferred_language, priority_order } = req.body;
 
     const { data, error } = await supabase
@@ -53,7 +67,18 @@ router.post('/profiles/:profileId/emergency-contacts', async (req: Request, res:
 // Delete emergency contact
 router.delete('/emergency-contacts/:id', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { id } = req.params;
+    const profileId = await getOwnedRecordProfileId(
+      'emergency_contacts',
+      id,
+      userId
+    );
+    if (!profileId) {
+      return res.status(403).json({ error: 'Emergency contact access denied' });
+    }
 
     const { error } = await supabase
       .from('emergency_contacts')
@@ -72,8 +97,12 @@ router.delete('/emergency-contacts/:id', async (req: Request, res: Response) => 
 // Trigger emergency event
 router.post('/profiles/:profileId/emergency-events', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { profileId } = req.params;
-    const userId = req.headers['x-user-id'] as string;
+    if (!(await requireProfileOwner(profileId, userId, res))) return;
+
     const { event_type, severity, description } = req.body;
 
     const { data, error } = await supabase
@@ -102,7 +131,18 @@ router.post('/profiles/:profileId/emergency-events', async (req: Request, res: R
 // Resolve emergency event
 router.post('/emergency-events/:id/resolve', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { id } = req.params;
+    const profileId = await getOwnedRecordProfileId(
+      'emergency_events',
+      id,
+      userId
+    );
+    if (!profileId) {
+      return res.status(403).json({ error: 'Emergency event access denied' });
+    }
 
     const { data, error } = await supabase
       .from('emergency_events')
@@ -124,7 +164,11 @@ router.post('/emergency-events/:id/resolve', async (req: Request, res: Response)
 // Get active emergency events for a profile
 router.get('/profiles/:profileId/emergency-events', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { profileId } = req.params;
+    if (!(await requireProfileOwner(profileId, userId, res))) return;
 
     const { data, error } = await supabase
       .from('emergency_events')
@@ -145,7 +189,11 @@ router.get('/profiles/:profileId/emergency-events', async (req: Request, res: Re
 // Get pharmacies for a profile
 router.get('/profiles/:profileId/pharmacies', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { profileId } = req.params;
+    if (!(await requireProfileOwner(profileId, userId, res))) return;
 
     const { data, error } = await supabase
       .from('pharmacies')
@@ -163,7 +211,12 @@ router.get('/profiles/:profileId/pharmacies', async (req: Request, res: Response
 // Add pharmacy
 router.post('/profiles/:profileId/pharmacies', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { profileId } = req.params;
+    if (!(await requireProfileOwner(profileId, userId, res))) return;
+
     const { name, phone, address, opening_hours, notes } = req.body;
 
     const { data, error } = await supabase
@@ -189,7 +242,14 @@ router.post('/profiles/:profileId/pharmacies', async (req: Request, res: Respons
 // Delete pharmacy
 router.delete('/pharmacies/:id', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { id } = req.params;
+    const profileId = await getOwnedRecordProfileId('pharmacies', id, userId);
+    if (!profileId) {
+      return res.status(403).json({ error: 'Pharmacy access denied' });
+    }
 
     const { error } = await supabase
       .from('pharmacies')
