@@ -2,30 +2,42 @@ import { Drug } from '../types/drug';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
-// Get backend URL from config with platform-specific defaults
-const getBackendUrl = () => {
-  if (Constants.expoConfig?.extra?.backendUrl) {
-    return Constants.expoConfig.extra.backendUrl;
-  }
+const RENDER_BACKEND_URL = 'https://medguide-p132.onrender.com';
 
-  // Default URLs for different platforms (development fallbacks)
+const getPrimaryBackendUrl = () =>
+  Constants.expoConfig?.extra?.backendUrl || RENDER_BACKEND_URL;
+
+const getLocalBackendUrl = () => {
+  if (Constants.expoConfig?.extra?.localBackendUrl) {
+    return Constants.expoConfig.extra.localBackendUrl;
+  }
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:3000'; // Android emulator
   }
   if (Platform.OS === 'ios') {
     return 'http://localhost:3000'; // iOS simulator
   }
-  // For web, we need the production URL - localhost won't work
-  return 'https://medguide-p132.onrender.com';
+  return 'http://localhost:3000';
 };
 
-const BACKEND_URL = getBackendUrl();
-const API_BASE = `${BACKEND_URL}/api`;
+const PRIMARY_API_BASE = `${getPrimaryBackendUrl()}/api`;
+const LOCAL_API_BASE = `${getLocalBackendUrl()}/api`;
+
+const fetchDrugSearch = (apiBase: string, query: string) =>
+  fetch(`${apiBase}/drugs/search?q=${encodeURIComponent(query)}`);
 
 export async function searchDrugs(query: string): Promise<Drug[]> {
   try {
-    const url = `${API_BASE}/drugs/search?q=${encodeURIComponent(query)}`;
-    const res = await fetch(url);
+    let res: Response;
+    try {
+      res = await fetchDrugSearch(PRIMARY_API_BASE, query);
+      if (res.status >= 500) {
+        res = await fetchDrugSearch(LOCAL_API_BASE, query);
+      }
+    } catch (error) {
+      console.warn('Primary drug search failed, retrying local:', error);
+      res = await fetchDrugSearch(LOCAL_API_BASE, query);
+    }
 
     if (!res.ok) {
       // Handle rate limiting
