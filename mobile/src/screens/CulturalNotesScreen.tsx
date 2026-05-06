@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Switch, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import SectionCard from '../components/ui/SectionCard';
 import LargeActionButton from '../components/ui/LargeActionButton';
@@ -20,6 +21,8 @@ export default function CulturalNotesScreen({ onBack }: CulturalNotesScreenProps
     activeProfile?.family_involvement_preference || 'full'
   );
 
+  const [hasChanges, setHasChanges] = useState(false);
+
   const handleSave = () => {
     if (activeProfile) {
       updateProfile(activeProfile.id, {
@@ -28,7 +31,14 @@ export default function CulturalNotesScreen({ onBack }: CulturalNotesScreenProps
         family_involvement_preference: familyInvolvement as any,
       });
     }
-    onBack?.();
+    Alert.alert('Saved', 'Your cultural and care preferences have been saved.', [
+      { text: 'OK', onPress: () => onBack?.() },
+    ]);
+  };
+
+  const handleFieldChange = (setter: (v: string) => void) => (value: string) => {
+    setter(value);
+    setHasChanges(true);
   };
 
   return (
@@ -36,7 +46,7 @@ export default function CulturalNotesScreen({ onBack }: CulturalNotesScreenProps
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Text style={styles.backText}>← Back</Text>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Cultural & Care Notes</Text>
         <Text style={styles.headerSubtitle}>
@@ -60,7 +70,7 @@ export default function CulturalNotesScreen({ onBack }: CulturalNotesScreenProps
             placeholder="e.g., Fasting during Ramadan - medication timing may need adjustment"
             placeholderTextColor={theme.colors.textSecondary}
             value={culturalNotes}
-            onChangeText={setCulturalNotes}
+            onChangeText={handleFieldChange(setCulturalNotes)}
             multiline
             numberOfLines={4}
             textAlignVertical="top"
@@ -78,7 +88,7 @@ export default function CulturalNotesScreen({ onBack }: CulturalNotesScreenProps
             placeholder="e.g., Requires gelatin-free medication capsules"
             placeholderTextColor={theme.colors.textSecondary}
             value={dietaryNotes}
-            onChangeText={setDietaryNotes}
+            onChangeText={handleFieldChange(setDietaryNotes)}
             multiline
             numberOfLines={4}
             textAlignVertical="top"
