@@ -1,12 +1,25 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Linking, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Linking,
+  Alert,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import ConfirmActionModal from '../components/ui/ConfirmActionModal';
-import { EmptyState, ErrorState, LoadingState } from '../components/ui/StateViews';
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from '../components/ui/StateViews';
 import { EmergencyContact } from '../types/models';
 import { emergencyContactApi } from '../services/api';
 import { useProfiles } from '../contexts/ProfileContext';
@@ -15,7 +28,9 @@ interface EmergencyContactsScreenProps {
   onBack?: () => void;
 }
 
-export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScreenProps) {
+export default function EmergencyContactsScreen({
+  onBack,
+}: EmergencyContactsScreenProps) {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { activeProfile } = useProfiles();
@@ -69,7 +84,8 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
         activeProfile.id,
         {
           name: newName,
-          relationship: newRelationship || t('emergencyContacts.defaultRelationship'),
+          relationship:
+            newRelationship || t('emergencyContacts.defaultRelationship'),
           phone: newPhone,
           priority_order: contacts.length + 1,
         }
@@ -95,7 +111,10 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
       setDeleteTargetId('');
     } catch (error) {
       console.warn('Failed to delete emergency contact:', error);
-      Alert.alert(t('emergencyContacts.removeErrorTitle'), t('common.tryAgain'));
+      Alert.alert(
+        t('emergencyContacts.removeErrorTitle'),
+        t('common.tryAgain')
+      );
     }
   };
 
@@ -103,8 +122,16 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
+        <TouchableOpacity
+          onPress={onBack}
+          style={styles.backButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={theme.colors.textPrimary}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('emergencyContacts.title')}</Text>
         <Text style={styles.headerSubtitle}>
@@ -139,15 +166,21 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
               <View key={contact.id} style={styles.contactCard}>
                 <View style={styles.contactHeader}>
                   <View style={styles.contactAvatar}>
-                    <Text style={styles.contactAvatarText}>{contact.name.charAt(0)}</Text>
+                    <Text style={styles.contactAvatarText}>
+                      {contact.name.charAt(0)}
+                    </Text>
                   </View>
                   <View style={styles.contactInfo}>
                     <Text style={styles.contactName}>{contact.name}</Text>
-                    <Text style={styles.contactRelationship}>{contact.relationship}</Text>
+                    <Text style={styles.contactRelationship}>
+                      {contact.relationship}
+                    </Text>
                     <Text style={styles.contactPhone}>{contact.phone}</Text>
                   </View>
                   <View style={styles.priorityBadge}>
-                    <Text style={styles.priorityText}>#{contact.priority_order}</Text>
+                    <Text style={styles.priorityText}>
+                      #{contact.priority_order}
+                    </Text>
                   </View>
                 </View>
                 <View style={styles.contactActions}>
@@ -157,15 +190,23 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
                     activeOpacity={0.7}
                   >
                     <Ionicons name="call" size={14} color="#FFFFFF" />
-                    <Text style={styles.callBtnText}>{t('emergencyContacts.call')}</Text>
+                    <Text style={styles.callBtnText}>
+                      {t('emergencyContacts.call')}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.messageBtn}
                     onPress={() => Linking.openURL(`sms:${contact.phone}`)}
                     activeOpacity={0.7}
                   >
-                    <Ionicons name="chatbubble" size={14} color={theme.colors.primary} />
-                    <Text style={styles.messageBtnText}>{t('emergencyContacts.message')}</Text>
+                    <Ionicons
+                      name="chatbubble"
+                      size={14}
+                      color={theme.colors.primary}
+                    />
+                    <Text style={styles.messageBtnText}>
+                      {t('emergencyContacts.message')}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.deleteBtn}
@@ -175,7 +216,11 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
                     }}
                     activeOpacity={0.7}
                   >
-                    <Ionicons name="trash" size={18} color={theme.colors.danger} />
+                    <Ionicons
+                      name="trash"
+                      size={18}
+                      color={theme.colors.danger}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -186,9 +231,13 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
         {/* Add Form */}
         {showAddForm && (
           <View style={styles.addForm}>
-            <Text style={styles.addFormTitle}>{t('emergencyContacts.addContact')}</Text>
+            <Text style={styles.addFormTitle}>
+              {t('emergencyContacts.addContact')}
+            </Text>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('emergencyContacts.name')}</Text>
+              <Text style={styles.inputLabel}>
+                {t('emergencyContacts.name')}
+              </Text>
               <TextInput
                 style={styles.input}
                 placeholder={t('emergencyContacts.namePlaceholder')}
@@ -198,7 +247,9 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
               />
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('emergencyContacts.phone')}</Text>
+              <Text style={styles.inputLabel}>
+                {t('emergencyContacts.phone')}
+              </Text>
               <TextInput
                 style={styles.input}
                 placeholder="+61 400 000 000"
@@ -209,7 +260,9 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
               />
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('emergencyContacts.relationship')}</Text>
+              <Text style={styles.inputLabel}>
+                {t('emergencyContacts.relationship')}
+              </Text>
               <TextInput
                 style={styles.input}
                 placeholder={t('emergencyContacts.relationshipPlaceholder')}

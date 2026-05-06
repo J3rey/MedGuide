@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+  Alert,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
@@ -111,7 +119,9 @@ const emergencyTypes: EmergencyType[] = [
   },
 ];
 
-export default function EmergencyProtocolScreen({ onBack }: EmergencyProtocolScreenProps) {
+export default function EmergencyProtocolScreen({
+  onBack,
+}: EmergencyProtocolScreenProps) {
   const insets = useSafeAreaInsets();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showCallConfirm, setShowCallConfirm] = useState(false);
@@ -125,7 +135,10 @@ export default function EmergencyProtocolScreen({ onBack }: EmergencyProtocolScr
   const confirmCall = () => {
     setShowCallConfirm(false);
     Linking.openURL('tel:000').catch(() => {
-      Alert.alert('Unable to Call', 'Please dial 000 manually from your phone app.');
+      Alert.alert(
+        'Unable to Call',
+        'Please dial 000 manually from your phone app.'
+      );
     });
   };
 
@@ -137,8 +150,16 @@ export default function EmergencyProtocolScreen({ onBack }: EmergencyProtocolScr
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
+        <TouchableOpacity
+          onPress={onBack}
+          style={styles.backButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={theme.colors.textPrimary}
+          />
         </TouchableOpacity>
         <View>
           <Text style={styles.headerTitle}>Emergency Help</Text>
@@ -161,9 +182,15 @@ export default function EmergencyProtocolScreen({ onBack }: EmergencyProtocolScr
         </View>
         <View style={styles.emergencyCallInfo}>
           <Text style={styles.emergencyCallTitle}>Call Emergency Services</Text>
-          <Text style={styles.emergencyCallSubtitle}>Call 000 for immediate help</Text>
+          <Text style={styles.emergencyCallSubtitle}>
+            Call 000 for immediate help
+          </Text>
         </View>
-        <Ionicons name="chevron-forward" size={22} color="rgba(255,255,255,0.8)" />
+        <Ionicons
+          name="chevron-forward"
+          size={22}
+          color="rgba(255,255,255,0.8)"
+        />
       </TouchableOpacity>
 
       <ScrollView
@@ -184,12 +211,23 @@ export default function EmergencyProtocolScreen({ onBack }: EmergencyProtocolScr
                 accessibilityLabel={emergency.title}
                 accessibilityHint="Tap to expand steps"
               >
-                <View style={[styles.emergencyIconContainer, { backgroundColor: emergency.iconColor + '15' }]}>
-                  <Ionicons name={emergency.icon} size={22} color={emergency.iconColor} />
+                <View
+                  style={[
+                    styles.emergencyIconContainer,
+                    { backgroundColor: emergency.iconColor + '15' },
+                  ]}
+                >
+                  <Ionicons
+                    name={emergency.icon}
+                    size={22}
+                    color={emergency.iconColor}
+                  />
                 </View>
                 <View style={styles.emergencyInfo}>
                   <Text style={styles.emergencyTitle}>{emergency.title}</Text>
-                  <Text style={styles.emergencyDescription}>{emergency.description}</Text>
+                  <Text style={styles.emergencyDescription}>
+                    {emergency.description}
+                  </Text>
                 </View>
                 <Ionicons
                   name={isExpanded ? 'chevron-up' : 'chevron-down'}
@@ -216,7 +254,9 @@ export default function EmergencyProtocolScreen({ onBack }: EmergencyProtocolScr
                     activeOpacity={0.7}
                   >
                     <Ionicons name="call" size={18} color="#FFFFFF" />
-                    <Text style={styles.callButtonText}>Call Emergency (000)</Text>
+                    <Text style={styles.callButtonText}>
+                      Call Emergency (000)
+                    </Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -227,13 +267,17 @@ export default function EmergencyProtocolScreen({ onBack }: EmergencyProtocolScr
         {/* Important Notice */}
         <View style={styles.noticeCard}>
           <View style={styles.noticeHeader}>
-            <Ionicons name="information-circle" size={20} color={theme.colors.warning} />
+            <Ionicons
+              name="information-circle"
+              size={20}
+              color={theme.colors.warning}
+            />
             <Text style={styles.noticeTitle}>Important</Text>
           </View>
           <Text style={styles.noticeText}>
-            This app does not replace professional medical advice.
-            If you are unsure, always call emergency services.
-            It is better to call and not need help than to not call and need it.
+            This app does not replace professional medical advice. If you are
+            unsure, always call emergency services. It is better to call and not
+            need help than to not call and need it.
           </Text>
         </View>
       </ScrollView>

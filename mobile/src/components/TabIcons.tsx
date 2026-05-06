@@ -50,9 +50,7 @@ export const ChatIcon = ({ active }: IconProps) => {
     <View style={styles.iconContainer}>
       <View style={[styles.chatBubble, { borderColor: color }]}>
         <View style={[styles.chatLine, { backgroundColor: color }]} />
-        <View
-          style={[styles.chatLineShort, { backgroundColor: color }]}
-        />
+        <View style={[styles.chatLineShort, { backgroundColor: color }]} />
       </View>
       <View style={[styles.chatTail, { borderTopColor: color }]} />
     </View>

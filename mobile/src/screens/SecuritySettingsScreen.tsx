@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Switch,
+  Alert,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
@@ -9,7 +17,9 @@ interface SecuritySettingsScreenProps {
   onBack?: () => void;
 }
 
-export default function SecuritySettingsScreen({ onBack }: SecuritySettingsScreenProps) {
+export default function SecuritySettingsScreen({
+  onBack,
+}: SecuritySettingsScreenProps) {
   const insets = useSafeAreaInsets();
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [biometricForApp, setBiometricForApp] = useState(false);
@@ -44,8 +54,16 @@ export default function SecuritySettingsScreen({ onBack }: SecuritySettingsScree
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
+        <TouchableOpacity
+          onPress={onBack}
+          style={styles.backButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={theme.colors.textPrimary}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Security</Text>
         <Text style={styles.headerSubtitle}>
@@ -62,7 +80,9 @@ export default function SecuritySettingsScreen({ onBack }: SecuritySettingsScree
         <SectionCard title="Biometric Authentication">
           <View style={styles.toggleRow}>
             <View style={styles.toggleInfo}>
-              <Text style={styles.toggleTitle}>Enable Face ID / Fingerprint</Text>
+              <Text style={styles.toggleTitle}>
+                Enable Face ID / Fingerprint
+              </Text>
               <Text style={styles.toggleSubtitle}>
                 Use biometrics to unlock the app
               </Text>
@@ -70,7 +90,10 @@ export default function SecuritySettingsScreen({ onBack }: SecuritySettingsScree
             <Switch
               value={biometricEnabled}
               onValueChange={handleBiometricToggle}
-              trackColor={{ false: theme.colors.switchBackground, true: theme.colors.primary }}
+              trackColor={{
+                false: theme.colors.switchBackground,
+                true: theme.colors.primary,
+              }}
               thumbColor="#FFFFFF"
             />
           </View>
@@ -78,7 +101,9 @@ export default function SecuritySettingsScreen({ onBack }: SecuritySettingsScree
           {biometricEnabled && (
             <>
               <View style={styles.divider} />
-              <Text style={styles.subSectionTitle}>Require biometrics for:</Text>
+              <Text style={styles.subSectionTitle}>
+                Require biometrics for:
+              </Text>
 
               <View style={styles.toggleRow}>
                 <View style={styles.toggleInfo}>
@@ -87,43 +112,61 @@ export default function SecuritySettingsScreen({ onBack }: SecuritySettingsScree
                 <Switch
                   value={biometricForApp}
                   onValueChange={setBiometricForApp}
-                  trackColor={{ false: theme.colors.switchBackground, true: theme.colors.primary }}
+                  trackColor={{
+                    false: theme.colors.switchBackground,
+                    true: theme.colors.primary,
+                  }}
                   thumbColor="#FFFFFF"
                 />
               </View>
 
               <View style={styles.toggleRow}>
                 <View style={styles.toggleInfo}>
-                  <Text style={styles.toggleTitle}>Viewing medication notes</Text>
+                  <Text style={styles.toggleTitle}>
+                    Viewing medication notes
+                  </Text>
                 </View>
                 <Switch
                   value={biometricForMeds}
                   onValueChange={setBiometricForMeds}
-                  trackColor={{ false: theme.colors.switchBackground, true: theme.colors.primary }}
+                  trackColor={{
+                    false: theme.colors.switchBackground,
+                    true: theme.colors.primary,
+                  }}
                   thumbColor="#FFFFFF"
                 />
               </View>
 
               <View style={styles.toggleRow}>
                 <View style={styles.toggleInfo}>
-                  <Text style={styles.toggleTitle}>Managing caregiver access</Text>
+                  <Text style={styles.toggleTitle}>
+                    Managing caregiver access
+                  </Text>
                 </View>
                 <Switch
                   value={biometricForCaregiver}
                   onValueChange={setBiometricForCaregiver}
-                  trackColor={{ false: theme.colors.switchBackground, true: theme.colors.primary }}
+                  trackColor={{
+                    false: theme.colors.switchBackground,
+                    true: theme.colors.primary,
+                  }}
                   thumbColor="#FFFFFF"
                 />
               </View>
 
               <View style={styles.toggleRow}>
                 <View style={styles.toggleInfo}>
-                  <Text style={styles.toggleTitle}>Changing emergency contacts</Text>
+                  <Text style={styles.toggleTitle}>
+                    Changing emergency contacts
+                  </Text>
                 </View>
                 <Switch
                   value={biometricForEmergency}
                   onValueChange={setBiometricForEmergency}
-                  trackColor={{ false: theme.colors.switchBackground, true: theme.colors.primary }}
+                  trackColor={{
+                    false: theme.colors.switchBackground,
+                    true: theme.colors.primary,
+                  }}
                   thumbColor="#FFFFFF"
                 />
               </View>
@@ -134,23 +177,34 @@ export default function SecuritySettingsScreen({ onBack }: SecuritySettingsScree
         {/* Security Info */}
         <SectionCard title="Security Information">
           <View style={styles.infoRow}>
-            <Ionicons name="lock-closed" size={20} color={theme.colors.primary} />
+            <Ionicons
+              name="lock-closed"
+              size={20}
+              color={theme.colors.primary}
+            />
             <Text style={styles.infoText}>
-              Biometric data is never stored by MedGuide. We only store a secure token on your device.
+              Biometric data is never stored by MedGuide. We only store a secure
+              token on your device.
             </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.infoRow}>
-            <Ionicons name="phone-portrait" size={20} color={theme.colors.primary} />
+            <Ionicons
+              name="phone-portrait"
+              size={20}
+              color={theme.colors.primary}
+            />
             <Text style={styles.infoText}>
-              If biometrics are unavailable, you can always use your device PIN or password.
+              If biometrics are unavailable, you can always use your device PIN
+              or password.
             </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.infoRow}>
             <Ionicons name="flash" size={20} color={theme.colors.warning} />
             <Text style={styles.infoText}>
-              Emergency features are always accessible, even when biometrics are enabled.
+              Emergency features are always accessible, even when biometrics are
+              enabled.
             </Text>
           </View>
         </SectionCard>

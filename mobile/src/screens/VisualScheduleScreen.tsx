@@ -1,5 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
@@ -29,9 +36,24 @@ interface TimeGroup {
 }
 
 const timeGroups: TimeGroup[] = [
-  { label: 'Morning', icon: 'sunny', iconColor: '#F59E0B', range: ['06:00', '12:00'] },
-  { label: 'Afternoon', icon: 'partly-sunny', iconColor: '#EA580C', range: ['12:00', '18:00'] },
-  { label: 'Evening', icon: 'moon', iconColor: '#6366F1', range: ['18:00', '24:00'] },
+  {
+    label: 'Morning',
+    icon: 'sunny',
+    iconColor: '#F59E0B',
+    range: ['06:00', '12:00'],
+  },
+  {
+    label: 'Afternoon',
+    icon: 'partly-sunny',
+    iconColor: '#EA580C',
+    range: ['12:00', '18:00'],
+  },
+  {
+    label: 'Evening',
+    icon: 'moon',
+    iconColor: '#6366F1',
+    range: ['18:00', '24:00'],
+  },
 ];
 
 const initialSchedule: ScheduleItemData[] = [
@@ -94,12 +116,18 @@ export default function VisualScheduleScreen() {
 
   const getStatusBorderColor = (status: MedicationStatus) => {
     switch (status) {
-      case 'taken': return theme.colors.success;
-      case 'missed': return theme.colors.danger;
-      case 'due_now': return theme.colors.warning;
-      case 'taken_late': return theme.colors.warning;
-      case 'skipped': return theme.colors.textSecondary;
-      default: return theme.colors.primary;
+      case 'taken':
+        return theme.colors.success;
+      case 'missed':
+        return theme.colors.danger;
+      case 'due_now':
+        return theme.colors.warning;
+      case 'taken_late':
+        return theme.colors.warning;
+      case 'skipped':
+        return theme.colors.textSecondary;
+      default:
+        return theme.colors.primary;
     }
   };
 
@@ -111,7 +139,13 @@ export default function VisualScheduleScreen() {
         onPress: () => {
           setSchedule((prev) =>
             prev.map((item) =>
-              item.id === id ? { ...item, status: 'taken' as MedicationStatus, color: theme.colors.success } : item
+              item.id === id
+                ? {
+                    ...item,
+                    status: 'taken' as MedicationStatus,
+                    color: theme.colors.success,
+                  }
+                : item
             )
           );
         },
@@ -127,7 +161,13 @@ export default function VisualScheduleScreen() {
         onPress: () => {
           setSchedule((prev) =>
             prev.map((item) =>
-              item.id === id ? { ...item, status: 'upcoming' as MedicationStatus, color: theme.colors.primary } : item
+              item.id === id
+                ? {
+                    ...item,
+                    status: 'upcoming' as MedicationStatus,
+                    color: theme.colors.primary,
+                  }
+                : item
             )
           );
           Alert.alert('Snoozed', `"${name}" has been snoozed for 15 minutes.`);
@@ -145,7 +185,13 @@ export default function VisualScheduleScreen() {
         onPress: () => {
           setSchedule((prev) =>
             prev.map((item) =>
-              item.id === id ? { ...item, status: 'skipped' as MedicationStatus, color: theme.colors.textSecondary } : item
+              item.id === id
+                ? {
+                    ...item,
+                    status: 'skipped' as MedicationStatus,
+                    color: theme.colors.textSecondary,
+                  }
+                : item
             )
           );
         },
@@ -154,13 +200,20 @@ export default function VisualScheduleScreen() {
   }, []);
 
   const handleDetails = useCallback((name: string, dose: string) => {
-    Alert.alert(name, `Dose: ${dose}\n\nTap "Ask MedGuide" in the Chat tab for more information about this medication.`);
+    Alert.alert(
+      name,
+      `Dose: ${dose}\n\nTap "Ask MedGuide" in the Chat tab for more information about this medication.`
+    );
   }, []);
 
   const summaryStats = {
-    taken: schedule.filter((i) => i.status === 'taken' || i.status === 'taken_late').length,
+    taken: schedule.filter(
+      (i) => i.status === 'taken' || i.status === 'taken_late'
+    ).length,
     missed: schedule.filter((i) => i.status === 'missed').length,
-    upcoming: schedule.filter((i) => i.status === 'upcoming' || i.status === 'due_now').length,
+    upcoming: schedule.filter(
+      (i) => i.status === 'upcoming' || i.status === 'due_now'
+    ).length,
     skipped: schedule.filter((i) => i.status === 'skipped').length,
   };
 
@@ -174,7 +227,10 @@ export default function VisualScheduleScreen() {
   const renderScheduleCard = (item: ScheduleItemData) => {
     const borderColor = getStatusBorderColor(item.status);
     const isDueNow = item.status === 'due_now';
-    const isActionable = item.status === 'due_now' || item.status === 'missed' || item.status === 'upcoming';
+    const isActionable =
+      item.status === 'due_now' ||
+      item.status === 'missed' ||
+      item.status === 'upcoming';
 
     return (
       <View
@@ -206,7 +262,11 @@ export default function VisualScheduleScreen() {
               activeOpacity={0.7}
               onPress={() => handleMarkTaken(item.id, item.medicationName)}
             >
-              <Ionicons name="checkmark-circle" size={14} color={theme.colors.success} />
+              <Ionicons
+                name="checkmark-circle"
+                size={14}
+                color={theme.colors.success}
+              />
               <Text style={styles.actionBtnTextGreen}>Taken</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -222,7 +282,11 @@ export default function VisualScheduleScreen() {
               activeOpacity={0.7}
               onPress={() => handleSkip(item.id, item.medicationName)}
             >
-              <Ionicons name="close-circle" size={14} color={theme.colors.textSecondary} />
+              <Ionicons
+                name="close-circle"
+                size={14}
+                color={theme.colors.textSecondary}
+              />
               <Text style={styles.actionBtnTextGray}>Skip</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -230,7 +294,11 @@ export default function VisualScheduleScreen() {
               activeOpacity={0.7}
               onPress={() => handleDetails(item.medicationName, item.dose)}
             >
-              <Ionicons name="information-circle" size={14} color={theme.colors.primary} />
+              <Ionicons
+                name="information-circle"
+                size={14}
+                color={theme.colors.primary}
+              />
               <Text style={styles.actionBtnTextBlue}>Info</Text>
             </TouchableOpacity>
           </View>
@@ -253,11 +321,19 @@ export default function VisualScheduleScreen() {
           {(['today', 'weekly', 'timeline'] as ViewMode[]).map((mode) => (
             <TouchableOpacity
               key={mode}
-              style={[styles.viewTab, viewMode === mode && styles.viewTabActive]}
+              style={[
+                styles.viewTab,
+                viewMode === mode && styles.viewTabActive,
+              ]}
               onPress={() => setViewMode(mode)}
               activeOpacity={0.7}
             >
-              <Text style={[styles.viewTabText, viewMode === mode && styles.viewTabTextActive]}>
+              <Text
+                style={[
+                  styles.viewTabText,
+                  viewMode === mode && styles.viewTabTextActive,
+                ]}
+              >
                 {mode.charAt(0).toUpperCase() + mode.slice(1)}
               </Text>
             </TouchableOpacity>
@@ -274,20 +350,38 @@ export default function VisualScheduleScreen() {
         {/* Summary Bar */}
         <View style={styles.summaryBar}>
           <View style={styles.summaryItem}>
-            <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />
-            <Text style={[styles.summaryCount, { color: theme.colors.success }]}>{summaryStats.taken}</Text>
+            <Ionicons
+              name="checkmark-circle"
+              size={18}
+              color={theme.colors.success}
+            />
+            <Text
+              style={[styles.summaryCount, { color: theme.colors.success }]}
+            >
+              {summaryStats.taken}
+            </Text>
             <Text style={styles.summaryLabel}>Taken</Text>
           </View>
           <View style={styles.summaryDivider} />
           <View style={styles.summaryItem}>
-            <Ionicons name="close-circle" size={18} color={theme.colors.danger} />
-            <Text style={[styles.summaryCount, { color: theme.colors.danger }]}>{summaryStats.missed}</Text>
+            <Ionicons
+              name="close-circle"
+              size={18}
+              color={theme.colors.danger}
+            />
+            <Text style={[styles.summaryCount, { color: theme.colors.danger }]}>
+              {summaryStats.missed}
+            </Text>
             <Text style={styles.summaryLabel}>Missed</Text>
           </View>
           <View style={styles.summaryDivider} />
           <View style={styles.summaryItem}>
             <Ionicons name="time" size={18} color={theme.colors.primary} />
-            <Text style={[styles.summaryCount, { color: theme.colors.primary }]}>{summaryStats.upcoming}</Text>
+            <Text
+              style={[styles.summaryCount, { color: theme.colors.primary }]}
+            >
+              {summaryStats.upcoming}
+            </Text>
             <Text style={styles.summaryLabel}>Upcoming</Text>
           </View>
         </View>
@@ -300,7 +394,9 @@ export default function VisualScheduleScreen() {
               <View style={styles.timeGroupHeader}>
                 <Ionicons name={group.icon} size={18} color={group.iconColor} />
                 <Text style={styles.timeGroupLabel}>{group.label}</Text>
-                <Text style={styles.timeGroupCount}>{group.items.length} medications</Text>
+                <Text style={styles.timeGroupCount}>
+                  {group.items.length} medications
+                </Text>
               </View>
               {group.items.map(renderScheduleCard)}
             </View>

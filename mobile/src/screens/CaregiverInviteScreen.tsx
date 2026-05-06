@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Share, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Share,
+  Alert,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import SectionCard from '../components/ui/SectionCard';
-import {
-  CaregiverRole,
-  defaultCaregiverPermissions,
-} from '../types/models';
+import { CaregiverRole, defaultCaregiverPermissions } from '../types/models';
 import { caregiverApi } from '../services/api';
 import { useProfiles } from '../contexts/ProfileContext';
 
@@ -17,26 +23,49 @@ interface CaregiverInviteScreenProps {
   onBack?: () => void;
 }
 
-export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenProps) {
+export default function CaregiverInviteScreen({
+  onBack,
+}: CaregiverInviteScreenProps) {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { activeProfile } = useProfiles();
-  const [inviteMethod, setInviteMethod] = useState<'email' | 'phone' | 'code'>('email');
+  const [inviteMethod, setInviteMethod] = useState<'email' | 'phone' | 'code'>(
+    'email'
+  );
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<CaregiverRole>('caregiver');
   const [inviteCode, setInviteCode] = useState('');
   const [isSending, setIsSending] = useState(false);
 
-  const roles: { value: CaregiverRole; labelKey: string; descriptionKey: string }[] = [
-    { value: 'caregiver', labelKey: 'caregiverInvite.roleCaregiver', descriptionKey: 'caregiverInvite.roleCaregiverDesc' },
-    { value: 'family_member', labelKey: 'caregiverInvite.roleFamily', descriptionKey: 'caregiverInvite.roleFamilyDesc' },
-    { value: 'emergency_contact', labelKey: 'caregiverInvite.roleEmergency', descriptionKey: 'caregiverInvite.roleEmergencyDesc' },
+  const roles: {
+    value: CaregiverRole;
+    labelKey: string;
+    descriptionKey: string;
+  }[] = [
+    {
+      value: 'caregiver',
+      labelKey: 'caregiverInvite.roleCaregiver',
+      descriptionKey: 'caregiverInvite.roleCaregiverDesc',
+    },
+    {
+      value: 'family_member',
+      labelKey: 'caregiverInvite.roleFamily',
+      descriptionKey: 'caregiverInvite.roleFamilyDesc',
+    },
+    {
+      value: 'emergency_contact',
+      labelKey: 'caregiverInvite.roleEmergency',
+      descriptionKey: 'caregiverInvite.roleEmergencyDesc',
+    },
   ];
 
   const createInvite = async () => {
     if (!activeProfile) {
-      Alert.alert(t('caregiverInvite.noActiveProfileTitle'), t('caregiverInvite.noActiveProfile'));
+      Alert.alert(
+        t('caregiverInvite.noActiveProfileTitle'),
+        t('caregiverInvite.noActiveProfile')
+      );
       return null;
     }
 
@@ -100,8 +129,16 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
+        <TouchableOpacity
+          onPress={onBack}
+          style={styles.backButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={theme.colors.textPrimary}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('caregiverInvite.title')}</Text>
         <Text style={styles.headerSubtitle}>
@@ -119,18 +156,33 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
           {roles.map((r) => (
             <TouchableOpacity
               key={r.value}
-              style={[styles.roleOption, role === r.value && styles.roleOptionActive]}
+              style={[
+                styles.roleOption,
+                role === r.value && styles.roleOptionActive,
+              ]}
               onPress={() => setRole(r.value)}
               activeOpacity={0.7}
             >
-              <View style={[styles.radioOuter, role === r.value && styles.radioOuterActive]}>
+              <View
+                style={[
+                  styles.radioOuter,
+                  role === r.value && styles.radioOuterActive,
+                ]}
+              >
                 {role === r.value && <View style={styles.radioInner} />}
               </View>
               <View style={styles.roleInfo}>
-                <Text style={[styles.roleLabel, role === r.value && styles.roleLabelActive]}>
+                <Text
+                  style={[
+                    styles.roleLabel,
+                    role === r.value && styles.roleLabelActive,
+                  ]}
+                >
                   {t(r.labelKey)}
                 </Text>
-                <Text style={styles.roleDescription}>{t(r.descriptionKey)}</Text>
+                <Text style={styles.roleDescription}>
+                  {t(r.descriptionKey)}
+                </Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -142,11 +194,19 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
             {(['email', 'phone', 'code'] as const).map((method) => (
               <TouchableOpacity
                 key={method}
-                style={[styles.methodTab, inviteMethod === method && styles.methodTabActive]}
+                style={[
+                  styles.methodTab,
+                  inviteMethod === method && styles.methodTabActive,
+                ]}
                 onPress={() => setInviteMethod(method)}
                 activeOpacity={0.7}
               >
-                <Text style={[styles.methodTabText, inviteMethod === method && styles.methodTabTextActive]}>
+                <Text
+                  style={[
+                    styles.methodTabText,
+                    inviteMethod === method && styles.methodTabTextActive,
+                  ]}
+                >
                   {t(`caregiverInvite.method.${method}`)}
                 </Text>
               </TouchableOpacity>
@@ -155,7 +215,9 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
 
           {inviteMethod === 'email' && (
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('caregiverInvite.email')}</Text>
+              <Text style={styles.inputLabel}>
+                {t('caregiverInvite.email')}
+              </Text>
               <TextInput
                 style={styles.input}
                 placeholder="caregiver@example.com"
@@ -170,7 +232,9 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
 
           {inviteMethod === 'phone' && (
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('caregiverInvite.phone')}</Text>
+              <Text style={styles.inputLabel}>
+                {t('caregiverInvite.phone')}
+              </Text>
               <TextInput
                 style={styles.input}
                 placeholder="+61 400 000 000"
@@ -184,17 +248,25 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
 
           {inviteMethod === 'code' && (
             <View style={styles.codeSection}>
-              <Text style={styles.codeLabel}>{t('caregiverInvite.shareCodeLabel')}</Text>
+              <Text style={styles.codeLabel}>
+                {t('caregiverInvite.shareCodeLabel')}
+              </Text>
               <View style={styles.codeBox}>
                 <Text style={styles.codeText}>
                   {inviteCode || t('caregiverInvite.generate')}
                 </Text>
               </View>
-              <TouchableOpacity style={styles.shareButton} onPress={handleShareCode} activeOpacity={0.7}>
+              <TouchableOpacity
+                style={styles.shareButton}
+                onPress={handleShareCode}
+                activeOpacity={0.7}
+              >
                 <Ionicons name="share-outline" size={18} color="#FFFFFF" />
-              <Text style={styles.shareButtonText}>
-                {isSending ? t('caregiverInvite.creating') : t('caregiverInvite.shareCode')}
-              </Text>
+                <Text style={styles.shareButtonText}>
+                  {isSending
+                    ? t('caregiverInvite.creating')
+                    : t('caregiverInvite.shareCode')}
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -207,24 +279,54 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
           </Text>
           <View style={styles.permList}>
             <View style={styles.permItem}>
-              <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />
-              <Text style={styles.permText}>{t('caregiverInvite.permViewStatus')}</Text>
+              <Ionicons
+                name="checkmark-circle"
+                size={18}
+                color={theme.colors.success}
+              />
+              <Text style={styles.permText}>
+                {t('caregiverInvite.permViewStatus')}
+              </Text>
             </View>
             <View style={styles.permItem}>
-              <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />
-              <Text style={styles.permText}>{t('caregiverInvite.permMissedAlerts')}</Text>
+              <Ionicons
+                name="checkmark-circle"
+                size={18}
+                color={theme.colors.success}
+              />
+              <Text style={styles.permText}>
+                {t('caregiverInvite.permMissedAlerts')}
+              </Text>
             </View>
             <View style={styles.permItem}>
-              <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />
-              <Text style={styles.permText}>{t('caregiverInvite.permVisualSchedule')}</Text>
+              <Ionicons
+                name="checkmark-circle"
+                size={18}
+                color={theme.colors.success}
+              />
+              <Text style={styles.permText}>
+                {t('caregiverInvite.permVisualSchedule')}
+              </Text>
             </View>
             <View style={styles.permItem}>
-              <Ionicons name="close-circle" size={18} color={theme.colors.textSecondary} />
-              <Text style={styles.permText}>{t('caregiverInvite.permManageMedications')}</Text>
+              <Ionicons
+                name="close-circle"
+                size={18}
+                color={theme.colors.textSecondary}
+              />
+              <Text style={styles.permText}>
+                {t('caregiverInvite.permManageMedications')}
+              </Text>
             </View>
             <View style={styles.permItem}>
-              <Ionicons name="close-circle" size={18} color={theme.colors.textSecondary} />
-              <Text style={styles.permText}>{t('caregiverInvite.permManageContacts')}</Text>
+              <Ionicons
+                name="close-circle"
+                size={18}
+                color={theme.colors.textSecondary}
+              />
+              <Text style={styles.permText}>
+                {t('caregiverInvite.permManageContacts')}
+              </Text>
             </View>
           </View>
         </SectionCard>

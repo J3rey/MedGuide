@@ -108,9 +108,7 @@ export default function CulturalNotesScreen({
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('culturalNotes.title')}</Text>
-        <Text style={styles.headerSubtitle}>
-          {t('culturalNotes.subtitle')}
-        </Text>
+        <Text style={styles.headerSubtitle}>{t('culturalNotes.subtitle')}</Text>
       </View>
 
       <ScrollView
@@ -197,7 +195,9 @@ export default function CulturalNotesScreen({
 
         {/* Disclaimer */}
         <View style={styles.disclaimer}>
-          <Text style={styles.disclaimerTitle}>{t('culturalNotes.important')}</Text>
+          <Text style={styles.disclaimerTitle}>
+            {t('culturalNotes.important')}
+          </Text>
           <Text style={styles.disclaimerText}>
             {t('culturalNotes.disclaimer')}
           </Text>

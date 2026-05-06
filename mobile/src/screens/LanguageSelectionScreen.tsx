@@ -26,7 +26,11 @@ const languages: Language[] = [
   { code: 'es', name: 'Spanish', nativeName: 'Espa\u00f1ol' },
   { code: 'it', name: 'Italian', nativeName: 'Italiano' },
   { code: 'id', name: 'Indonesian', nativeName: 'Bahasa Indonesia' },
-  { code: 'hi', name: 'Hindi', nativeName: '\u0939\u093f\u0928\u094d\u0926\u0940' },
+  {
+    code: 'hi',
+    name: 'Hindi',
+    nativeName: '\u0939\u093f\u0928\u094d\u0926\u0940',
+  },
 ];
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Language'>;

@@ -13,11 +13,21 @@ interface EmptyStateProps {
   icon?: keyof typeof Ionicons.glyphMap;
 }
 
-export function EmptyState({ title, message, actionLabel, onAction, icon }: EmptyStateProps) {
+export function EmptyState({
+  title,
+  message,
+  actionLabel,
+  onAction,
+  icon,
+}: EmptyStateProps) {
   return (
     <View style={styles.container}>
       <View style={styles.iconCircle}>
-        <Ionicons name={icon || 'documents-outline'} size={32} color={theme.colors.primary} />
+        <Ionicons
+          name={icon || 'documents-outline'}
+          size={32}
+          color={theme.colors.primary}
+        />
       </View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
@@ -42,7 +52,9 @@ export function LoadingState({ message = 'Loading...' }: LoadingStateProps) {
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" color={theme.colors.primary} />
-      <Text style={[styles.message, { marginTop: theme.spacing.base }]}>{message}</Text>
+      <Text style={[styles.message, { marginTop: theme.spacing.base }]}>
+        {message}
+      </Text>
     </View>
   );
 }
@@ -63,7 +75,12 @@ export function ErrorState({
 }: ErrorStateProps) {
   return (
     <View style={styles.container}>
-      <View style={[styles.iconCircle, { backgroundColor: theme.colors.dangerLight }]}>
+      <View
+        style={[
+          styles.iconCircle,
+          { backgroundColor: theme.colors.dangerLight },
+        ]}
+      >
         <Ionicons name="alert-circle" size={32} color={theme.colors.danger} />
       </View>
       <Text style={styles.title}>{title}</Text>
@@ -108,7 +125,8 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.textSecondary,
     textAlign: 'center',
-    lineHeight: theme.typography.fontSize.base * theme.typography.lineHeight.relaxed,
+    lineHeight:
+      theme.typography.fontSize.base * theme.typography.lineHeight.relaxed,
   },
   actionButton: {
     marginTop: theme.spacing.xl,

@@ -1,10 +1,23 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, TextInput, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+  TextInput,
+  Alert,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
-import { EmptyState, ErrorState, LoadingState } from '../components/ui/StateViews';
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from '../components/ui/StateViews';
 import SectionCard from '../components/ui/SectionCard';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import { CaregiverPatient, caregiverApi } from '../services/api';
@@ -45,14 +58,21 @@ function CaregiverStatusCard({
   phone,
   labels,
 }: CaregiverStatusCardProps) {
-  const completionPercent = medicationsTotal > 0 ? Math.round((medicationsTaken / medicationsTotal) * 100) : 0;
+  const completionPercent =
+    medicationsTotal > 0
+      ? Math.round((medicationsTaken / medicationsTotal) * 100)
+      : 0;
 
   return (
-    <View style={[styles.statusCard, hasEmergencyAlert && styles.emergencyCard]}>
+    <View
+      style={[styles.statusCard, hasEmergencyAlert && styles.emergencyCard]}
+    >
       {hasEmergencyAlert && (
         <View style={styles.emergencyBanner}>
           <Ionicons name="warning" size={16} color={theme.colors.emergency} />
-          <Text style={styles.emergencyBannerText}>{labels.emergencyActive}</Text>
+          <Text style={styles.emergencyBannerText}>
+            {labels.emergencyActive}
+          </Text>
         </View>
       )}
 
@@ -69,18 +89,22 @@ function CaregiverStatusCard({
       {/* Completion Status */}
       <View style={styles.completionRow}>
         <View style={styles.completionBar}>
-          <View style={[styles.completionFill, { width: `${completionPercent}%` }]} />
+          <View
+            style={[styles.completionFill, { width: `${completionPercent}%` }]}
+          />
         </View>
-        <Text style={styles.completionText}>
-          {labels.takenToday}
-        </Text>
+        <Text style={styles.completionText}>{labels.takenToday}</Text>
       </View>
 
       {/* Stats */}
       <View style={styles.statsRow}>
         {missedCount > 0 && (
           <View style={styles.statBadge}>
-            <Ionicons name="close-circle" size={14} color={theme.colors.danger} />
+            <Ionicons
+              name="close-circle"
+              size={14}
+              color={theme.colors.danger}
+            />
             <Text style={styles.statBadgeText}>{labels.missed}</Text>
           </View>
         )}
@@ -106,7 +130,11 @@ function CaregiverStatusCard({
           <Text style={styles.quickActionLabel}>{labels.message}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.quickActionBtn} activeOpacity={0.7}>
-          <Ionicons name="document-text" size={20} color={theme.colors.primary} />
+          <Ionicons
+            name="document-text"
+            size={20}
+            color={theme.colors.primary}
+          />
           <Text style={styles.quickActionLabel}>{labels.details}</Text>
         </TouchableOpacity>
       </View>
@@ -114,7 +142,10 @@ function CaregiverStatusCard({
   );
 }
 
-export default function CaregiverDashboardScreen({ onBack, onNavigate }: CaregiverDashboardScreenProps) {
+export default function CaregiverDashboardScreen({
+  onBack,
+  onNavigate,
+}: CaregiverDashboardScreenProps) {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const [patients, setPatients] = useState<CaregiverPatient[]>([]);
@@ -151,10 +182,16 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
       await caregiverApi.acceptInvite(inviteCode.trim().toUpperCase());
       setInviteCode('');
       await loadPatients();
-      Alert.alert(t('caregiverDashboard.inviteAcceptedTitle'), t('caregiverDashboard.inviteAcceptedMessage'));
+      Alert.alert(
+        t('caregiverDashboard.inviteAcceptedTitle'),
+        t('caregiverDashboard.inviteAcceptedMessage')
+      );
     } catch (error) {
       console.warn('Failed to accept caregiver invite:', error);
-      Alert.alert(t('caregiverDashboard.acceptErrorTitle'), t('caregiverDashboard.acceptErrorMessage'));
+      Alert.alert(
+        t('caregiverDashboard.acceptErrorTitle'),
+        t('caregiverDashboard.acceptErrorMessage')
+      );
     } finally {
       setIsAcceptingInvite(false);
     }
@@ -166,11 +203,21 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
+        <TouchableOpacity
+          onPress={onBack}
+          style={styles.backButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={theme.colors.textPrimary}
+          />
         </TouchableOpacity>
         <View>
-          <Text style={styles.headerTitle}>{t('caregiverDashboard.title')}</Text>
+          <Text style={styles.headerTitle}>
+            {t('caregiverDashboard.title')}
+          </Text>
           <Text style={styles.headerSubtitle}>
             {t('caregiverDashboard.subtitle')}
           </Text>
@@ -196,7 +243,10 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
                 medicationsTaken={patient.status?.medicationsTaken || 0}
                 medicationsTotal={patient.status?.medicationsTotal || 0}
                 missedCount={patient.status?.missedCount || 0}
-                lastCheckIn={patient.status?.lastCheckIn || t('caregiverDashboard.noLogsToday')}
+                lastCheckIn={
+                  patient.status?.lastCheckIn ||
+                  t('caregiverDashboard.noLogsToday')
+                }
                 hasEmergencyAlert={patient.status?.hasEmergencyAlert || false}
                 phone={patient.status?.phone}
                 labels={{
@@ -204,14 +254,13 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
                   takenToday: t('caregiverDashboard.takenToday', {
                     taken: patient.status?.medicationsTaken || 0,
                     total: patient.status?.medicationsTotal || 0,
-                    percent:
-                      patient.status?.medicationsTotal
-                        ? Math.round(
-                            ((patient.status?.medicationsTaken || 0) /
-                              patient.status.medicationsTotal) *
-                              100
-                          )
-                        : 0,
+                    percent: patient.status?.medicationsTotal
+                      ? Math.round(
+                          ((patient.status?.medicationsTaken || 0) /
+                            patient.status.medicationsTotal) *
+                            100
+                        )
+                      : 0,
                   }),
                   missed: t('caregiverDashboard.missed', {
                     count: patient.status?.missedCount || 0,
@@ -256,8 +305,14 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
               onPress={() => onNavigate?.('CaregiverPermissions')}
               activeOpacity={0.7}
             >
-              <Ionicons name="settings" size={18} color={theme.colors.primary} />
-              <Text style={styles.manageButtonText}>{t('caregiverDashboard.managePermissions')}</Text>
+              <Ionicons
+                name="settings"
+                size={18}
+                color={theme.colors.primary}
+              />
+              <Text style={styles.manageButtonText}>
+                {t('caregiverDashboard.managePermissions')}
+              </Text>
             </TouchableOpacity>
           </>
         ) : (

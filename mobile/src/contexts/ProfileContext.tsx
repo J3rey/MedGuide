@@ -20,9 +20,7 @@ const createFallbackProfile = (): Profile => ({
   created_at: new Date().toISOString(),
 });
 
-const demoProfiles: Profile[] = [
-  createFallbackProfile(),
-];
+const demoProfiles: Profile[] = [createFallbackProfile()];
 
 interface ProfileContextType {
   profiles: Profile[];
@@ -52,7 +50,9 @@ const ProfileContext = createContext<ProfileContextType>({
 
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const [profiles, setProfiles] = useState<Profile[]>(demoProfiles);
-  const [activeProfile, setActiveProfileState] = useState<Profile | null>(demoProfiles[0]);
+  const [activeProfile, setActiveProfileState] = useState<Profile | null>(
+    demoProfiles[0]
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,7 +77,11 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       setProfiles(nextProfiles);
       setActiveProfileState((current) => {
         if (!current) return nextProfiles[0] || null;
-        return nextProfiles.find((profile) => profile.id === current.id) || nextProfiles[0] || null;
+        return (
+          nextProfiles.find((profile) => profile.id === current.id) ||
+          nextProfiles[0] ||
+          null
+        );
       });
     } catch (loadError) {
       console.warn('Failed to load profiles from API:', loadError);
@@ -98,7 +102,9 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addProfile = useCallback(
-    async (profileData: Omit<Profile, 'id' | 'owner_user_id' | 'created_at'>) => {
+    async (
+      profileData: Omit<Profile, 'id' | 'owner_user_id' | 'created_at'>
+    ) => {
       const createdProfile = await profileApi.createProfile(profileData);
       setProfiles((prev) => [...prev, createdProfile]);
       setActiveProfileState(createdProfile);
@@ -106,15 +112,18 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const updateProfile = useCallback(async (id: string, updates: Partial<Profile>) => {
-    const updatedProfile = await profileApi.updateProfile(id, updates);
-    setProfiles((prev) =>
-      prev.map((p) => (p.id === id ? updatedProfile : p))
-    );
-    setActiveProfileState((prev) =>
-      prev && prev.id === id ? updatedProfile : prev
-    );
-  }, []);
+  const updateProfile = useCallback(
+    async (id: string, updates: Partial<Profile>) => {
+      const updatedProfile = await profileApi.updateProfile(id, updates);
+      setProfiles((prev) =>
+        prev.map((p) => (p.id === id ? updatedProfile : p))
+      );
+      setActiveProfileState((prev) =>
+        prev && prev.id === id ? updatedProfile : prev
+      );
+    },
+    []
+  );
 
   const deleteProfile = useCallback(
     async (id: string) => {
@@ -153,9 +162,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ProfileContext.Provider value={value}>
-      {children}
-    </ProfileContext.Provider>
+    <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>
   );
 }
 

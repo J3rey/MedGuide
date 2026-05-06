@@ -1,12 +1,24 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import { useProfiles } from '../contexts/ProfileContext';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import ConfirmActionModal from '../components/ui/ConfirmActionModal';
-import { Profile, Relationship, defaultAccessibilitySettings } from '../types/models';
+import {
+  Profile,
+  Relationship,
+  defaultAccessibilitySettings,
+} from '../types/models';
 
 interface ManageProfilesScreenProps {
   onBack?: () => void;
@@ -22,18 +34,38 @@ const relationships: { value: Relationship; label: string }[] = [
   { value: 'other', label: 'Other' },
 ];
 
-const avatarColors = ['#364EFF', '#16A34A', '#F59E0B', '#DC2626', '#8B5CF6', '#EC4899', '#06B6D4'];
+const avatarColors = [
+  '#364EFF',
+  '#16A34A',
+  '#F59E0B',
+  '#DC2626',
+  '#8B5CF6',
+  '#EC4899',
+  '#06B6D4',
+];
 
-export default function ManageProfilesScreen({ onBack }: ManageProfilesScreenProps) {
+export default function ManageProfilesScreen({
+  onBack,
+}: ManageProfilesScreenProps) {
   const insets = useSafeAreaInsets();
-  const { profiles, activeProfile, setActiveProfile, addProfile, deleteProfile, isLoading, error, refreshProfiles } = useProfiles();
+  const {
+    profiles,
+    activeProfile,
+    setActiveProfile,
+    addProfile,
+    deleteProfile,
+    isLoading,
+    error,
+    refreshProfiles,
+  } = useProfiles();
   const [showAddForm, setShowAddForm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState('');
 
   // Form state
   const [newName, setNewName] = useState('');
-  const [newRelationship, setNewRelationship] = useState<Relationship>('parent');
+  const [newRelationship, setNewRelationship] =
+    useState<Relationship>('parent');
   const [newColor, setNewColor] = useState(avatarColors[1]);
 
   const handleAdd = async () => {
@@ -69,8 +101,16 @@ export default function ManageProfilesScreen({ onBack }: ManageProfilesScreenPro
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
+        <TouchableOpacity
+          onPress={onBack}
+          style={styles.backButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={theme.colors.textPrimary}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Manage Profiles</Text>
         <Text style={styles.headerSubtitle}>
@@ -94,15 +134,32 @@ export default function ManageProfilesScreen({ onBack }: ManageProfilesScreenPro
 
         {/* Existing Profiles */}
         {profiles.map((profile) => (
-          <View key={profile.id} style={[styles.profileCard, activeProfile?.id === profile.id && styles.activeCard]}>
+          <View
+            key={profile.id}
+            style={[
+              styles.profileCard,
+              activeProfile?.id === profile.id && styles.activeCard,
+            ]}
+          >
             <View style={styles.profileRow}>
-              <View style={[styles.avatar, { backgroundColor: profile.avatar_color || theme.colors.primary }]}>
-                <Text style={styles.avatarText}>{profile.name.charAt(0).toUpperCase()}</Text>
+              <View
+                style={[
+                  styles.avatar,
+                  {
+                    backgroundColor:
+                      profile.avatar_color || theme.colors.primary,
+                  },
+                ]}
+              >
+                <Text style={styles.avatarText}>
+                  {profile.name.charAt(0).toUpperCase()}
+                </Text>
               </View>
               <View style={styles.profileInfo}>
                 <Text style={styles.profileName}>{profile.name}</Text>
                 <Text style={styles.profileRelationship}>
-                  {relationships.find((r) => r.value === profile.relationship)?.label || profile.relationship}
+                  {relationships.find((r) => r.value === profile.relationship)
+                    ?.label || profile.relationship}
                 </Text>
               </View>
               {activeProfile?.id === profile.id && (
@@ -156,26 +213,30 @@ export default function ManageProfilesScreen({ onBack }: ManageProfilesScreenPro
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Relationship</Text>
               <View style={styles.relationshipGrid}>
-                {relationships.filter((r) => r.value !== 'self').map((rel) => (
-                  <TouchableOpacity
-                    key={rel.value}
-                    style={[
-                      styles.relationshipChip,
-                      newRelationship === rel.value && styles.relationshipChipActive,
-                    ]}
-                    onPress={() => setNewRelationship(rel.value)}
-                    activeOpacity={0.7}
-                  >
-                    <Text
+                {relationships
+                  .filter((r) => r.value !== 'self')
+                  .map((rel) => (
+                    <TouchableOpacity
+                      key={rel.value}
                       style={[
-                        styles.relationshipChipText,
-                        newRelationship === rel.value && styles.relationshipChipTextActive,
+                        styles.relationshipChip,
+                        newRelationship === rel.value &&
+                          styles.relationshipChipActive,
                       ]}
+                      onPress={() => setNewRelationship(rel.value)}
+                      activeOpacity={0.7}
                     >
-                      {rel.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                      <Text
+                        style={[
+                          styles.relationshipChipText,
+                          newRelationship === rel.value &&
+                            styles.relationshipChipTextActive,
+                        ]}
+                      >
+                        {rel.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
               </View>
             </View>
 
@@ -193,7 +254,9 @@ export default function ManageProfilesScreen({ onBack }: ManageProfilesScreenPro
                     onPress={() => setNewColor(color)}
                     activeOpacity={0.7}
                   >
-                    {newColor === color && <Ionicons name="checkmark" size={18} color="#FFFFFF" />}
+                    {newColor === color && (
+                      <Ionicons name="checkmark" size={18} color="#FFFFFF" />
+                    )}
                   </TouchableOpacity>
                 ))}
               </View>

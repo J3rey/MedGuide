@@ -9,7 +9,12 @@ interface SectionCardProps {
   style?: ViewStyle;
 }
 
-export default function SectionCard({ title, subtitle, children, style }: SectionCardProps) {
+export default function SectionCard({
+  title,
+  subtitle,
+  children,
+  style,
+}: SectionCardProps) {
   return (
     <View style={[styles.card, style]}>
       {title && (

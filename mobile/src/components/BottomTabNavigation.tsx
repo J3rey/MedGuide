@@ -20,19 +20,49 @@ interface TabConfig {
 }
 
 const tabs: TabConfig[] = [
-  { key: 'home', labelKey: 'navigation.home', icon: 'home-outline', activeIcon: 'home' },
-  { key: 'schedule', labelKey: 'navigation.schedule', icon: 'calendar-outline', activeIcon: 'calendar' },
-  { key: 'scan', labelKey: 'navigation.scan', icon: 'scan-outline', activeIcon: 'scan' },
-  { key: 'chat', labelKey: 'navigation.chat', icon: 'chatbubble-ellipses-outline', activeIcon: 'chatbubble-ellipses' },
-  { key: 'profile', labelKey: 'navigation.profile', icon: 'person-outline', activeIcon: 'person' },
+  {
+    key: 'home',
+    labelKey: 'navigation.home',
+    icon: 'home-outline',
+    activeIcon: 'home',
+  },
+  {
+    key: 'schedule',
+    labelKey: 'navigation.schedule',
+    icon: 'calendar-outline',
+    activeIcon: 'calendar',
+  },
+  {
+    key: 'scan',
+    labelKey: 'navigation.scan',
+    icon: 'scan-outline',
+    activeIcon: 'scan',
+  },
+  {
+    key: 'chat',
+    labelKey: 'navigation.chat',
+    icon: 'chatbubble-ellipses-outline',
+    activeIcon: 'chatbubble-ellipses',
+  },
+  {
+    key: 'profile',
+    labelKey: 'navigation.profile',
+    icon: 'person-outline',
+    activeIcon: 'person',
+  },
 ];
 
-export default function BottomTabNavigation({ activeTab, onTabChange }: BottomTabNavigationProps) {
+export default function BottomTabNavigation({
+  activeTab,
+  onTabChange,
+}: BottomTabNavigationProps) {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
 
   return (
-    <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+    <View
+      style={[styles.container, { paddingBottom: Math.max(insets.bottom, 8) }]}
+    >
       <View style={styles.tabBar}>
         {tabs.map((tab) => {
           const isActive = activeTab === tab.key;
@@ -47,11 +77,20 @@ export default function BottomTabNavigation({ activeTab, onTabChange }: BottomTa
               accessibilityState={{ selected: isActive }}
               accessibilityLabel={label}
             >
-              <View style={[styles.iconContainer, isActive && styles.iconContainerActive]}>
+              <View
+                style={[
+                  styles.iconContainer,
+                  isActive && styles.iconContainerActive,
+                ]}
+              >
                 <Ionicons
                   name={isActive ? tab.activeIcon : tab.icon}
                   size={22}
-                  color={isActive ? theme.colors.navActive : theme.colors.navInactiveText}
+                  color={
+                    isActive
+                      ? theme.colors.navActive
+                      : theme.colors.navInactiveText
+                  }
                 />
               </View>
               <Text style={[styles.label, isActive && styles.labelActive]}>

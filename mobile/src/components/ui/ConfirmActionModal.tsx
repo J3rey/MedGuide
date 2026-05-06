@@ -25,8 +25,17 @@ export default function ConfirmActionModal({
   onCancel,
 }: ConfirmActionModalProps) {
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onCancel}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onCancel}
+    >
+      <TouchableOpacity
+        style={styles.overlay}
+        activeOpacity={1}
+        onPress={onCancel}
+      >
         <TouchableOpacity activeOpacity={1} style={styles.modal}>
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.message}>{message}</Text>
@@ -75,7 +84,8 @@ const styles = StyleSheet.create({
   message: {
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.textSecondary,
-    lineHeight: theme.typography.fontSize.base * theme.typography.lineHeight.relaxed,
+    lineHeight:
+      theme.typography.fontSize.base * theme.typography.lineHeight.relaxed,
     marginBottom: theme.spacing.xl,
   },
   actions: {

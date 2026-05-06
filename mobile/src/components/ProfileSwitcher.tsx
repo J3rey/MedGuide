@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import { useProfiles } from '../contexts/ProfileContext';
@@ -24,36 +31,76 @@ export default function ProfileSwitcher() {
         }}
         activeOpacity={0.7}
       >
-        <View style={[styles.avatar, { backgroundColor: item.avatar_color || theme.colors.primary }]}>
+        <View
+          style={[
+            styles.avatar,
+            { backgroundColor: item.avatar_color || theme.colors.primary },
+          ]}
+        >
           <Text style={styles.avatarText}>{getInitial(item.name)}</Text>
         </View>
         <View style={styles.profileInfo}>
-          <Text style={[styles.profileName, isActive && styles.profileNameActive]}>
+          <Text
+            style={[styles.profileName, isActive && styles.profileNameActive]}
+          >
             {item.name}
           </Text>
           {item.relationship !== 'self' && (
             <Text style={styles.profileRelationship}>
-              {item.relationship.charAt(0).toUpperCase() + item.relationship.slice(1)}
+              {item.relationship.charAt(0).toUpperCase() +
+                item.relationship.slice(1)}
             </Text>
           )}
         </View>
-        {isActive && <View style={styles.checkmark}><Ionicons name="checkmark" size={14} color="#FFFFFF" /></View>}
+        {isActive && (
+          <View style={styles.checkmark}>
+            <Ionicons name="checkmark" size={14} color="#FFFFFF" />
+          </View>
+        )}
       </TouchableOpacity>
     );
   };
 
   return (
     <>
-      <TouchableOpacity style={styles.switcher} onPress={() => setShowPicker(true)} activeOpacity={0.7}>
-        <View style={[styles.miniAvatar, { backgroundColor: activeProfile.avatar_color || theme.colors.primary }]}>
-          <Text style={styles.miniAvatarText}>{getInitial(activeProfile.name)}</Text>
+      <TouchableOpacity
+        style={styles.switcher}
+        onPress={() => setShowPicker(true)}
+        activeOpacity={0.7}
+      >
+        <View
+          style={[
+            styles.miniAvatar,
+            {
+              backgroundColor:
+                activeProfile.avatar_color || theme.colors.primary,
+            },
+          ]}
+        >
+          <Text style={styles.miniAvatarText}>
+            {getInitial(activeProfile.name)}
+          </Text>
         </View>
         <Text style={styles.switcherName}>{activeProfile.name}</Text>
-        <Ionicons name="chevron-down" size={14} color={theme.colors.textSecondary} style={{marginLeft: theme.spacing.xs}} />
+        <Ionicons
+          name="chevron-down"
+          size={14}
+          color={theme.colors.textSecondary}
+          style={{ marginLeft: theme.spacing.xs }}
+        />
       </TouchableOpacity>
 
-      <Modal visible={showPicker} transparent animationType="slide" onRequestClose={() => setShowPicker(false)}>
-        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setShowPicker(false)}>
+      <Modal
+        visible={showPicker}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowPicker(false)}
+      >
+        <TouchableOpacity
+          style={styles.overlay}
+          activeOpacity={1}
+          onPress={() => setShowPicker(false)}
+        >
           <View style={styles.bottomSheet}>
             <View style={styles.handle} />
             <Text style={styles.sheetTitle}>Switch Profile</Text>

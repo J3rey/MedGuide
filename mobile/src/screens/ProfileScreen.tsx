@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +27,14 @@ interface SettingsRowProps {
   danger?: boolean;
 }
 
-function SettingsRow({ icon, iconColor, title, subtitle, onPress, danger }: SettingsRowProps) {
+function SettingsRow({
+  icon,
+  iconColor,
+  title,
+  subtitle,
+  onPress,
+  danger,
+}: SettingsRowProps) {
   return (
     <TouchableOpacity
       style={styles.settingsRow}
@@ -30,23 +43,44 @@ function SettingsRow({ icon, iconColor, title, subtitle, onPress, danger }: Sett
       accessibilityLabel={title}
       accessibilityHint={subtitle}
     >
-      <View style={[styles.settingsIcon, danger && { backgroundColor: theme.colors.dangerLight }]}>
+      <View
+        style={[
+          styles.settingsIcon,
+          danger && { backgroundColor: theme.colors.dangerLight },
+        ]}
+      >
         <Ionicons
           name={icon}
           size={18}
-          color={danger ? theme.colors.danger : (iconColor || theme.colors.primary)}
+          color={
+            danger ? theme.colors.danger : iconColor || theme.colors.primary
+          }
         />
       </View>
       <View style={styles.settingsInfo}>
-        <Text style={[styles.settingsTitle, danger && { color: theme.colors.danger }]}>{title}</Text>
+        <Text
+          style={[
+            styles.settingsTitle,
+            danger && { color: theme.colors.danger },
+          ]}
+        >
+          {title}
+        </Text>
         {subtitle && <Text style={styles.settingsSubtitle}>{subtitle}</Text>}
       </View>
-      <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+      <Ionicons
+        name="chevron-forward"
+        size={18}
+        color={theme.colors.textSecondary}
+      />
     </TouchableOpacity>
   );
 }
 
-export default function ProfileScreen({ onNavigate, onBack }: ProfileScreenProps) {
+export default function ProfileScreen({
+  onNavigate,
+  onBack,
+}: ProfileScreenProps) {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { activeProfile } = useProfiles();
@@ -67,7 +101,15 @@ export default function ProfileScreen({ onNavigate, onBack }: ProfileScreenProps
       >
         {/* Profile Card */}
         <View style={styles.profileCard}>
-          <View style={[styles.avatar, { backgroundColor: activeProfile?.avatar_color || theme.colors.primary }]}>
+          <View
+            style={[
+              styles.avatar,
+              {
+                backgroundColor:
+                  activeProfile?.avatar_color || theme.colors.primary,
+              },
+            ]}
+          >
             <Text style={styles.avatarText}>
               {activeProfile ? getInitial(activeProfile.name) : '?'}
             </Text>
@@ -81,7 +123,9 @@ export default function ProfileScreen({ onNavigate, onBack }: ProfileScreenProps
             onPress={() => onNavigate?.('ManageProfiles')}
             activeOpacity={0.7}
           >
-            <Text style={styles.editProfileText}>{t('profile.manageProfiles')}</Text>
+            <Text style={styles.editProfileText}>
+              {t('profile.manageProfiles')}
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -194,9 +238,7 @@ export default function ProfileScreen({ onNavigate, onBack }: ProfileScreenProps
 
         {/* Disclaimer */}
         <View style={styles.disclaimer}>
-          <Text style={styles.disclaimerText}>
-            {t('profile.disclaimer')}
-          </Text>
+          <Text style={styles.disclaimerText}>{t('profile.disclaimer')}</Text>
         </View>
       </ScrollView>
     </View>

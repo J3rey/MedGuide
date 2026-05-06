@@ -1,11 +1,24 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Linking, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Linking,
+  Alert,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import LargeActionButton from '../components/ui/LargeActionButton';
-import { EmptyState, ErrorState, LoadingState } from '../components/ui/StateViews';
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from '../components/ui/StateViews';
 import { Pharmacy } from '../types/models';
 import { pharmacyApi } from '../services/api';
 import { useProfiles } from '../contexts/ProfileContext';
@@ -95,13 +108,19 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
+        <TouchableOpacity
+          onPress={onBack}
+          style={styles.backButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={theme.colors.textPrimary}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('pharmacy.title')}</Text>
-        <Text style={styles.headerSubtitle}>
-          {t('pharmacy.subtitle')}
-        </Text>
+        <Text style={styles.headerSubtitle}>{t('pharmacy.subtitle')}</Text>
       </View>
 
       <ScrollView
@@ -131,24 +150,46 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
               <View key={pharmacy.id} style={styles.pharmacyCard}>
                 <View style={styles.pharmacyHeader}>
                   <View style={styles.pharmacyIcon}>
-                    <Ionicons name="medkit" size={24} color={theme.colors.primary} />
+                    <Ionicons
+                      name="medkit"
+                      size={24}
+                      color={theme.colors.primary}
+                    />
                   </View>
                   <View style={styles.pharmacyInfo}>
                     <Text style={styles.pharmacyName}>{pharmacy.name}</Text>
                     {pharmacy.address && (
                       <View style={styles.detailRow}>
-                        <Ionicons name="location-outline" size={14} color={theme.colors.textSecondary} />
-                        <Text style={styles.pharmacyDetail}>{pharmacy.address}</Text>
+                        <Ionicons
+                          name="location-outline"
+                          size={14}
+                          color={theme.colors.textSecondary}
+                        />
+                        <Text style={styles.pharmacyDetail}>
+                          {pharmacy.address}
+                        </Text>
                       </View>
                     )}
                     <View style={styles.detailRow}>
-                      <Ionicons name="call-outline" size={14} color={theme.colors.textSecondary} />
-                      <Text style={styles.pharmacyDetail}>{pharmacy.phone}</Text>
+                      <Ionicons
+                        name="call-outline"
+                        size={14}
+                        color={theme.colors.textSecondary}
+                      />
+                      <Text style={styles.pharmacyDetail}>
+                        {pharmacy.phone}
+                      </Text>
                     </View>
                     {pharmacy.opening_hours && (
                       <View style={styles.detailRow}>
-                        <Ionicons name="time-outline" size={14} color={theme.colors.textSecondary} />
-                        <Text style={styles.pharmacyDetail}>{pharmacy.opening_hours}</Text>
+                        <Ionicons
+                          name="time-outline"
+                          size={14}
+                          color={theme.colors.textSecondary}
+                        />
+                        <Text style={styles.pharmacyDetail}>
+                          {pharmacy.opening_hours}
+                        </Text>
                       </View>
                     )}
                   </View>
@@ -169,7 +210,11 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
                     onPress={() => handleDelete(pharmacy.id)}
                     activeOpacity={0.7}
                   >
-                    <Ionicons name="trash" size={18} color={theme.colors.danger} />
+                    <Ionicons
+                      name="trash"
+                      size={18}
+                      color={theme.colors.danger}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -202,7 +247,9 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
               />
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('pharmacy.addressLabel')}</Text>
+              <Text style={styles.inputLabel}>
+                {t('pharmacy.addressLabel')}
+              </Text>
               <TextInput
                 style={styles.input}
                 placeholder="123 Main Street"

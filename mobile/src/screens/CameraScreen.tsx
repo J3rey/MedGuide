@@ -811,10 +811,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[
-            styles.previewBtnPrimary,
-            isProcessing && styles.btnDisabled,
-          ]}
+          style={[styles.previewBtnPrimary, isProcessing && styles.btnDisabled]}
           onPress={async () => {
             if (!uri || isProcessing) return;
             await runScanFromUri(uri);

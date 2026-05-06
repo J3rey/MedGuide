@@ -8,14 +8,45 @@ interface StatusChipProps {
   label?: string;
 }
 
-const statusConfig: Record<MedicationStatus, { bg: string; text: string; label: string }> = {
-  upcoming: { bg: theme.colors.primaryLight, text: theme.colors.primary, label: 'Upcoming' },
-  due_now: { bg: theme.colors.warningLight, text: theme.colors.warning, label: 'Due Now' },
-  taken: { bg: theme.colors.successLight, text: theme.colors.success, label: 'Taken' },
-  taken_late: { bg: theme.colors.warningLight, text: theme.colors.warning, label: 'Taken Late' },
-  missed: { bg: theme.colors.dangerLight, text: theme.colors.danger, label: 'Missed' },
-  skipped: { bg: '#F3F4F6', text: theme.colors.statusSkipped, label: 'Skipped' },
-  snoozed: { bg: theme.colors.primaryLight, text: theme.colors.primary, label: 'Snoozed' },
+const statusConfig: Record<
+  MedicationStatus,
+  { bg: string; text: string; label: string }
+> = {
+  upcoming: {
+    bg: theme.colors.primaryLight,
+    text: theme.colors.primary,
+    label: 'Upcoming',
+  },
+  due_now: {
+    bg: theme.colors.warningLight,
+    text: theme.colors.warning,
+    label: 'Due Now',
+  },
+  taken: {
+    bg: theme.colors.successLight,
+    text: theme.colors.success,
+    label: 'Taken',
+  },
+  taken_late: {
+    bg: theme.colors.warningLight,
+    text: theme.colors.warning,
+    label: 'Taken Late',
+  },
+  missed: {
+    bg: theme.colors.dangerLight,
+    text: theme.colors.danger,
+    label: 'Missed',
+  },
+  skipped: {
+    bg: '#F3F4F6',
+    text: theme.colors.statusSkipped,
+    label: 'Skipped',
+  },
+  snoozed: {
+    bg: theme.colors.primaryLight,
+    text: theme.colors.primary,
+    label: 'Snoozed',
+  },
 };
 
 export default function StatusChip({ status, label }: StatusChipProps) {

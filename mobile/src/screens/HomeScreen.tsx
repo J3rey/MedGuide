@@ -1,5 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -41,30 +48,36 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
     status: 'upcoming' as const,
   };
 
-  const handleTakeNow = useCallback((medId: string, medName: string) => {
-    Alert.alert(
-      t('home.confirmTitle'),
-      t('home.markTakenConfirm', { medication: medName }),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('home.yesTaken'),
-          onPress: () => {
-            setMissedMedications((prev) => prev.filter((m) => m.id !== medId));
-            setTodayProgress((prev) => ({
-              ...prev,
-              taken: prev.taken + 1,
-              missed: Math.max(0, prev.missed - 1),
-            }));
+  const handleTakeNow = useCallback(
+    (medId: string, medName: string) => {
+      Alert.alert(
+        t('home.confirmTitle'),
+        t('home.markTakenConfirm', { medication: medName }),
+        [
+          { text: t('common.cancel'), style: 'cancel' },
+          {
+            text: t('home.yesTaken'),
+            onPress: () => {
+              setMissedMedications((prev) =>
+                prev.filter((m) => m.id !== medId)
+              );
+              setTodayProgress((prev) => ({
+                ...prev,
+                taken: prev.taken + 1,
+                missed: Math.max(0, prev.missed - 1),
+              }));
+            },
           },
-        },
-      ]
-    );
-  }, [t]);
+        ]
+      );
+    },
+    [t]
+  );
 
-  const progressPercent = todayProgress.total > 0
-    ? Math.round((todayProgress.taken / todayProgress.total) * 100)
-    : 0;
+  const progressPercent =
+    todayProgress.total > 0
+      ? Math.round((todayProgress.taken / todayProgress.total) * 100)
+      : 0;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -101,13 +114,21 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             </View>
             <View style={styles.progressStats}>
               <View style={styles.statRow}>
-                <Ionicons name="checkmark-circle" size={16} color={theme.colors.success} />
+                <Ionicons
+                  name="checkmark-circle"
+                  size={16}
+                  color={theme.colors.success}
+                />
                 <Text style={styles.statText}>
                   {t('home.takenCount', { count: todayProgress.taken })}
                 </Text>
               </View>
               <View style={styles.statRow}>
-                <Ionicons name="close-circle" size={16} color={theme.colors.danger} />
+                <Ionicons
+                  name="close-circle"
+                  size={16}
+                  color={theme.colors.danger}
+                />
                 <Text style={styles.statText}>
                   {t('home.missedCount', { count: todayProgress.missed })}
                 </Text>
@@ -126,8 +147,14 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
         {missedMedications.length > 0 && (
           <View style={styles.warningCard}>
             <View style={styles.warningHeader}>
-              <Ionicons name="alert-circle" size={20} color={theme.colors.danger} />
-              <Text style={styles.warningTitle}>{t('home.missedMedication')}</Text>
+              <Ionicons
+                name="alert-circle"
+                size={20}
+                color={theme.colors.danger}
+              />
+              <Text style={styles.warningTitle}>
+                {t('home.missedMedication')}
+              </Text>
             </View>
             {missedMedications.map((med) => (
               <View key={med.id} style={styles.missedItem}>
@@ -168,10 +195,17 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             onPress={() => onNavigate?.('Scan')}
             activeOpacity={0.7}
           >
-            <View style={[styles.quickActionIcon, { backgroundColor: theme.colors.primaryLight }]}>
+            <View
+              style={[
+                styles.quickActionIcon,
+                { backgroundColor: theme.colors.primaryLight },
+              ]}
+            >
               <Ionicons name="scan" size={24} color={theme.colors.primary} />
             </View>
-            <Text style={styles.quickActionLabel}>{t('home.scanPrescription')}</Text>
+            <Text style={styles.quickActionLabel}>
+              {t('home.scanPrescription')}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -179,10 +213,21 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             onPress={() => onNavigate?.('Schedule')}
             activeOpacity={0.7}
           >
-            <View style={[styles.quickActionIcon, { backgroundColor: theme.colors.successLight }]}>
-              <Ionicons name="calendar" size={24} color={theme.colors.success} />
+            <View
+              style={[
+                styles.quickActionIcon,
+                { backgroundColor: theme.colors.successLight },
+              ]}
+            >
+              <Ionicons
+                name="calendar"
+                size={24}
+                color={theme.colors.success}
+              />
             </View>
-            <Text style={styles.quickActionLabel}>{t('home.viewSchedule')}</Text>
+            <Text style={styles.quickActionLabel}>
+              {t('home.viewSchedule')}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -190,8 +235,17 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             onPress={() => onNavigate?.('Chat')}
             activeOpacity={0.7}
           >
-            <View style={[styles.quickActionIcon, { backgroundColor: theme.colors.warningLight }]}>
-              <Ionicons name="chatbubble-ellipses" size={24} color={theme.colors.warning} />
+            <View
+              style={[
+                styles.quickActionIcon,
+                { backgroundColor: theme.colors.warningLight },
+              ]}
+            >
+              <Ionicons
+                name="chatbubble-ellipses"
+                size={24}
+                color={theme.colors.warning}
+              />
             </View>
             <Text style={styles.quickActionLabel}>{t('home.askMedGuide')}</Text>
           </TouchableOpacity>
@@ -201,7 +255,9 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             onPress={() => onNavigate?.('PharmacyList')}
             activeOpacity={0.7}
           >
-            <View style={[styles.quickActionIcon, { backgroundColor: '#F0FDF4' }]}>
+            <View
+              style={[styles.quickActionIcon, { backgroundColor: '#F0FDF4' }]}
+            >
               <Ionicons name="medkit" size={24} color="#16A34A" />
             </View>
             <Text style={styles.quickActionLabel}>{t('home.myPharmacy')}</Text>
@@ -222,7 +278,11 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
               onPress={() => onNavigate?.('CaregiverInvite')}
               activeOpacity={0.7}
             >
-              <Ionicons name="person-add" size={16} color={theme.colors.primary} />
+              <Ionicons
+                name="person-add"
+                size={16}
+                color={theme.colors.primary}
+              />
               <Text style={styles.addButtonText}> {t('common.add')}</Text>
             </TouchableOpacity>
           </View>

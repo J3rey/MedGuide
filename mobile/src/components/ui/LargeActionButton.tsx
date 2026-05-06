@@ -1,8 +1,20 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, ActivityIndicator } from 'react-native';
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  ViewStyle,
+  ActivityIndicator,
+} from 'react-native';
 import theme from '../../styles/theme';
 
-type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'emergency' | 'outline';
+type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'danger'
+  | 'emergency'
+  | 'outline';
 
 interface LargeActionButtonProps {
   title: string;
@@ -15,13 +27,20 @@ interface LargeActionButtonProps {
   fullWidth?: boolean;
 }
 
-const variantStyles: Record<ButtonVariant, { bg: string; text: string; border?: string }> = {
+const variantStyles: Record<
+  ButtonVariant,
+  { bg: string; text: string; border?: string }
+> = {
   primary: { bg: theme.colors.primary, text: '#FFFFFF' },
   secondary: { bg: theme.colors.surfaceMuted, text: theme.colors.primary },
   success: { bg: theme.colors.success, text: '#FFFFFF' },
   danger: { bg: theme.colors.danger, text: '#FFFFFF' },
   emergency: { bg: theme.colors.emergency, text: '#FFFFFF' },
-  outline: { bg: 'transparent', text: theme.colors.primary, border: theme.colors.border },
+  outline: {
+    bg: 'transparent',
+    text: theme.colors.primary,
+    border: theme.colors.border,
+  },
 };
 
 export default function LargeActionButton({

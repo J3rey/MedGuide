@@ -1,6 +1,20 @@
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
-import { AccessibilitySettings, defaultAccessibilitySettings } from '../types/models';
-import { textSizeMultipliers, buttonSizeMultipliers, TextSizeScale, ButtonSizeScale } from '../styles/theme';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useMemo,
+} from 'react';
+import {
+  AccessibilitySettings,
+  defaultAccessibilitySettings,
+} from '../types/models';
+import {
+  textSizeMultipliers,
+  buttonSizeMultipliers,
+  TextSizeScale,
+  ButtonSizeScale,
+} from '../styles/theme';
 
 interface AccessibilityContextType {
   settings: AccessibilitySettings;
@@ -20,16 +34,26 @@ const AccessibilityContext = createContext<AccessibilityContextType>({
   isSimplified: false,
 });
 
-export function AccessibilityProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<AccessibilitySettings>(defaultAccessibilitySettings);
+export function AccessibilityProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [settings, setSettings] = useState<AccessibilitySettings>(
+    defaultAccessibilitySettings
+  );
 
-  const updateSettings = useCallback((newSettings: Partial<AccessibilitySettings>) => {
-    setSettings((prev) => ({ ...prev, ...newSettings }));
-  }, []);
+  const updateSettings = useCallback(
+    (newSettings: Partial<AccessibilitySettings>) => {
+      setSettings((prev) => ({ ...prev, ...newSettings }));
+    },
+    []
+  );
 
   const getScaledFontSize = useCallback(
     (baseSize: number) => {
-      const multiplier = textSizeMultipliers[settings.text_size as TextSizeScale] || 1;
+      const multiplier =
+        textSizeMultipliers[settings.text_size as TextSizeScale] || 1;
       return Math.round(baseSize * multiplier);
     },
     [settings.text_size]
@@ -37,7 +61,8 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
 
   const getScaledButtonHeight = useCallback(
     (baseHeight: number) => {
-      const multiplier = buttonSizeMultipliers[settings.button_size as ButtonSizeScale] || 1;
+      const multiplier =
+        buttonSizeMultipliers[settings.button_size as ButtonSizeScale] || 1;
       return Math.round(baseHeight * multiplier);
     },
     [settings.button_size]

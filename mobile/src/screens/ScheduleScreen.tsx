@@ -141,7 +141,6 @@ export default function ScheduleScreen(): React.JSX.Element {
     return alarm.days.includes(dayKey);
   };
 
-
   const initializeNotifications = async (): Promise<void> => {
     try {
       await registerForPushNotificationsAsync();
@@ -396,7 +395,8 @@ export default function ScheduleScreen(): React.JSX.Element {
             styles.header,
             {
               paddingHorizontal: containerPadding,
-              paddingTop: Math.max(insets.top, theme.spacing.base) + theme.spacing.md,
+              paddingTop:
+                Math.max(insets.top, theme.spacing.base) + theme.spacing.md,
             },
           ]}
         >
@@ -567,142 +567,149 @@ export default function ScheduleScreen(): React.JSX.Element {
               onPress={() => {}}
               style={styles.sheetContainer}
             >
-            {/* Handle bar */}
-            <View style={styles.sheetHandle} />
+              {/* Handle bar */}
+              <View style={styles.sheetHandle} />
 
-            <Text style={styles.sheetTitle}>
-              {editingAlarm ? t('schedule.editAlarm') : t('schedule.addAlarm')}
-            </Text>
+              <Text style={styles.sheetTitle}>
+                {editingAlarm
+                  ? t('schedule.editAlarm')
+                  : t('schedule.addAlarm')}
+              </Text>
 
-            {/* Medication input */}
-            <View style={styles.fieldGroup}>
-              <Text style={styles.fieldLabel}>{t('schedule.medication')}</Text>
-              <TextInput
-                style={styles.fieldInput}
-                value={newAlarmMed}
-                onChangeText={setNewAlarmMed}
-                placeholder={t('schedule.medicationPlaceholder')}
-                placeholderTextColor={theme.colors.mutedForeground}
-                autoFocus={!editingAlarm}
-              />
-            </View>
+              {/* Medication input */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>
+                  {t('schedule.medication')}
+                </Text>
+                <TextInput
+                  style={styles.fieldInput}
+                  value={newAlarmMed}
+                  onChangeText={setNewAlarmMed}
+                  placeholder={t('schedule.medicationPlaceholder')}
+                  placeholderTextColor={theme.colors.mutedForeground}
+                  autoFocus={!editingAlarm}
+                />
+              </View>
 
-            {/* Time picker */}
-            <View style={styles.fieldGroup}>
-              <Text style={styles.fieldLabel}>{t('schedule.time')}</Text>
-              {Platform.OS === 'web' ? (
-                <View style={styles.webTimeRow}>
+              {/* Time picker */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>{t('schedule.time')}</Text>
+                {Platform.OS === 'web' ? (
+                  <View style={styles.webTimeRow}>
+                    <TouchableOpacity
+                      style={styles.webTimeBtn}
+                      onPress={() => {
+                        const newDate = new Date(newAlarmTime);
+                        newDate.setHours((newDate.getHours() + 1) % 24);
+                        setNewAlarmTime(newDate);
+                      }}
+                    >
+                      <Text style={styles.webTimeBtnText}>+</Text>
+                    </TouchableOpacity>
+                    <View style={styles.webTimeDisplay}>
+                      <Text style={styles.webTimeText}>
+                        {formatTime(newAlarmTime)}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.webTimeBtn}
+                      onPress={() => {
+                        const newDate = new Date(newAlarmTime);
+                        newDate.setMinutes((newDate.getMinutes() + 5) % 60);
+                        setNewAlarmTime(newDate);
+                      }}
+                    >
+                      <Text style={styles.webTimeBtnText}>+5m</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.webTimeBtn}
+                      onPress={() => {
+                        const newDate = new Date(newAlarmTime);
+                        newDate.setMinutes(
+                          (newDate.getMinutes() - 5 + 60) % 60
+                        );
+                        setNewAlarmTime(newDate);
+                      }}
+                    >
+                      <Text style={styles.webTimeBtnText}>-5m</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
                   <TouchableOpacity
-                    style={styles.webTimeBtn}
-                    onPress={() => {
-                      const newDate = new Date(newAlarmTime);
-                      newDate.setHours((newDate.getHours() + 1) % 24);
-                      setNewAlarmTime(newDate);
-                    }}
+                    style={styles.timePickerBtn}
+                    onPress={() => setShowTimePicker(true)}
                   >
-                    <Text style={styles.webTimeBtnText}>+</Text>
-                  </TouchableOpacity>
-                  <View style={styles.webTimeDisplay}>
-                    <Text style={styles.webTimeText}>
+                    <Text style={styles.timePickerBtnText}>
                       {formatTime(newAlarmTime)}
                     </Text>
-                  </View>
-                  <TouchableOpacity
-                    style={styles.webTimeBtn}
-                    onPress={() => {
-                      const newDate = new Date(newAlarmTime);
-                      newDate.setMinutes((newDate.getMinutes() + 5) % 60);
-                      setNewAlarmTime(newDate);
-                    }}
-                  >
-                    <Text style={styles.webTimeBtnText}>+5m</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.webTimeBtn}
-                    onPress={() => {
-                      const newDate = new Date(newAlarmTime);
-                      newDate.setMinutes((newDate.getMinutes() - 5 + 60) % 60);
-                      setNewAlarmTime(newDate);
-                    }}
-                  >
-                    <Text style={styles.webTimeBtnText}>-5m</Text>
-                  </TouchableOpacity>
+                )}
+              </View>
+
+              {/* Day selector */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>{t('schedule.repeat')}</Text>
+                <View style={styles.dayChipsRow}>
+                  {dayOptions.map(({ key, label }) => (
+                    <TouchableOpacity
+                      key={key}
+                      style={[
+                        styles.dayChip,
+                        selectedDays.includes(key) && styles.dayChipSelected,
+                      ]}
+                      onPress={() => toggleDay(key)}
+                    >
+                      <Text
+                        style={[
+                          styles.dayChipLabel,
+                          selectedDays.includes(key) &&
+                            styles.dayChipLabelSelected,
+                        ]}
+                      >
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
                 </View>
-              ) : (
+              </View>
+
+              {/* Actions */}
+              <View style={styles.sheetActions}>
+                <TouchableOpacity onPress={resetForm} style={styles.cancelBtn}>
+                  <Text style={styles.cancelBtnText}>{t('common.cancel')}</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
-                  style={styles.timePickerBtn}
-                  onPress={() => setShowTimePicker(true)}
+                  onPress={editingAlarm ? updateAlarm : addAlarm}
+                  style={styles.saveBtn}
                 >
-                  <Text style={styles.timePickerBtnText}>
-                    {formatTime(newAlarmTime)}
+                  <Text style={styles.saveBtnText}>
+                    {editingAlarm
+                      ? t('schedule.updateAlarm')
+                      : t('schedule.addAlarmBtn')}
                   </Text>
                 </TouchableOpacity>
-              )}
-            </View>
-
-            {/* Day selector */}
-            <View style={styles.fieldGroup}>
-              <Text style={styles.fieldLabel}>{t('schedule.repeat')}</Text>
-              <View style={styles.dayChipsRow}>
-                {dayOptions.map(({ key, label }) => (
-                  <TouchableOpacity
-                    key={key}
-                    style={[
-                      styles.dayChip,
-                      selectedDays.includes(key) && styles.dayChipSelected,
-                    ]}
-                    onPress={() => toggleDay(key)}
-                  >
-                    <Text
-                      style={[
-                        styles.dayChipLabel,
-                        selectedDays.includes(key) &&
-                          styles.dayChipLabelSelected,
-                      ]}
-                    >
-                      {label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
               </View>
-            </View>
 
-            {/* Actions */}
-            <View style={styles.sheetActions}>
-              <TouchableOpacity onPress={resetForm} style={styles.cancelBtn}>
-                <Text style={styles.cancelBtnText}>{t('common.cancel')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={editingAlarm ? updateAlarm : addAlarm}
-                style={styles.saveBtn}
-              >
-                <Text style={styles.saveBtnText}>
-                  {editingAlarm
-                    ? t('schedule.updateAlarm')
-                    : t('schedule.addAlarmBtn')}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Delete button for editing */}
-            {editingAlarm && (
-              <TouchableOpacity
-                onPress={() => {
-                  resetForm();
-                  confirmDelete(editingAlarm);
-                }}
-                style={styles.deleteBtn}
-              >
-                <Text style={styles.deleteBtnText}>{t('common.delete')}</Text>
-              </TouchableOpacity>
-            )}
+              {/* Delete button for editing */}
+              {editingAlarm && (
+                <TouchableOpacity
+                  onPress={() => {
+                    resetForm();
+                    confirmDelete(editingAlarm);
+                  }}
+                  style={styles.deleteBtn}
+                >
+                  <Text style={styles.deleteBtnText}>{t('common.delete')}</Text>
+                </TouchableOpacity>
+              )}
             </TouchableOpacity>
           </TouchableOpacity>
         </KeyboardAvoidingView>
       </Modal>
 
       {/* Time Picker Modal */}
-      {showTimePicker && Platform.OS !== 'web' &&
+      {showTimePicker &&
+        Platform.OS !== 'web' &&
         (Platform.OS === 'ios' ? (
           <Modal
             visible={showTimePicker}
@@ -717,16 +724,12 @@ export default function ScheduleScreen(): React.JSX.Element {
             >
               <View style={styles.timePickerSheet}>
                 <View style={styles.timePickerSheetHeader}>
-                  <TouchableOpacity
-                    onPress={() => setShowTimePicker(false)}
-                  >
+                  <TouchableOpacity onPress={() => setShowTimePicker(false)}>
                     <Text style={styles.timePickerCancel}>
                       {t('common.cancel')}
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => setShowTimePicker(false)}
-                  >
+                  <TouchableOpacity onPress={() => setShowTimePicker(false)}>
                     <Text style={styles.timePickerDone}>
                       {t('common.done')}
                     </Text>
