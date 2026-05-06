@@ -1,19 +1,38 @@
 /**
- * MedGuide Design System - Warm Gradient Medical Theme
- * Inspired by modern health app design with soft gradients,
- * frosted glass cards, and warm blue-orange palette.
+ * MedGuide Design System - Clean Medical Theme
+ * Primary: #364EFF - Trustworthy, calm, accessible
+ * Designed for elderly users, caregivers, and mobile-first UX
  */
 
-type ColorPalette = {
+export type ColorPalette = {
+  // Core
+  primary: string;
+  primaryLight: string;
+  primaryDark: string;
   background: string;
+  surface: string;
+  surfaceMuted: string;
+  textPrimary: string;
+  textSecondary: string;
+  border: string;
+
+  // Semantic
+  success: string;
+  successLight: string;
+  warning: string;
+  warningLight: string;
+  danger: string;
+  dangerLight: string;
+  emergency: string;
+  emergencyLight: string;
+
+  // Legacy compatibility
   foreground: string;
   card: string;
   cardForeground: string;
   popover: string;
   popoverForeground: string;
-  primary: string;
   primaryForeground: string;
-  primaryLight: string;
   secondary: string;
   secondaryForeground: string;
   secondaryLight: string;
@@ -23,162 +42,246 @@ type ColorPalette = {
   accentForeground: string;
   destructive: string;
   destructiveForeground: string;
-  border: string;
   input: string;
   inputBackground: string;
   switchBackground: string;
   ring: string;
+
+  // Navigation
+  navBar: string;
+  navBarBorder: string;
+  navActive: string;
+  navActiveBackground: string;
+  navInactiveText: string;
+
+  // Chat
+  botBubble: string;
+  botBubbleBorder: string;
+
+  // Alarm
+  alarmBackground: string;
+  alarmForeground: string;
+
+  // Camera
+  cameraSurface: string;
+  cameraOverlay: string;
+  cameraText: string;
+
+  // Schedule status
+  statusUpcoming: string;
+  statusTaken: string;
+  statusDueSoon: string;
+  statusMissed: string;
+  statusSkipped: string;
+
+  // Gradient / Legacy
+  gradientStart: string;
+  gradientEnd: string;
+  navPill: string;
+  navPillText: string;
+
+  // Charts
   chart1: string;
   chart2: string;
   chart3: string;
   chart4: string;
   chart5: string;
-  sidebar: string;
-  sidebarForeground: string;
-  sidebarPrimary: string;
-  sidebarPrimaryForeground: string;
-  sidebarAccent: string;
-  sidebarAccentForeground: string;
-  sidebarBorder: string;
-  sidebarRing: string;
-  botBubble: string;
-  botBubbleBorder: string;
-  alarmBackground: string;
-  alarmForeground: string;
-  cameraSurface: string;
-  cameraOverlay: string;
-  cameraText: string;
-  // Warm theme additions
-  gradientStart: string;
-  gradientMid: string;
-  gradientEnd: string;
-  navBar: string;
-  navBarBorder: string;
-  navPill: string;
-  navPillText: string;
-  navInactiveText: string;
-  headerGradientStart: string;
-  headerGradientEnd: string;
-  success: string;
-  successLight: string;
 };
 
 export const colors: ColorPalette = {
-  background: '#F0F4FA',
-  foreground: '#1A2B4A',
+  // Core palette
+  primary: '#364EFF',
+  primaryLight: '#EEF1FF',
+  primaryDark: '#1E2FBF',
+  background: '#F8F9FF',
+  surface: '#FFFFFF',
+  surfaceMuted: '#F1F3FF',
+  textPrimary: '#111827',
+  textSecondary: '#4B5563',
+  border: '#DDE3FF',
+
+  // Semantic
+  success: '#16A34A',
+  successLight: '#DCFCE7',
+  warning: '#F59E0B',
+  warningLight: '#FEF3C7',
+  danger: '#DC2626',
+  dangerLight: '#FEE2E2',
+  emergency: '#B91C1C',
+  emergencyLight: '#FEE2E2',
+
+  // Legacy compatibility
+  foreground: '#111827',
   card: '#FFFFFF',
-  cardForeground: '#1A2B4A',
+  cardForeground: '#111827',
   popover: '#FFFFFF',
-  popoverForeground: '#1A2B4A',
-  primary: '#4A8FE7',
+  popoverForeground: '#111827',
   primaryForeground: '#FFFFFF',
-  primaryLight: '#E8F2FD',
-  secondary: '#F5A623',
+  secondary: '#6B7280',
   secondaryForeground: '#FFFFFF',
-  secondaryLight: '#FEF3E0',
-  muted: '#E8EDF5',
-  mutedForeground: '#8494AD',
-  accent: '#FF8C42',
+  secondaryLight: '#F3F4F6',
+  muted: '#F1F3FF',
+  mutedForeground: '#6B7280',
+  accent: '#364EFF',
   accentForeground: '#FFFFFF',
-  destructive: '#E74C3C',
+  destructive: '#DC2626',
   destructiveForeground: '#FFFFFF',
-  border: '#E0E6F0',
   input: 'transparent',
-  inputBackground: '#F5F8FC',
-  switchBackground: '#CBD5E1',
-  ring: '#4A8FE7',
-  chart1: '#4A8FE7',
-  chart2: '#F5A623',
-  chart3: '#2ECC71',
-  chart4: '#9B59B6',
-  chart5: '#E74C3C',
-  sidebar: '#FFFFFF',
-  sidebarForeground: '#1A2B4A',
-  sidebarPrimary: '#4A8FE7',
-  sidebarPrimaryForeground: '#FFFFFF',
-  sidebarAccent: '#F5F8FC',
-  sidebarAccentForeground: '#1A2B4A',
-  sidebarBorder: '#E0E6F0',
-  sidebarRing: '#4A8FE7',
-  botBubble: '#F5F7FB',
-  botBubbleBorder: '#E8EDF5',
-  alarmBackground: '#E74C3C',
+  inputBackground: '#F8F9FF',
+  switchBackground: '#D1D5DB',
+  ring: '#364EFF',
+
+  // Navigation
+  navBar: '#FFFFFF',
+  navBarBorder: '#DDE3FF',
+  navActive: '#364EFF',
+  navActiveBackground: '#EEF1FF',
+  navInactiveText: '#6B7280',
+
+  // Chat
+  botBubble: '#F1F3FF',
+  botBubbleBorder: '#DDE3FF',
+
+  // Alarm
+  alarmBackground: '#DC2626',
   alarmForeground: '#FFFFFF',
+
+  // Camera
   cameraSurface: '#000000',
   cameraOverlay: 'rgba(0, 0, 0, 0.7)',
   cameraText: '#FFFFFF',
-  // Warm theme
-  gradientStart: '#E8F0FE',
-  gradientMid: '#F0F4FA',
-  gradientEnd: '#FDE8D8',
-  navBar: '#FFFFFF',
-  navBarBorder: '#E8EDF5',
-  navPill: '#4A8FE7',
+
+  // Schedule status
+  statusUpcoming: '#364EFF',
+  statusTaken: '#16A34A',
+  statusDueSoon: '#F59E0B',
+  statusMissed: '#DC2626',
+  statusSkipped: '#9CA3AF',
+
+  // Gradient / Legacy
+  gradientStart: '#364EFF',
+  gradientEnd: '#5B73FF',
+  navPill: '#364EFF',
   navPillText: '#FFFFFF',
-  navInactiveText: '#8494AD',
-  headerGradientStart: '#E8F0FE',
-  headerGradientEnd: '#FDE8D8',
-  success: '#2ECC71',
-  successLight: '#E8F8F0',
+
+  // Charts
+  chart1: '#364EFF',
+  chart2: '#16A34A',
+  chart3: '#F59E0B',
+  chart4: '#8B5CF6',
+  chart5: '#EC4899',
 };
 
 export const darkColors: ColorPalette = {
-  background: '#0D1B2A',
-  foreground: '#E8EDF5',
-  card: '#1B2838',
-  cardForeground: '#E8EDF5',
-  popover: '#1B2838',
-  popoverForeground: '#E8EDF5',
-  primary: '#5B9FEF',
+  // Core palette
+  primary: '#5B73FF',
+  primaryLight: '#1E2340',
+  primaryDark: '#8FA3FF',
+  background: '#0F1117',
+  surface: '#1A1D2E',
+  surfaceMuted: '#252840',
+  textPrimary: '#F9FAFB',
+  textSecondary: '#9CA3AF',
+  border: '#2D3154',
+
+  // Semantic
+  success: '#22C55E',
+  successLight: '#14532D',
+  warning: '#FBBF24',
+  warningLight: '#422006',
+  danger: '#EF4444',
+  dangerLight: '#450A0A',
+  emergency: '#DC2626',
+  emergencyLight: '#450A0A',
+
+  // Legacy compatibility
+  foreground: '#F9FAFB',
+  card: '#1A1D2E',
+  cardForeground: '#F9FAFB',
+  popover: '#1A1D2E',
+  popoverForeground: '#F9FAFB',
   primaryForeground: '#FFFFFF',
-  primaryLight: '#1B2838',
-  secondary: '#F5A623',
-  secondaryForeground: '#1A2B4A',
-  secondaryLight: '#2A2010',
-  muted: '#1F3044',
-  mutedForeground: '#8494AD',
-  accent: '#FF8C42',
+  secondary: '#9CA3AF',
+  secondaryForeground: '#1A1D2E',
+  secondaryLight: '#252840',
+  muted: '#252840',
+  mutedForeground: '#9CA3AF',
+  accent: '#5B73FF',
   accentForeground: '#FFFFFF',
-  destructive: '#E74C3C',
+  destructive: '#EF4444',
   destructiveForeground: '#FEE2E2',
-  border: '#2A3A50',
-  input: '#1F3044',
-  inputBackground: '#1F3044',
-  switchBackground: '#3A4A5C',
-  ring: '#5B9FEF',
-  chart1: '#5B9FEF',
-  chart2: '#F5A623',
-  chart3: '#2ECC71',
-  chart4: '#9B59B6',
-  chart5: '#E74C3C',
-  sidebar: '#1B2838',
-  sidebarForeground: '#E8EDF5',
-  sidebarPrimary: '#5B9FEF',
-  sidebarPrimaryForeground: '#FFFFFF',
-  sidebarAccent: '#1F3044',
-  sidebarAccentForeground: '#E8EDF5',
-  sidebarBorder: '#2A3A50',
-  sidebarRing: '#5B9FEF',
-  botBubble: '#1F3044',
-  botBubbleBorder: '#2A3A50',
-  alarmBackground: '#E74C3C',
+  input: '#252840',
+  inputBackground: '#252840',
+  switchBackground: '#4B5563',
+  ring: '#5B73FF',
+
+  // Navigation
+  navBar: '#1A1D2E',
+  navBarBorder: '#2D3154',
+  navActive: '#5B73FF',
+  navActiveBackground: '#1E2340',
+  navInactiveText: '#6B7280',
+
+  // Chat
+  botBubble: '#252840',
+  botBubbleBorder: '#2D3154',
+
+  // Alarm
+  alarmBackground: '#DC2626',
   alarmForeground: '#FFFFFF',
+
+  // Camera
   cameraSurface: '#000000',
   cameraOverlay: 'rgba(0, 0, 0, 0.7)',
   cameraText: '#FFFFFF',
-  // Warm theme dark
-  gradientStart: '#0D1B2A',
-  gradientMid: '#0D1B2A',
-  gradientEnd: '#1A1510',
-  navBar: '#1B2838',
-  navBarBorder: '#2A3A50',
-  navPill: '#5B9FEF',
+
+  // Schedule status
+  statusUpcoming: '#5B73FF',
+  statusTaken: '#22C55E',
+  statusDueSoon: '#FBBF24',
+  statusMissed: '#EF4444',
+  statusSkipped: '#6B7280',
+
+  // Gradient / Legacy
+  gradientStart: '#1E2340',
+  gradientEnd: '#2D3154',
+  navPill: '#5B73FF',
   navPillText: '#FFFFFF',
-  navInactiveText: '#6B7B8D',
-  headerGradientStart: '#1B2838',
-  headerGradientEnd: '#1A1510',
-  success: '#2ECC71',
-  successLight: '#1A2A20',
+
+  // Charts
+  chart1: '#5B73FF',
+  chart2: '#22C55E',
+  chart3: '#FBBF24',
+  chart4: '#A78BFA',
+  chart5: '#F472B6',
+};
+
+// High contrast palette for accessibility
+export const highContrastColors: Partial<ColorPalette> = {
+  primary: '#1E2FBF',
+  background: '#FFFFFF',
+  surface: '#FFFFFF',
+  textPrimary: '#000000',
+  textSecondary: '#1F2937',
+  border: '#000000',
+  foreground: '#000000',
+  cardForeground: '#000000',
+};
+
+export type TextSizeScale = 'small' | 'default' | 'large' | 'extraLarge';
+export type ButtonSizeScale = 'default' | 'large' | 'extraLarge';
+
+export const textSizeMultipliers: Record<TextSizeScale, number> = {
+  small: 0.85,
+  default: 1,
+  large: 1.25,
+  extraLarge: 1.5,
+};
+
+export const buttonSizeMultipliers: Record<ButtonSizeScale, number> = {
+  default: 1,
+  large: 1.2,
+  extraLarge: 1.4,
 };
 
 type Typography = {
@@ -207,10 +310,10 @@ type Typography = {
 
 export const typography: Typography = {
   fontSize: {
-    xs: 11,
-    sm: 13,
-    base: 15,
-    lg: 17,
+    xs: 12,
+    sm: 14,
+    base: 16,
+    lg: 18,
     xl: 20,
     '2xl': 24,
     '3xl': 30,
@@ -225,7 +328,7 @@ export const typography: Typography = {
   lineHeight: {
     tight: 1.2,
     normal: 1.5,
-    relaxed: 1.7,
+    relaxed: 1.75,
   },
 };
 
@@ -285,9 +388,12 @@ type Shadow = {
 
 type Shadows = {
   none: Shadow;
-  surface: Shadow;
+  sm: Shadow;
   card: Shadow;
+  md: Shadow;
+  lg: Shadow;
   interactive: Shadow;
+  surface: Shadow;
   elevated: Shadow;
 };
 
@@ -299,52 +405,89 @@ export const shadows: Shadows = {
     shadowRadius: 0,
     elevation: 0,
   },
-  surface: {
-    shadowColor: '#4A8FE7',
+  sm: {
+    shadowColor: '#364EFF',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  card: {
+    shadowColor: '#111827',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
   },
-  card: {
-    shadowColor: '#1A2B4A',
+  md: {
+    shadowColor: '#364EFF',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 3,
-  },
-  interactive: {
-    shadowColor: '#4A8FE7',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 4,
   },
-  elevated: {
-    shadowColor: '#1A2B4A',
+  lg: {
+    shadowColor: '#111827',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.1,
     shadowRadius: 24,
     elevation: 6,
   },
+  interactive: {
+    shadowColor: '#364EFF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  surface: {
+    shadowColor: '#111827',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 1,
+  },
+  elevated: {
+    shadowColor: '#111827',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 5,
+  },
+};
+
+// Minimum touch target sizes for accessibility
+export const touchTargets = {
+  minimum: 44,
+  comfortable: 48,
+  large: 56,
+  extraLarge: 64,
 };
 
 type Theme = {
   colors: ColorPalette;
   darkColors: ColorPalette;
+  highContrastColors: Partial<ColorPalette>;
   typography: Typography;
   spacing: Spacing;
   radius: Radius;
   shadows: Shadows;
+  touchTargets: typeof touchTargets;
+  textSizeMultipliers: typeof textSizeMultipliers;
+  buttonSizeMultipliers: typeof buttonSizeMultipliers;
 };
 
 export const theme: Theme = {
   colors,
   darkColors,
+  highContrastColors,
   typography,
   spacing,
   radius,
   shadows,
+  touchTargets,
+  textSizeMultipliers,
+  buttonSizeMultipliers,
 };
 
 export default theme;
