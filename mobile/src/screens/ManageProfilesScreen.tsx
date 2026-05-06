@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import { useProfiles } from '../contexts/ProfileContext';
 import LargeActionButton from '../components/ui/LargeActionButton';
@@ -59,7 +60,7 @@ export default function ManageProfilesScreen({ onBack }: ManageProfilesScreenPro
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Text style={styles.backText}>← Back</Text>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Manage Profiles</Text>
         <Text style={styles.headerSubtitle}>
@@ -173,7 +174,7 @@ export default function ManageProfilesScreen({ onBack }: ManageProfilesScreenPro
                     onPress={() => setNewColor(color)}
                     activeOpacity={0.7}
                   >
-                    {newColor === color && <Text style={styles.colorCheck}>✓</Text>}
+                    {newColor === color && <Ionicons name="checkmark" size={18} color="#FFFFFF" />}
                   </TouchableOpacity>
                 ))}
               </View>

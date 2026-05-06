@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import { useAccessibility } from '../contexts/AccessibilityContext';
 import SectionCard from '../components/ui/SectionCard';
@@ -32,7 +33,7 @@ export default function AccessibilitySettingsScreen({ onBack }: AccessibilitySet
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Text style={styles.backText}>← Back</Text>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Accessibility</Text>
         <Text style={styles.headerSubtitle}>
