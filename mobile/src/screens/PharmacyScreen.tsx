@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Linking } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Linking, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import LargeActionButton from '../components/ui/LargeActionButton';
-import { EmptyState } from '../components/ui/StateViews';
+import { EmptyState, ErrorState, LoadingState } from '../components/ui/StateViews';
 import { Pharmacy } from '../types/models';
+import { pharmacyApi } from '../services/api';
+import { useProfiles } from '../contexts/ProfileContext';
 
 interface PharmacyScreenProps {
   onBack?: () => void;
@@ -13,30 +15,78 @@ interface PharmacyScreenProps {
 
 export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
   const insets = useSafeAreaInsets();
+  const { activeProfile } = useProfiles();
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newAddress, setNewAddress] = useState('');
   const [newHours, setNewHours] = useState('');
 
-  const handleAdd = () => {
-    if (!newName || !newPhone) return;
-    const pharmacy: Pharmacy = {
-      id: `pharm-${Date.now()}`,
-      profile_id: 'profile-1',
-      name: newName,
-      phone: newPhone,
-      address: newAddress || undefined,
-      opening_hours: newHours || undefined,
-      created_at: new Date().toISOString(),
-    };
-    setPharmacies([...pharmacies, pharmacy]);
+  const loadPharmacies = useCallback(async () => {
+    if (!activeProfile) return;
+
+    setIsLoading(true);
+    setLoadError(null);
+
+    try {
+      const nextPharmacies = await pharmacyApi.listPharmacies(activeProfile.id);
+      setPharmacies(nextPharmacies);
+    } catch (error) {
+      console.warn('Failed to load pharmacies:', error);
+      setLoadError('Could not load pharmacies for this profile.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeProfile]);
+
+  useEffect(() => {
+    loadPharmacies();
+  }, [loadPharmacies]);
+
+  const resetForm = () => {
     setNewName('');
     setNewPhone('');
     setNewAddress('');
     setNewHours('');
-    setShowAddForm(false);
+  };
+
+  const handleAdd = async () => {
+    if (!newName || !newPhone || !activeProfile) return;
+
+    setIsSaving(true);
+
+    try {
+      const pharmacy = await pharmacyApi.createPharmacy(activeProfile.id, {
+        name: newName,
+        phone: newPhone,
+        address: newAddress || undefined,
+        opening_hours: newHours || undefined,
+      });
+      setPharmacies((current) => [...current, pharmacy]);
+      resetForm();
+      setShowAddForm(false);
+    } catch (error) {
+      console.warn('Failed to save pharmacy:', error);
+      Alert.alert('Could not save pharmacy', 'Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await pharmacyApi.deletePharmacy(id);
+      setPharmacies((current) =>
+        current.filter((pharmacy) => pharmacy.id !== id)
+      );
+    } catch (error) {
+      console.warn('Failed to delete pharmacy:', error);
+      Alert.alert('Could not remove pharmacy', 'Please try again.');
+    }
   };
 
   return (
@@ -57,7 +107,16 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {pharmacies.length === 0 && !showAddForm ? (
+        {!activeProfile ? (
+          <EmptyState
+            title="No Active Profile"
+            message="Select a profile before adding pharmacy details."
+          />
+        ) : isLoading ? (
+          <LoadingState message="Loading pharmacies..." />
+        ) : loadError ? (
+          <ErrorState message={loadError} onRetry={loadPharmacies} />
+        ) : pharmacies.length === 0 && !showAddForm ? (
           <EmptyState
             title="No Pharmacy Added"
             message="Add your pharmacy so you can quickly call for refills or questions"
@@ -75,17 +134,17 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
                   <View style={styles.pharmacyInfo}>
                     <Text style={styles.pharmacyName}>{pharmacy.name}</Text>
                     {pharmacy.address && (
-                      <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
+                      <View style={styles.detailRow}>
                         <Ionicons name="location-outline" size={14} color={theme.colors.textSecondary} />
                         <Text style={styles.pharmacyDetail}>{pharmacy.address}</Text>
                       </View>
                     )}
-                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
+                    <View style={styles.detailRow}>
                       <Ionicons name="call-outline" size={14} color={theme.colors.textSecondary} />
                       <Text style={styles.pharmacyDetail}>{pharmacy.phone}</Text>
                     </View>
                     {pharmacy.opening_hours && (
-                      <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
+                      <View style={styles.detailRow}>
                         <Ionicons name="time-outline" size={14} color={theme.colors.textSecondary} />
                         <Text style={styles.pharmacyDetail}>{pharmacy.opening_hours}</Text>
                       </View>
@@ -100,6 +159,13 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
                   >
                     <Ionicons name="call" size={16} color="#FFFFFF" />
                     <Text style={styles.callPharmacyText}>Call Pharmacy</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.deletePharmacyBtn}
+                    onPress={() => handleDelete(pharmacy.id)}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="trash" size={18} color={theme.colors.danger} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -154,7 +220,10 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
             <View style={styles.formActions}>
               <LargeActionButton
                 title="Cancel"
-                onPress={() => setShowAddForm(false)}
+                onPress={() => {
+                  resetForm();
+                  setShowAddForm(false);
+                }}
                 variant="outline"
                 style={{ flex: 1 }}
               />
@@ -162,7 +231,7 @@ export default function PharmacyScreen({ onBack }: PharmacyScreenProps) {
                 title="Save"
                 onPress={handleAdd}
                 variant="primary"
-                disabled={!newName || !newPhone}
+                disabled={!newName || !newPhone || isSaving}
                 style={{ flex: 1 }}
               />
             </View>
@@ -245,6 +314,11 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: theme.spacing.md,
   },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   pharmacyName: {
     fontSize: theme.typography.fontSize.lg,
     fontWeight: theme.typography.fontWeight.semibold,
@@ -257,15 +331,26 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   pharmacyActions: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
     paddingTop: theme.spacing.md,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
   },
   callPharmacyBtn: {
+    flex: 1,
     backgroundColor: theme.colors.successLight,
     paddingVertical: theme.spacing.md,
     borderRadius: theme.radius.lg,
     alignItems: 'center',
+  },
+  deletePharmacyBtn: {
+    backgroundColor: theme.colors.dangerLight,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.base,
+    borderRadius: theme.radius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   callPharmacyText: {
     color: theme.colors.success,

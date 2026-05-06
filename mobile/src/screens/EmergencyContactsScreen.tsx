@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Linking } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Linking, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import ConfirmActionModal from '../components/ui/ConfirmActionModal';
-import { EmptyState } from '../components/ui/StateViews';
+import { EmptyState, ErrorState, LoadingState } from '../components/ui/StateViews';
 import { EmergencyContact } from '../types/models';
+import { emergencyContactApi } from '../services/api';
+import { useProfiles } from '../contexts/ProfileContext';
 
 interface EmergencyContactsScreenProps {
   onBack?: () => void;
@@ -14,17 +16,11 @@ interface EmergencyContactsScreenProps {
 
 export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScreenProps) {
   const insets = useSafeAreaInsets();
-  const [contacts, setContacts] = useState<EmergencyContact[]>([
-    {
-      id: '1',
-      profile_id: 'profile-1',
-      name: 'Dr. Smith',
-      relationship: 'Doctor',
-      phone: '+61400000001',
-      priority_order: 1,
-      created_at: new Date().toISOString(),
-    },
-  ]);
+  const { activeProfile } = useProfiles();
+  const [contacts, setContacts] = useState<EmergencyContact[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string>('');
@@ -32,27 +28,73 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
   const [newPhone, setNewPhone] = useState('');
   const [newRelationship, setNewRelationship] = useState('');
 
-  const handleAddContact = () => {
-    if (!newName || !newPhone) return;
-    const newContact: EmergencyContact = {
-      id: `contact-${Date.now()}`,
-      profile_id: 'profile-1',
-      name: newName,
-      relationship: newRelationship,
-      phone: newPhone,
-      priority_order: contacts.length + 1,
-      created_at: new Date().toISOString(),
-    };
-    setContacts([...contacts, newContact]);
+  const loadContacts = useCallback(async () => {
+    if (!activeProfile) return;
+
+    setIsLoading(true);
+    setLoadError(null);
+
+    try {
+      const nextContacts = await emergencyContactApi.listContacts(
+        activeProfile.id
+      );
+      setContacts(nextContacts);
+    } catch (error) {
+      console.warn('Failed to load emergency contacts:', error);
+      setLoadError('Could not load emergency contacts for this profile.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeProfile]);
+
+  useEffect(() => {
+    loadContacts();
+  }, [loadContacts]);
+
+  const resetForm = () => {
     setNewName('');
     setNewPhone('');
     setNewRelationship('');
-    setShowAddForm(false);
   };
 
-  const handleDelete = () => {
-    setContacts(contacts.filter((c) => c.id !== deleteTargetId));
-    setShowDeleteConfirm(false);
+  const handleAddContact = async () => {
+    if (!newName || !newPhone || !activeProfile) return;
+
+    setIsSaving(true);
+
+    try {
+      const newContact = await emergencyContactApi.createContact(
+        activeProfile.id,
+        {
+          name: newName,
+          relationship: newRelationship || 'Emergency contact',
+          phone: newPhone,
+          priority_order: contacts.length + 1,
+        }
+      );
+      setContacts((current) => [...current, newContact]);
+      resetForm();
+      setShowAddForm(false);
+    } catch (error) {
+      console.warn('Failed to save emergency contact:', error);
+      Alert.alert('Could not save contact', 'Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await emergencyContactApi.deleteContact(deleteTargetId);
+      setContacts((current) =>
+        current.filter((contact) => contact.id !== deleteTargetId)
+      );
+      setShowDeleteConfirm(false);
+      setDeleteTargetId('');
+    } catch (error) {
+      console.warn('Failed to delete emergency contact:', error);
+      Alert.alert('Could not remove contact', 'Please try again.');
+    }
   };
 
   return (
@@ -73,7 +115,16 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {contacts.length === 0 && !showAddForm ? (
+        {!activeProfile ? (
+          <EmptyState
+            title="No Active Profile"
+            message="Select a profile before adding emergency contacts."
+          />
+        ) : isLoading ? (
+          <LoadingState message="Loading emergency contacts..." />
+        ) : loadError ? (
+          <ErrorState message={loadError} onRetry={loadContacts} />
+        ) : contacts.length === 0 && !showAddForm ? (
           <EmptyState
             title="No Emergency Contacts"
             message="Add people who should be contacted in an emergency"
@@ -168,7 +219,10 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
             <View style={styles.formActions}>
               <LargeActionButton
                 title="Cancel"
-                onPress={() => setShowAddForm(false)}
+                onPress={() => {
+                  resetForm();
+                  setShowAddForm(false);
+                }}
                 variant="outline"
                 style={{ flex: 1 }}
               />
@@ -176,7 +230,7 @@ export default function EmergencyContactsScreen({ onBack }: EmergencyContactsScr
                 title="Save Contact"
                 onPress={handleAddContact}
                 variant="primary"
-                disabled={!newName || !newPhone}
+                disabled={!newName || !newPhone || isSaving}
                 style={{ flex: 1 }}
               />
             </View>
