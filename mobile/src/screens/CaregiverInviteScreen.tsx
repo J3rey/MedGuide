@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Share } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Share, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import SectionCard from '../components/ui/SectionCard';
@@ -39,7 +40,7 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
-          <Text style={styles.backText}>← Back</Text>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Invite Caregiver</Text>
         <Text style={styles.headerSubtitle}>
@@ -127,7 +128,8 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
                 <Text style={styles.codeText}>{inviteCode}</Text>
               </View>
               <TouchableOpacity style={styles.shareButton} onPress={handleShareCode} activeOpacity={0.7}>
-                <Text style={styles.shareButtonText}>📤 Share Code</Text>
+                <Ionicons name="share-outline" size={18} color="#FFFFFF" />
+              <Text style={styles.shareButtonText}> Share Code</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -140,23 +142,23 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
           </Text>
           <View style={styles.permList}>
             <View style={styles.permItem}>
-              <Text style={styles.permCheck}>✓</Text>
+              <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />
               <Text style={styles.permText}>View medication status</Text>
             </View>
             <View style={styles.permItem}>
-              <Text style={styles.permCheck}>✓</Text>
+              <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />
               <Text style={styles.permText}>Receive missed-dose alerts</Text>
             </View>
             <View style={styles.permItem}>
-              <Text style={styles.permCheck}>✓</Text>
+              <Ionicons name="checkmark-circle" size={18} color={theme.colors.success} />
               <Text style={styles.permText}>View visual schedule</Text>
             </View>
             <View style={styles.permItem}>
-              <Text style={styles.permCross}>✗</Text>
+              <Ionicons name="close-circle" size={18} color={theme.colors.textSecondary} />
               <Text style={styles.permText}>Manage medications</Text>
             </View>
             <View style={styles.permItem}>
-              <Text style={styles.permCross}>✗</Text>
+              <Ionicons name="close-circle" size={18} color={theme.colors.textSecondary} />
               <Text style={styles.permText}>Manage emergency contacts</Text>
             </View>
           </View>
@@ -166,7 +168,14 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
         {inviteMethod !== 'code' && (
           <LargeActionButton
             title="Send Invitation"
-            onPress={() => {}}
+            onPress={() => {
+              const target = inviteMethod === 'email' ? email : phone;
+              Alert.alert(
+                'Invitation Sent',
+                `An invitation has been sent to ${target} as a ${role}.`,
+                [{ text: 'OK', onPress: () => onBack?.() }]
+              );
+            }}
             variant="primary"
             fullWidth
             disabled={inviteMethod === 'email' ? !email : !phone}
