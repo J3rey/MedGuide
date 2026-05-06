@@ -5,7 +5,12 @@ import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import LargeActionButton from '../components/ui/LargeActionButton';
 import SectionCard from '../components/ui/SectionCard';
-import { CaregiverRole } from '../types/models';
+import {
+  CaregiverRole,
+  defaultCaregiverPermissions,
+} from '../types/models';
+import { caregiverApi } from '../services/api';
+import { useProfiles } from '../contexts/ProfileContext';
 
 interface CaregiverInviteScreenProps {
   onBack?: () => void;
@@ -13,11 +18,13 @@ interface CaregiverInviteScreenProps {
 
 export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenProps) {
   const insets = useSafeAreaInsets();
+  const { activeProfile } = useProfiles();
   const [inviteMethod, setInviteMethod] = useState<'email' | 'phone' | 'code'>('email');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<CaregiverRole>('caregiver');
-  const [inviteCode] = useState('MG-' + Math.random().toString(36).substring(2, 8).toUpperCase());
+  const [inviteCode, setInviteCode] = useState('');
+  const [isSending, setIsSending] = useState(false);
 
   const roles: { value: CaregiverRole; label: string; description: string }[] = [
     { value: 'caregiver', label: 'Caregiver', description: 'Can view status and receive alerts' },
@@ -25,14 +32,59 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
     { value: 'emergency_contact', label: 'Emergency Contact', description: 'Receives emergency alerts' },
   ];
 
-  const handleShareCode = async () => {
+  const createInvite = async () => {
+    if (!activeProfile) {
+      Alert.alert('No active profile', 'Select a profile before inviting a caregiver.');
+      return null;
+    }
+
+    setIsSending(true);
+
+    try {
+      const targetEmail = inviteMethod === 'email' ? email : undefined;
+      const response = await caregiverApi.inviteCaregiver(activeProfile.id, {
+        role,
+        email: targetEmail || undefined,
+        permissions: defaultCaregiverPermissions,
+      });
+
+      setInviteCode(response.invite_code);
+      return response.invite_code;
+    } catch (error) {
+      console.warn('Failed to create caregiver invite:', error);
+      Alert.alert('Could not create invite', 'Please try again.');
+      return null;
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const shareInviteCode = async (code: string) => {
     try {
       await Share.share({
-        message: `Join me on MedGuide as my ${role}. Use invite code: ${inviteCode}`,
+        message: `Join me on MedGuide as my ${role.replace('_', ' ')}. Use invite code: ${code}`,
       });
     } catch (error) {
-      // Handle error
+      console.warn('Failed to share invite:', error);
     }
+  };
+
+  const handleShareCode = async () => {
+    const code = inviteCode || (await createInvite());
+    if (code) await shareInviteCode(code);
+  };
+
+  const handleSendInvitation = async () => {
+    const target = inviteMethod === 'email' ? email : phone;
+    const code = await createInvite();
+
+    if (!code) return;
+
+    Alert.alert(
+      'Invitation Created',
+      `Share invite code ${code} with ${target}. They can accept it in MedGuide as a ${role.replace('_', ' ')}.`,
+      [{ text: 'OK', onPress: () => onBack?.() }]
+    );
   };
 
   return (
@@ -125,11 +177,15 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
             <View style={styles.codeSection}>
               <Text style={styles.codeLabel}>Share this invite code:</Text>
               <View style={styles.codeBox}>
-                <Text style={styles.codeText}>{inviteCode}</Text>
+                <Text style={styles.codeText}>
+                  {inviteCode || 'Generate'}
+                </Text>
               </View>
               <TouchableOpacity style={styles.shareButton} onPress={handleShareCode} activeOpacity={0.7}>
                 <Ionicons name="share-outline" size={18} color="#FFFFFF" />
-              <Text style={styles.shareButtonText}> Share Code</Text>
+              <Text style={styles.shareButtonText}>
+                {isSending ? ' Creating...' : ' Share Code'}
+              </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -167,18 +223,15 @@ export default function CaregiverInviteScreen({ onBack }: CaregiverInviteScreenP
         {/* Send Button */}
         {inviteMethod !== 'code' && (
           <LargeActionButton
-            title="Send Invitation"
-            onPress={() => {
-              const target = inviteMethod === 'email' ? email : phone;
-              Alert.alert(
-                'Invitation Sent',
-                `An invitation has been sent to ${target} as a ${role}.`,
-                [{ text: 'OK', onPress: () => onBack?.() }]
-              );
-            }}
+            title={isSending ? 'Creating Invitation...' : 'Create Invitation'}
+            onPress={handleSendInvitation}
             variant="primary"
             fullWidth
-            disabled={inviteMethod === 'email' ? !email : !phone}
+            disabled={
+              isSending ||
+              !activeProfile ||
+              (inviteMethod === 'email' ? !email : !phone)
+            }
           />
         )}
       </ScrollView>

@@ -1,9 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, TextInput, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
-import { EmptyState } from '../components/ui/StateViews';
+import { EmptyState, ErrorState, LoadingState } from '../components/ui/StateViews';
+import SectionCard from '../components/ui/SectionCard';
+import LargeActionButton from '../components/ui/LargeActionButton';
+import { CaregiverPatient, caregiverApi } from '../services/api';
 
 interface CaregiverDashboardScreenProps {
   onBack?: () => void;
@@ -102,22 +105,50 @@ function CaregiverStatusCard({
 
 export default function CaregiverDashboardScreen({ onBack, onNavigate }: CaregiverDashboardScreenProps) {
   const insets = useSafeAreaInsets();
+  const [patients, setPatients] = useState<CaregiverPatient[]>([]);
+  const [inviteCode, setInviteCode] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAcceptingInvite, setIsAcceptingInvite] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Demo data - in production this would come from the caregiver service
-  const caregiverProfiles = [
-    {
-      name: 'Mum',
-      relationship: 'Parent',
-      medicationsTaken: 3,
-      medicationsTotal: 5,
-      missedCount: 1,
-      lastCheckIn: '2 hours ago',
-      hasEmergencyAlert: false,
-      phone: '+61400000000',
-    },
-  ];
+  const loadPatients = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError(null);
 
-  const hasCaregiverAccess = caregiverProfiles.length > 0;
+    try {
+      const nextPatients = await caregiverApi.listMyPatients();
+      setPatients(nextPatients);
+    } catch (error) {
+      console.warn('Failed to load caregiver patients:', error);
+      setLoadError('Could not load caregiver dashboard.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadPatients();
+  }, [loadPatients]);
+
+  const handleAcceptInvite = async () => {
+    if (!inviteCode.trim()) return;
+
+    setIsAcceptingInvite(true);
+
+    try {
+      await caregiverApi.acceptInvite(inviteCode.trim().toUpperCase());
+      setInviteCode('');
+      await loadPatients();
+      Alert.alert('Invite accepted', 'This profile is now visible in your caregiver dashboard.');
+    } catch (error) {
+      console.warn('Failed to accept caregiver invite:', error);
+      Alert.alert('Could not accept invite', 'Check the invite code and try again.');
+    } finally {
+      setIsAcceptingInvite(false);
+    }
+  };
+
+  const hasCaregiverAccess = patients.length > 0;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -139,11 +170,44 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {hasCaregiverAccess ? (
+        {isLoading ? (
+          <LoadingState message="Loading caregiver dashboard..." />
+        ) : loadError ? (
+          <ErrorState message={loadError} onRetry={loadPatients} />
+        ) : hasCaregiverAccess ? (
           <>
-            {caregiverProfiles.map((profile, index) => (
-              <CaregiverStatusCard key={index} {...profile} />
+            {patients.map((patient) => (
+              <CaregiverStatusCard
+                key={patient.id}
+                name={patient.profiles.name}
+                relationship={patient.profiles.relationship}
+                medicationsTaken={patient.status?.medicationsTaken || 0}
+                medicationsTotal={patient.status?.medicationsTotal || 0}
+                missedCount={patient.status?.missedCount || 0}
+                lastCheckIn={patient.status?.lastCheckIn || 'No logs today'}
+                hasEmergencyAlert={patient.status?.hasEmergencyAlert || false}
+                phone={patient.status?.phone}
+              />
             ))}
+
+            <SectionCard title="Accept Another Invite">
+              <TextInput
+                style={styles.input}
+                placeholder="MG-ABC123"
+                placeholderTextColor={theme.colors.textSecondary}
+                value={inviteCode}
+                onChangeText={setInviteCode}
+                autoCapitalize="characters"
+              />
+              <LargeActionButton
+                title={isAcceptingInvite ? 'Accepting...' : 'Accept Invite'}
+                onPress={handleAcceptInvite}
+                variant="primary"
+                fullWidth
+                disabled={!inviteCode.trim() || isAcceptingInvite}
+                style={styles.acceptInviteButton}
+              />
+            </SectionCard>
 
             <TouchableOpacity
               style={styles.manageButton}
@@ -155,12 +219,30 @@ export default function CaregiverDashboardScreen({ onBack, onNavigate }: Caregiv
             </TouchableOpacity>
           </>
         ) : (
-          <EmptyState
-            title="No Caregiver Access"
-            message="You haven't been added as a caregiver for anyone yet. Ask a family member to invite you."
-            actionLabel="Learn More"
-            onAction={() => {}}
-          />
+          <>
+            <EmptyState
+              title="No Caregiver Access"
+              message="Ask a family member to invite you, then enter the invite code below."
+            />
+            <SectionCard title="Accept Invite Code">
+              <TextInput
+                style={styles.input}
+                placeholder="MG-ABC123"
+                placeholderTextColor={theme.colors.textSecondary}
+                value={inviteCode}
+                onChangeText={setInviteCode}
+                autoCapitalize="characters"
+              />
+              <LargeActionButton
+                title={isAcceptingInvite ? 'Accepting...' : 'Accept Invite'}
+                onPress={handleAcceptInvite}
+                variant="primary"
+                fullWidth
+                disabled={!inviteCode.trim() || isAcceptingInvite}
+                style={styles.acceptInviteButton}
+              />
+            </SectionCard>
+          </>
         )}
       </ScrollView>
     </View>
@@ -321,6 +403,20 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.sm,
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.textPrimary,
+  },
+  input: {
+    backgroundColor: theme.colors.inputBackground,
+    borderWidth: 1.5,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.lg,
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: theme.spacing.md,
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.textPrimary,
+    minHeight: theme.touchTargets.comfortable,
+  },
+  acceptInviteButton: {
+    marginTop: theme.spacing.md,
   },
   manageButton: {
     flexDirection: 'row',
