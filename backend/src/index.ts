@@ -5,6 +5,10 @@ import chatRoutes from './routes/chat';
 import alarmRoutes from './routes/alarms';
 import drugRoutes from './routes/drugs';
 import ocrRoutes from './routes/ocr';
+import profileRoutes from './routes/profiles';
+import caregiverRoutes from './routes/caregivers';
+import emergencyRoutes from './routes/emergency';
+import medicationRoutes from './routes/medications';
 import { apiLimiter } from './middleware/rateLimiter';
 
 const app: Application = express();
@@ -33,6 +37,10 @@ app.use('/api', chatRoutes);
 app.use('/api', alarmRoutes);
 app.use('/api', drugRoutes);
 app.use('/api', ocrRoutes);
+app.use('/api', profileRoutes);
+app.use('/api', caregiverRoutes);
+app.use('/api', emergencyRoutes);
+app.use('/api', medicationRoutes);
 
 // Start server
 const server = app.listen(PORT, '0.0.0.0', () => {
