@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import theme from '../styles/theme';
 import { useProfiles } from '../contexts/ProfileContext';
 import SectionCard from '../components/ui/SectionCard';
@@ -11,24 +12,35 @@ interface ProfileScreenProps {
 }
 
 interface SettingsRowProps {
-  icon: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  iconColor?: string;
   title: string;
   subtitle?: string;
   onPress: () => void;
   danger?: boolean;
 }
 
-function SettingsRow({ icon, title, subtitle, onPress, danger }: SettingsRowProps) {
+function SettingsRow({ icon, iconColor, title, subtitle, onPress, danger }: SettingsRowProps) {
   return (
-    <TouchableOpacity style={styles.settingsRow} onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity
+      style={styles.settingsRow}
+      onPress={onPress}
+      activeOpacity={0.6}
+      accessibilityLabel={title}
+      accessibilityHint={subtitle}
+    >
       <View style={[styles.settingsIcon, danger && { backgroundColor: theme.colors.dangerLight }]}>
-        <Text style={styles.settingsIconText}>{icon}</Text>
+        <Ionicons
+          name={icon}
+          size={18}
+          color={danger ? theme.colors.danger : (iconColor || theme.colors.primary)}
+        />
       </View>
       <View style={styles.settingsInfo}>
         <Text style={[styles.settingsTitle, danger && { color: theme.colors.danger }]}>{title}</Text>
         {subtitle && <Text style={styles.settingsSubtitle}>{subtitle}</Text>}
       </View>
-      <Text style={styles.chevron}>›</Text>
+      <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
     </TouchableOpacity>
   );
 }
@@ -73,21 +85,22 @@ export default function ProfileScreen({ onNavigate, onBack }: ProfileScreenProps
         <Text style={styles.sectionLabel}>People & Access</Text>
         <SectionCard>
           <SettingsRow
-            icon="👥"
+            icon="people"
             title="Manage Profiles"
             subtitle="Add or switch between profiles"
             onPress={() => onNavigate?.('ManageProfiles')}
           />
           <View style={styles.divider} />
           <SettingsRow
-            icon="🤝"
+            icon="heart"
+            iconColor="#E11D48"
             title="Caregiver Access"
             subtitle="Manage caregivers and permissions"
             onPress={() => onNavigate?.('CaregiverDashboard')}
           />
           <View style={styles.divider} />
           <SettingsRow
-            icon="📨"
+            icon="person-add"
             title="Invite Caregiver"
             subtitle="Share medication status with family"
             onPress={() => onNavigate?.('CaregiverInvite')}
@@ -98,23 +111,27 @@ export default function ProfileScreen({ onNavigate, onBack }: ProfileScreenProps
         <Text style={styles.sectionLabel}>Health & Safety</Text>
         <SectionCard>
           <SettingsRow
-            icon="🏥"
+            icon="medkit"
+            iconColor="#16A34A"
             title="My Pharmacy"
             subtitle="Store pharmacy details"
             onPress={() => onNavigate?.('PharmacyList')}
           />
           <View style={styles.divider} />
           <SettingsRow
-            icon="🚨"
+            icon="call"
+            iconColor="#DC2626"
             title="Emergency Contacts"
             subtitle="People to contact in emergencies"
             onPress={() => onNavigate?.('EmergencyContacts')}
           />
           <View style={styles.divider} />
           <SettingsRow
-            icon="⚠️"
+            icon="shield-checkmark"
+            iconColor="#B91C1C"
             title="Emergency Protocol"
             subtitle="What to do in an emergency"
+            danger
             onPress={() => onNavigate?.('EmergencyProtocol')}
           />
         </SectionCard>
@@ -123,28 +140,32 @@ export default function ProfileScreen({ onNavigate, onBack }: ProfileScreenProps
         <Text style={styles.sectionLabel}>Preferences</Text>
         <SectionCard>
           <SettingsRow
-            icon="♿"
+            icon="accessibility"
+            iconColor="#7C3AED"
             title="Accessibility"
             subtitle="Text size, contrast, button size"
             onPress={() => onNavigate?.('AccessibilitySettings')}
           />
           <View style={styles.divider} />
           <SettingsRow
-            icon="🔒"
+            icon="lock-closed"
+            iconColor="#1D4ED8"
             title="Security"
             subtitle="Biometric login, PIN"
             onPress={() => onNavigate?.('SecuritySettings')}
           />
           <View style={styles.divider} />
           <SettingsRow
-            icon="🌐"
+            icon="globe"
+            iconColor="#0891B2"
             title="Language"
             subtitle={activeProfile?.preferred_language || 'English'}
             onPress={() => onBack?.()}
           />
           <View style={styles.divider} />
           <SettingsRow
-            icon="🌸"
+            icon="leaf"
+            iconColor="#059669"
             title="Cultural Notes"
             subtitle="Dietary and cultural preferences"
             onPress={() => onNavigate?.('CulturalNotes')}
@@ -155,7 +176,8 @@ export default function ProfileScreen({ onNavigate, onBack }: ProfileScreenProps
         <Text style={styles.sectionLabel}>About</Text>
         <SectionCard>
           <SettingsRow
-            icon="📄"
+            icon="document-text"
+            iconColor="#6B7280"
             title="Terms & Conditions"
             onPress={() => onNavigate?.('TermsAndConditions')}
           />
@@ -257,17 +279,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: theme.spacing.md,
+    minHeight: theme.touchTargets.minimum,
   },
   settingsIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: theme.colors.surfaceMuted,
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: theme.colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  settingsIconText: {
-    fontSize: 18,
   },
   settingsInfo: {
     flex: 1,
@@ -282,10 +302,6 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.sm,
     color: theme.colors.textSecondary,
     marginTop: 2,
-  },
-  chevron: {
-    fontSize: 22,
-    color: theme.colors.textSecondary,
   },
   divider: {
     height: 1,
