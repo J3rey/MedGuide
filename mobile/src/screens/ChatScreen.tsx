@@ -25,9 +25,13 @@ interface ChatMessage {
 
 interface ChatScreenProps {
   initialDrugName?: string;
+  initialDrugRequestId?: number;
 }
 
-export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
+export default function ChatScreen({
+  initialDrugName,
+  initialDrugRequestId = 0,
+}: ChatScreenProps = {}) {
   const { t } = useTranslation();
 
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -43,7 +47,7 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
   const [activeDrugName, setActiveDrugName] = useState<string | null>(
     initialDrugName || null
   );
-  const lastInitialDrugNameRef = useRef<string | null>(null);
+  const lastInitialDrugRequestIdRef = useRef<number | null>(null);
 
   const scrollViewRef = useRef<ScrollView>(null);
   const { width: screenWidth } = useWindowDimensions();
@@ -123,13 +127,16 @@ export default function ChatScreen({ initialDrugName }: ChatScreenProps = {}) {
   };
 
   useEffect(() => {
-    if (initialDrugName && initialDrugName !== lastInitialDrugNameRef.current) {
-      lastInitialDrugNameRef.current = initialDrugName;
+    if (
+      initialDrugName &&
+      initialDrugRequestId !== lastInitialDrugRequestIdRef.current
+    ) {
+      lastInitialDrugRequestIdRef.current = initialDrugRequestId;
       setActiveDrugName(initialDrugName);
       const query = `${t('chat.tellMeAbout')} ${initialDrugName}`;
       sendMessage(query, initialDrugName);
     }
-  }, [initialDrugName, t]);
+  }, [initialDrugName, initialDrugRequestId, t]);
 
   const containerPadding = screenWidth > 768 ? 48 : 24;
   const maxContentWidth = screenWidth > 768 ? 800 : screenWidth;

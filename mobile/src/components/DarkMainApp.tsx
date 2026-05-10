@@ -53,6 +53,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
   const [showAlarm, setShowAlarm] = useState(false);
   const [currentAlarm, setCurrentAlarm] = useState<AlarmData | null>(null);
   const [chatDrugName, setChatDrugName] = useState<string | null>(null);
+  const [chatDrugRequestId, setChatDrugRequestId] = useState(0);
   const { scannedDrug, setScannedDrug } = useScan();
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
@@ -67,6 +68,7 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
   useEffect(() => {
     if (scannedDrug) {
       setChatDrugName(scannedDrug);
+      setChatDrugRequestId((current) => current + 1);
       setActiveTab('chat');
       setTimeout(() => setScannedDrug(null), 1000);
     }
@@ -155,7 +157,12 @@ function DarkMainAppContent({ onBack }: DarkMainAppProps) {
           </NavigationContainer>
         );
       case 'chat':
-        return <ChatScreen initialDrugName={chatDrugName || undefined} />;
+        return (
+          <ChatScreen
+            initialDrugName={chatDrugName || undefined}
+            initialDrugRequestId={chatDrugRequestId}
+          />
+        );
       case 'settings': {
         const containerPadding = screenWidth > 768 ? 48 : 24;
         return (

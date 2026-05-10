@@ -78,6 +78,7 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
   const [showAlarm, setShowAlarm] = useState(false);
   const [currentAlarm, setCurrentAlarm] = useState<AlarmData | null>(null);
   const [chatDrugName, setChatDrugName] = useState<string | null>(null);
+  const [chatDrugRequestId, setChatDrugRequestId] = useState(0);
   const { scannedDrug, setScannedDrug } = useScan();
   const notificationListener = useRef<Notifications.Subscription | undefined>(
     undefined
@@ -90,6 +91,7 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
   useEffect(() => {
     if (scannedDrug) {
       setChatDrugName(scannedDrug);
+      setChatDrugRequestId((current) => current + 1);
       setActiveTab('chat');
       setTimeout(() => setScannedDrug(null), 1000);
     }
@@ -229,7 +231,12 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
           </NavigationContainer>
         );
       case 'chat':
-        return <ChatScreen initialDrugName={chatDrugName || undefined} />;
+        return (
+          <ChatScreen
+            initialDrugName={chatDrugName || undefined}
+            initialDrugRequestId={chatDrugRequestId}
+          />
+        );
       case 'profile':
         return <ProfileScreen onNavigate={handleNavigate} onBack={onBack} />;
       default:
