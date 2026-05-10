@@ -104,17 +104,25 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
         async (response) => {
           const data = response.notification.request.content.data;
           const actionId = response.actionIdentifier;
+          const notificationId = response.notification.request.identifier;
+          const medicationName = data.medicationName as string;
 
           if (data.isAlarm) {
             if (actionId === 'SNOOZE_5') {
-              await handleSnooze(data.medicationName as string, 5);
+              await dismissAlarm(notificationId);
+              await snoozeAlarm(medicationName, 5);
+              setShowAlarm(false);
+              setCurrentAlarm(null);
             } else if (actionId === 'SNOOZE_10') {
-              await handleSnooze(data.medicationName as string, 10);
+              await dismissAlarm(notificationId);
+              await snoozeAlarm(medicationName, 10);
+              setShowAlarm(false);
+              setCurrentAlarm(null);
             } else if (
               actionId === 'DISMISS' ||
               actionId === Notifications.DEFAULT_ACTION_IDENTIFIER
             ) {
-              await dismissAlarm(response.notification.request.identifier);
+              await dismissAlarm(notificationId);
             }
           }
         }
