@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Notifications from 'expo-notifications';
 import BottomTabNavigation, { Tab } from './BottomTabNavigation';
 import HomeScreen from '../screens/HomeScreen';
-import VisualScheduleScreen from '../screens/VisualScheduleScreen';
+import ScheduleScreen from '../screens/ScheduleScreen';
 import CameraScreen from '../screens/CameraScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -213,7 +213,7 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
       case 'home':
         return <HomeScreen onNavigate={handleNavigate} />;
       case 'schedule':
-        return <VisualScheduleScreen />;
+        return <ScheduleScreen />;
       case 'scan':
         return (
           <NavigationContainer independent={true}>
