@@ -7,7 +7,7 @@ export const chatMessageSchema = z.object({
       .string()
       .min(1, 'Message cannot be empty')
       .max(1000, 'Message too long'),
-    language: z.enum(['en', 'es', 'zh', 'ko', 'it']).default('en'),
+    language: z.enum(['en', 'es', 'zh', 'ko', 'it', 'id', 'hi']).default('en'),
     medications: z.array(z.string()).optional(),
   }),
 });
