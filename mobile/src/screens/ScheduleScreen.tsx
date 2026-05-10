@@ -20,6 +20,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import theme from '../styles/theme';
 import { supabase } from '../services/supabase';
+import { getAppUserId } from '../services/api';
 import {
   registerForPushNotificationsAsync,
   scheduleAlarmNotification,
@@ -30,6 +31,7 @@ import {
 
 interface Alarm {
   id: number;
+  user_id?: string;
   time: string;
   medication_name: string;
   enabled: boolean;
@@ -44,6 +46,7 @@ const ALL_DAY_KEYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function ScheduleScreen(): React.JSX.Element {
   const { t } = useTranslation();
+  const appUserId = getAppUserId();
 
   const dayOptions = [
     { key: 'Daily', label: t('schedule.daily') },
@@ -165,6 +168,7 @@ export default function ScheduleScreen(): React.JSX.Element {
       const { data, error } = await supabase
         .from('alarms')
         .select('*')
+        .eq('user_id', appUserId)
         .order('time', { ascending: true });
 
       if (error) {
@@ -213,7 +217,8 @@ export default function ScheduleScreen(): React.JSX.Element {
       const { error } = await supabase
         .from('alarms')
         .update({ enabled: newEnabled, notification_id: notificationId })
-        .eq('id', alarm.id);
+        .eq('id', alarm.id)
+        .eq('user_id', appUserId);
 
       if (error) throw error;
     } catch (error) {
@@ -248,6 +253,7 @@ export default function ScheduleScreen(): React.JSX.Element {
       const { data, error } = await supabase
         .from('alarms')
         .insert({
+          user_id: appUserId,
           medication_name: newAlarmMed,
           time: timeString24,
           days: selectedDays,
@@ -316,6 +322,7 @@ export default function ScheduleScreen(): React.JSX.Element {
           notification_id: notificationId,
         })
         .eq('id', editingAlarm.id)
+        .eq('user_id', appUserId)
         .select()
         .single();
 
@@ -349,7 +356,8 @@ export default function ScheduleScreen(): React.JSX.Element {
       const { error } = await supabase
         .from('alarms')
         .delete()
-        .eq('id', alarm.id);
+        .eq('id', alarm.id)
+        .eq('user_id', appUserId);
 
       if (error) throw error;
 
