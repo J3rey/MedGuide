@@ -1,5 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../services/supabase';
+import {
+  getOwnedRecordProfileId,
+  requireProfileOwner,
+  requireUserId,
+} from '../services/profileAccess';
 import { getErrorMessage } from '../types/errors';
 
 const router = Router();
@@ -22,7 +27,11 @@ router.get(
   '/profiles/:profileId/medications',
   async (req: Request, res: Response) => {
     try {
+      const userId = requireUserId(req, res);
+      if (!userId) return;
+
       const { profileId } = req.params;
+      if (!(await requireProfileOwner(profileId, userId, res))) return;
 
       const { data, error } = await supabase
         .from('medications')
@@ -48,7 +57,12 @@ router.post(
   '/profiles/:profileId/medications',
   async (req: Request, res: Response) => {
     try {
+      const userId = requireUserId(req, res);
+      if (!userId) return;
+
       const { profileId } = req.params;
+      if (!(await requireProfileOwner(profileId, userId, res))) return;
+
       const { custom_name, dose, instructions, notes, drug_id, color, icon } =
         req.body;
 
@@ -78,7 +92,19 @@ router.post(
 // Update medication
 router.put('/medications/:id', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { id } = req.params;
+    const profileId = await getOwnedRecordProfileId(
+      'medications',
+      id,
+      userId
+    );
+    if (!profileId) {
+      return res.status(403).json({ error: 'Medication access denied' });
+    }
+
     const updates = req.body;
     delete updates.id;
     delete updates.profile_id;
@@ -88,6 +114,7 @@ router.put('/medications/:id', async (req: Request, res: Response) => {
       .from('medications')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
+      .eq('profile_id', profileId)
       .select()
       .single();
 
@@ -101,9 +128,24 @@ router.put('/medications/:id', async (req: Request, res: Response) => {
 // Delete medication
 router.delete('/medications/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const userId = requireUserId(req, res);
+    if (!userId) return;
 
-    const { error } = await supabase.from('medications').delete().eq('id', id);
+    const { id } = req.params;
+    const profileId = await getOwnedRecordProfileId(
+      'medications',
+      id,
+      userId
+    );
+    if (!profileId) {
+      return res.status(403).json({ error: 'Medication access denied' });
+    }
+
+    const { error } = await supabase
+      .from('medications')
+      .delete()
+      .eq('id', id)
+      .eq('profile_id', profileId);
 
     if (error) throw error;
     res.status(204).send();
@@ -119,6 +161,9 @@ router.post(
   '/medications/:medicationId/schedules',
   async (req: Request, res: Response) => {
     try {
+      const userId = requireUserId(req, res);
+      if (!userId) return;
+
       const { medicationId } = req.params;
       const {
         profile_id,
@@ -129,11 +174,25 @@ router.post(
         escalation_threshold_minutes,
       } = req.body;
 
+      const medicationProfileId = await getOwnedRecordProfileId(
+        'medications',
+        medicationId,
+        userId
+      );
+      if (!medicationProfileId) {
+        return res.status(403).json({ error: 'Medication access denied' });
+      }
+      if (profile_id && profile_id !== medicationProfileId) {
+        return res
+          .status(400)
+          .json({ error: 'Schedule profile must match medication profile' });
+      }
+
       const { data, error } = await supabase
         .from('medication_schedules')
         .insert({
           medication_id: medicationId,
-          profile_id,
+          profile_id: medicationProfileId,
           scheduled_time,
           days: days || ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
           recurrence_rule: recurrence_rule || 'daily',
@@ -154,12 +213,24 @@ router.post(
 // Delete schedule
 router.delete('/schedules/:id', async (req: Request, res: Response) => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { id } = req.params;
+    const profileId = await getOwnedRecordProfileId(
+      'medication_schedules',
+      id,
+      userId
+    );
+    if (!profileId) {
+      return res.status(403).json({ error: 'Schedule access denied' });
+    }
 
     const { error } = await supabase
       .from('medication_schedules')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('profile_id', profileId);
 
     if (error) throw error;
     res.status(204).send();
@@ -173,7 +244,9 @@ router.delete('/schedules/:id', async (req: Request, res: Response) => {
 // Log medication action (taken, skipped, missed)
 router.post('/medication-logs', async (req: Request, res: Response) => {
   try {
-    const userId = req.headers['x-user-id'] as string;
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const {
       medication_id,
       profile_id,
@@ -183,9 +256,23 @@ router.post('/medication-logs', async (req: Request, res: Response) => {
       notes,
     } = req.body;
 
+    const medicationProfileId = await getOwnedRecordProfileId(
+      'medications',
+      medication_id,
+      userId
+    );
+    if (!medicationProfileId) {
+      return res.status(403).json({ error: 'Medication access denied' });
+    }
+    if (profile_id && profile_id !== medicationProfileId) {
+      return res
+        .status(400)
+        .json({ error: 'Log profile must match medication profile' });
+    }
+
     const logData: MedicationLogInsert = {
       medication_id,
-      profile_id,
+      profile_id: medicationProfileId,
       scheduled_instance_time,
       status,
       logged_by_user_id: userId,
@@ -215,7 +302,12 @@ router.get(
   '/profiles/:profileId/medication-logs/today',
   async (req: Request, res: Response) => {
     try {
+      const userId = requireUserId(req, res);
+      if (!userId) return;
+
       const { profileId } = req.params;
+      if (!(await requireProfileOwner(profileId, userId, res))) return;
+
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const tomorrow = new Date(today);
