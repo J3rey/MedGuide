@@ -41,7 +41,7 @@ export const alarmCreateSchema = z.object({
 // Alarm update validation
 export const alarmUpdateSchema = z.object({
   params: z.object({
-    id: z.string().uuid('Invalid alarm ID format'),
+    id: z.string().regex(/^\d+$/, 'Invalid alarm ID format'),
   }),
   body: z.object({
     medication_name: z.string().min(1).max(100).optional(),
@@ -58,6 +58,6 @@ export const alarmUpdateSchema = z.object({
 // Alarm ID validation
 export const alarmIdSchema = z.object({
   params: z.object({
-    id: z.string().uuid('Invalid alarm ID format'),
+    id: z.string().regex(/^\d+$/, 'Invalid alarm ID format'),
   }),
 });

@@ -8,6 +8,8 @@ import {
   alarmIdSchema,
 } from '../validators/schemas';
 import { alarmsLimiter } from '../middleware/rateLimiter';
+import { requireUserId } from '../services/profileAccess';
+import { getErrorMessage } from '../types/errors';
 
 const router = Router();
 
@@ -17,20 +19,20 @@ router.use(alarmsLimiter);
 // Get all alarms
 router.get('/alarms', async (req: Request, res: Response): Promise<void> => {
   try {
+    const userId = requireUserId(req, res);
+    if (!userId) return;
+
     const { data, error } = await supabase
       .from('alarms')
       .select('*')
+      .eq('user_id', userId)
       .order('time', { ascending: true });
 
     if (error) throw error;
 
     res.json(data);
   } catch (error) {
-    console.error(
-      'Error fetching alarms:',
-      error instanceof Error ? error.message : error
-    );
-    res.status(500).json({ error: 'Failed to fetch alarms' });
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -40,12 +42,16 @@ router.post(
   validate(alarmCreateSchema),
   async (req: Request, res: Response): Promise<void> => {
     try {
+      const userId = requireUserId(req, res);
+      if (!userId) return;
+
       const { medication_name, time, days, enabled, notification_id } =
         req.body;
 
       const { data, error } = await supabase
         .from('alarms')
         .insert({
+          user_id: userId,
           medication_name,
           time,
           days,
@@ -60,11 +66,7 @@ router.post(
 
       res.status(201).json(data);
     } catch (error) {
-      console.error(
-        'Error creating alarm:',
-        error instanceof Error ? error.message : error
-      );
-      res.status(500).json({ error: 'Failed to create alarm' });
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -75,6 +77,9 @@ router.put(
   validate(alarmUpdateSchema),
   async (req: Request, res: Response): Promise<void> => {
     try {
+      const userId = requireUserId(req, res);
+      if (!userId) return;
+
       const { id } = req.params;
       const { medication_name, time, days, enabled, notification_id } =
         req.body;
@@ -92,18 +97,19 @@ router.put(
         .from('alarms')
         .update(updateData)
         .eq('id', id)
+        .eq('user_id', userId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) {
+        res.status(404).json({ error: 'Alarm not found' });
+        return;
+      }
 
       res.json(data);
     } catch (error) {
-      console.error(
-        'Error updating alarm:',
-        error instanceof Error ? error.message : error
-      );
-      res.status(500).json({ error: 'Failed to update alarm' });
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -114,19 +120,28 @@ router.delete(
   validate(alarmIdSchema),
   async (req: Request, res: Response): Promise<void> => {
     try {
+      const userId = requireUserId(req, res);
+      if (!userId) return;
+
       const { id } = req.params;
 
-      const { error } = await supabase.from('alarms').delete().eq('id', id);
+      const { data, error } = await supabase
+        .from('alarms')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId)
+        .select('id')
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) {
+        res.status(404).json({ error: 'Alarm not found' });
+        return;
+      }
 
       res.json({ message: 'Alarm deleted successfully' });
     } catch (error) {
-      console.error(
-        'Error deleting alarm:',
-        error instanceof Error ? error.message : error
-      );
-      res.status(500).json({ error: 'Failed to delete alarm' });
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
@@ -136,6 +151,9 @@ router.post(
   '/alarms/:id/snooze',
   async (req: Request, res: Response): Promise<void> => {
     try {
+      const userId = requireUserId(req, res);
+      if (!userId) return;
+
       const { id } = req.params;
 
       // Get current alarm data
@@ -143,9 +161,14 @@ router.post(
         .from('alarms')
         .select('snooze_count')
         .eq('id', id)
-        .single();
+        .eq('user_id', userId)
+        .maybeSingle();
 
       if (fetchError) throw fetchError;
+      if (!alarm) {
+        res.status(404).json({ error: 'Alarm not found' });
+        return;
+      }
 
       // Increment snooze count and update timestamp
       const { data, error } = await supabase
@@ -155,18 +178,19 @@ router.post(
           last_snoozed: new Date().toISOString(),
         })
         .eq('id', id)
+        .eq('user_id', userId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) {
+        res.status(404).json({ error: 'Alarm not found' });
+        return;
+      }
 
       res.json(data);
     } catch (error) {
-      console.error(
-        'Error recording snooze:',
-        error instanceof Error ? error.message : error
-      );
-      res.status(500).json({ error: 'Failed to record snooze' });
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   }
 );
