@@ -296,7 +296,6 @@ export default function CaregiverDashboardScreen({
                 style={styles.acceptInviteButton}
               />
             </SectionCard>
-
           </>
         ) : (
           <>

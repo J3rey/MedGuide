@@ -96,11 +96,7 @@ router.put('/medications/:id', async (req: Request, res: Response) => {
     if (!userId) return;
 
     const { id } = req.params;
-    const profileId = await getOwnedRecordProfileId(
-      'medications',
-      id,
-      userId
-    );
+    const profileId = await getOwnedRecordProfileId('medications', id, userId);
     if (!profileId) {
       return res.status(403).json({ error: 'Medication access denied' });
     }
@@ -132,11 +128,7 @@ router.delete('/medications/:id', async (req: Request, res: Response) => {
     if (!userId) return;
 
     const { id } = req.params;
-    const profileId = await getOwnedRecordProfileId(
-      'medications',
-      id,
-      userId
-    );
+    const profileId = await getOwnedRecordProfileId('medications', id, userId);
     if (!profileId) {
       return res.status(403).json({ error: 'Medication access denied' });
     }
