@@ -24,7 +24,6 @@ import { CaregiverPatient, caregiverApi } from '../services/api';
 
 interface CaregiverDashboardScreenProps {
   onBack?: () => void;
-  onNavigate?: (screen: string) => void;
 }
 
 interface CaregiverStatusCardProps {
@@ -143,7 +142,6 @@ function CaregiverStatusCard({
 
 export default function CaregiverDashboardScreen({
   onBack,
-  onNavigate,
 }: CaregiverDashboardScreenProps) {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
@@ -299,20 +297,6 @@ export default function CaregiverDashboardScreen({
               />
             </SectionCard>
 
-            <TouchableOpacity
-              style={styles.manageButton}
-              onPress={() => onNavigate?.('CaregiverPermissions')}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name="settings"
-                size={18}
-                color={theme.colors.primary}
-              />
-              <Text style={styles.manageButtonText}>
-                {t('caregiverDashboard.managePermissions')}
-              </Text>
-            </TouchableOpacity>
           </>
         ) : (
           <>
@@ -517,20 +501,5 @@ const styles = StyleSheet.create({
   },
   acceptInviteButton: {
     marginTop: theme.spacing.md,
-  },
-  manageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.primaryLight,
-    paddingVertical: theme.spacing.base,
-    borderRadius: theme.radius.lg,
-    marginTop: theme.spacing.md,
-    gap: theme.spacing.sm,
-  },
-  manageButtonText: {
-    color: theme.colors.primary,
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: theme.typography.fontWeight.semibold,
   },
 });

@@ -42,13 +42,23 @@ type SubScreen =
   | 'SecuritySettings'
   | 'CaregiverDashboard'
   | 'CaregiverInvite'
-  | 'CaregiverPermissions'
   | 'EmergencyProtocol'
   | 'EmergencyContacts'
   | 'PharmacyList'
   | 'ManageProfiles'
-  | 'CulturalNotes'
-  | 'TermsAndConditions';
+  | 'CulturalNotes';
+
+const profileSubScreens: Exclude<SubScreen, null>[] = [
+  'AccessibilitySettings',
+  'SecuritySettings',
+  'CaregiverDashboard',
+  'CaregiverInvite',
+  'EmergencyProtocol',
+  'EmergencyContacts',
+  'PharmacyList',
+  'ManageProfiles',
+  'CulturalNotes',
+];
 
 const CameraStack = createNativeStackNavigator<CameraStackParamList>();
 
@@ -165,6 +175,10 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
       setActiveTab('chat');
       return;
     }
+    if (!profileSubScreens.includes(screen as Exclude<SubScreen, null>)) {
+      console.warn(`Unknown profile sub-screen: ${screen}`);
+      return;
+    }
     // Profile sub-screens
     setSubScreen(screen as SubScreen);
     if (activeTab !== 'profile') {
@@ -185,12 +199,7 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
         case 'SecuritySettings':
           return <SecuritySettingsScreen onBack={handleSubScreenBack} />;
         case 'CaregiverDashboard':
-          return (
-            <CaregiverDashboardScreen
-              onBack={handleSubScreenBack}
-              onNavigate={handleNavigate}
-            />
-          );
+          return <CaregiverDashboardScreen onBack={handleSubScreenBack} />;
         case 'CaregiverInvite':
           return <CaregiverInviteScreen onBack={handleSubScreenBack} />;
         case 'EmergencyProtocol':
@@ -204,7 +213,6 @@ export default function MainAppContainer({ onBack }: MainAppContainerProps) {
         case 'CulturalNotes':
           return <CulturalNotesScreen onBack={handleSubScreenBack} />;
         default:
-          setSubScreen(null);
           return <ProfileScreen onNavigate={handleNavigate} onBack={onBack} />;
       }
     }

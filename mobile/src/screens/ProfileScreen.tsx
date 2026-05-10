@@ -223,13 +223,6 @@ export default function ProfileScreen({
         {/* About */}
         <Text style={styles.sectionLabel}>{t('profile.about')}</Text>
         <SectionCard>
-          <SettingsRow
-            icon="document-text"
-            iconColor="#6B7280"
-            title={t('profile.terms')}
-            onPress={() => onNavigate?.('TermsAndConditions')}
-          />
-          <View style={styles.divider} />
           <View style={styles.aboutRow}>
             <Text style={styles.aboutLabel}>{t('profile.version')}</Text>
             <Text style={styles.aboutValue}>3.0.0</Text>
